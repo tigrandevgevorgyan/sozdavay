@@ -1,37 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:level_up/config/dio_client.dart';
+import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
+import 'package:level_up/data/services/profile/models/user_profile_response.dart';
 import 'package:level_up/routing/levelup_router.dart';
-import 'package:level_up/ui/core/ui/options_dialog.dart';
+import 'package:level_up/ui/core/common_widgets/options_dialog.dart';
+import 'package:level_up/utils/error_utils.dart';
+import 'package:level_up/utils/result.dart';
 
 class ProfilePreferencesViewModel extends ChangeNotifier {
-  final genderWeightDialogContent = PreferencesOptionsDialogContent(
-    'пол и весовая категория',
-    ['Женский до 55 кг', 'Женский 55+ кг', 'Мужской до 85 кг', 'Мужской 85+ кг'],
-  );
+  final IProfileRepository profileRepository;
 
-  final levelDialogContent = PreferencesOptionsDialogContent(
-    'Ваш Уровень подготовки',
-    ['Начинающий', 'Опытный', 'Легендарный'],
-  );
+  // final genderWeightDialogContent = PreferencesOptionsDialogContent(
+  //   'пол и весовая категория',
+  //   ['Женский до 55 кг', 'Женский 55+ кг', 'Мужской до 85 кг', 'Мужской 85+ кг'],
+  // );
 
-  final goalDialogContent = PreferencesOptionsDialogContent(
-    'ЦЕль',
-    ['Хочу похудеть', 'Поддерживаю форму', 'Набрать вес'],
-  );
+  final levelDialogContent = PreferencesOptionsDialogContent('Ваш Уровень подготовки'
+      //  ['Начинающий', 'Опытный', 'Легендарный'],
+      );
 
-  final priorityDialogContent = PreferencesOptionsDialogContent(
-    'Приоритет в тренировках',
-    ['Низ тела', 'Баланс в тренировках', 'Верх тела'],
-  );
+  final goalDialogContent = PreferencesOptionsDialogContent('ЦЕль'
+      //['Хочу похудеть', 'Поддерживаю форму', 'Набрать вес'],
+      );
 
-  final trainingWeeklyDialogContent = PreferencesOptionsDialogContent(
-    'кол-во тренировок в неделю',
-    ['2 тренировки', '3 тренировки', '4 тренировки'],
-  );
+  final priorityDialogContent = PreferencesOptionsDialogContent('Приоритет в тренировках'
+      // ['Низ тела', 'Баланс в тренировках', 'Верх тела'],
+      );
 
-  ProfilePreferencesViewModel() {
+  final trainingWeeklyDialogContent = PreferencesOptionsDialogContent('кол-во тренировок в неделю'
+      // ['2 тренировки', '3 тренировки', '4 тренировки'],
+      );
+
+  ProfilePreferencesViewModel(BuildContext context, {required this.profileRepository}) {
     _nameController = TextEditingController();
+    _loadProfileAndOptions(context);
   }
+
+  bool _isLoading = true;
+
+  bool get isLoading => _isLoading;
+
+  bool _isUpdating = false;
+
+  bool get isUpdating => _isUpdating;
 
   late TextEditingController _nameController;
 
@@ -41,64 +53,113 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   String? get genderWeightSelection => _genderWeightSelection;
 
-  String? _levelSelection;
+  int? _levelSelection;
 
-  String? get levelSelection => _levelSelection;
+  String? get levelSelection => levelDialogContent.getOptionById(_levelSelection);
 
-  String? _goalSelection;
+  int? _goalSelection;
 
-  String? get goalSelection => _goalSelection;
+  String? get goalSelection => goalDialogContent.getOptionById(_goalSelection);
 
-  String? _prioritySelection;
+  int? _prioritySelection;
 
-  String? get prioritySelection => _prioritySelection;
+  String? get prioritySelection => priorityDialogContent.getOptionById(_prioritySelection);
 
-  String? _trainingWeeklySelection;
+  int? _trainingWeeklySelection;
 
-  String? get trainingWeeklySelection => _trainingWeeklySelection;
+  String? get trainingWeeklySelection => trainingWeeklyDialogContent.getOptionById(_trainingWeeklySelection);
 
-  void onGenderWeightClicked(BuildContext context) async {
-    final result = await OptionsDialog.showDialog(context, _genderWeightSelection, genderWeightDialogContent.title, genderWeightDialogContent.options);
-    if (result != null) {
-      _genderWeightSelection = result;
-      notifyListeners();
-    }
-  }
+  String? _error;
+
+  String? get error => _error;
+
+  bool get isPriorityAvailable => priorityDialogContent.hasPriorityById(_prioritySelection);
+
+  //TODO: update once api is ready
+  // void onGenderWeightClicked(BuildContext context) async {
+  //   final result = await OptionsDialog.showDialog(context, _genderWeightSelection, genderWeightDialogContent.title, genderWeightDialogContent.options);
+  //   if (result != null) {
+  //     _genderWeightSelection = result;
+  //     notifyListeners();
+  //   }
+  // }
 
   void onLevelClicked(BuildContext context) async {
-    final result = await OptionsDialog.showDialog(context, _levelSelection, levelDialogContent.title, levelDialogContent.options);
+    final result = await OptionsDialog.showDialog(context, levelSelection, levelDialogContent.title, levelDialogContent.optionsValues);
     if (result != null) {
-      _levelSelection = result;
+      _levelSelection = levelDialogContent.getIdByValue(result);
       notifyListeners();
     }
   }
 
   void onGoalClicked(BuildContext context) async {
-    final result = await OptionsDialog.showDialog(context, _goalSelection, goalDialogContent.title, goalDialogContent.options);
+    final result = await OptionsDialog.showDialog(context, goalSelection, goalDialogContent.title, goalDialogContent.optionsValues);
     if (result != null) {
-      _goalSelection = result;
+      _goalSelection = goalDialogContent.getIdByValue(result);
       notifyListeners();
     }
   }
 
   void onPriorityClicked(BuildContext context) async {
-    final result = await OptionsDialog.showDialog(context, _prioritySelection, priorityDialogContent.title, priorityDialogContent.options);
+    final result = await OptionsDialog.showDialog(context, prioritySelection, priorityDialogContent.title, priorityDialogContent.optionsValues);
     if (result != null) {
-      _prioritySelection = result;
+      _prioritySelection = priorityDialogContent.getIdByValue(result);
       notifyListeners();
     }
   }
 
   void onTrainingWeeklyClicked(BuildContext context) async {
-    final result = await OptionsDialog.showDialog(context, _trainingWeeklySelection, trainingWeeklyDialogContent.title, trainingWeeklyDialogContent.options);
+    final result = await OptionsDialog.showDialog(context, trainingWeeklySelection, trainingWeeklyDialogContent.title, trainingWeeklyDialogContent.optionsValues);
     if (result != null) {
-      _trainingWeeklySelection = result;
+      _trainingWeeklySelection = trainingWeeklyDialogContent.getIdByValue(result);
       notifyListeners();
     }
   }
 
-  void onSaveClicked(BuildContext context) {
-    GoRouter.of(context).go(LevelUpRouter.homePath);
+  void onSaveClicked(BuildContext context) async {
+    _error = null;
+    notifyListeners();
+    if (_trainingWeeklySelection == null || _levelSelection == null || _goalSelection == null || (isPriorityAvailable && _prioritySelection == null)) {
+      _error = 'Не заполнены все поля';
+      notifyListeners();
+      return;
+    }
+    _isUpdating = true;
+    notifyListeners();
+    final result = await profileRepository.updateProfile('male', _trainingWeeklySelection!, _levelSelection!, _goalSelection!, _prioritySelection);
+    switch (result) {
+      case Ok<UserProfileShortResponse>():
+        if (context.mounted) {
+          GoRouter.of(context).go(LevelUpRouter.homePath);
+        }
+      case Error<UserProfileShortResponse>():
+        if (context.mounted) {
+          ErrorUtils.showError(context, result.error.getErrorMessage());
+        }
+    }
+    _isUpdating = false;
+    notifyListeners();
+  }
+
+  void _loadProfileAndOptions(BuildContext context) async {
+    final profile = await profileRepository.getProfile();
+    switch (profile) {
+      case Ok<UserProfileExtendedResponse>():
+        levelDialogContent.setOptions(profile.value.experiences);
+        goalDialogContent.setOptions(profile.value.goals);
+        priorityDialogContent.setOptions(profile.value.priorities);
+        trainingWeeklyDialogContent.setOptions(profile.value.days);
+        _levelSelection = profile.value.data.experience?.id;
+        _goalSelection = profile.value.data.goal?.id;
+        _prioritySelection = profile.value.data.priority?.id;
+        _trainingWeeklySelection = profile.value.data.days;
+      case Error<UserProfileExtendedResponse>():
+        if (context.mounted) {
+          ErrorUtils.showError(context, profile.error.getErrorMessage());
+        }
+    }
+    _isLoading = false;
+    notifyListeners();
   }
 
   @override
@@ -110,11 +171,28 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
 class PreferencesOptionsDialogContent {
   final String title;
-  final List<String> options;
+  List<IdNamePairWithPriority> _options = [];
 
-  PreferencesOptionsDialogContent(this.title, this.options);
+  PreferencesOptionsDialogContent(this.title);
 
-  int getIndexOfItem(String item) {
-    return options.indexOf(item);
+  List<String> get optionsValues => _options.map((option) => option.name).toList();
+
+  bool hasPriorityById(int? id) {
+    return _options.firstWhere((option) => option.id == id, orElse: () => IdNamePairWithPriority(false, -1, "")).isPriorityAvailable ?? false;
+  }
+
+  void setOptions(List<IdNamePairWithPriority> options) {
+    _options = options;
+  }
+
+  String? getOptionById(int? id) {
+    if (id == null) {
+      return null;
+    }
+    return _options.firstWhere((option) => option.id == id, orElse: () => IdNamePairWithPriority(false, -1, "")).name;
+  }
+
+  int? getIdByValue(String value) {
+    return _options.firstWhere((option) => option.name == value, orElse: () => IdNamePairWithPriority(false, -1, "")).id;
   }
 }

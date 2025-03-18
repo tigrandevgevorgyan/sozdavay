@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:level_up/ui/core/common_widgets/level_up_button.dart';
+import 'package:level_up/ui/core/common_widgets/level_up_radio_button.dart';
+import 'package:level_up/ui/core/common_widgets/measurable_widget.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
-import 'package:level_up/ui/core/ui/level_up_button.dart';
-import 'package:level_up/ui/core/ui/level_up_radio_button.dart';
-import 'package:level_up/ui/core/ui/measurable_widget.dart';
 
 const maxAllowedHeightRatio = 0.95;
 const minAllowedHeightRatio = 0.13;

@@ -13,6 +13,11 @@ class RatingScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Рейтинг', style: Style.ablation18w900),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(12),
+          ),
+        ),
       ),
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(

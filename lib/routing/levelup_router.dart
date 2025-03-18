@@ -5,6 +5,7 @@ import 'package:level_up/ui/profile_preferences/widgets/profile_preferences_scre
 import 'package:level_up/ui/rating/widgets/rating_screen.dart';
 import 'package:level_up/ui/signin/widgets/signin_screen.dart';
 import 'package:level_up/ui/splash/widgets/splash_screen.dart';
+import 'package:level_up/ui/text_editing_screen/text_editing_screen.dart';
 
 class LevelUpRouter {
   static final LevelUpRouter _instance = LevelUpRouter._internal();
@@ -18,6 +19,7 @@ class LevelUpRouter {
   static const String profilePreferencesPath = '/profile_preferences';
   static const String homePath = '/home';
   static const String ratingPath = '/rating';
+  static const String textEditingPath = '/text_editing';
 
   late GlobalKey<NavigatorState> navigatorKey;
 
@@ -85,6 +87,15 @@ class LevelUpRouter {
               },
             ),
           ]),
+      GoRoute(
+        path: textEditingPath,
+        pageBuilder: (context, state) {
+          return getPage(
+            child: TextEditingScreen(params: state.extra as TextEditingScreenParams),
+            state: state,
+          );
+        },
+      ),
     ];
 
     router = GoRouter(

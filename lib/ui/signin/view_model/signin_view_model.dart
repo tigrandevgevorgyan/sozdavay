@@ -1,8 +1,14 @@
 import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
+import 'package:level_up/config/dio_client.dart';
 import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
+import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
+import 'package:level_up/data/services/auth/models/access_token_response.dart';
+import 'package:level_up/routing/levelup_router.dart';
+import 'package:level_up/utils/result.dart';
 
 class SignInViewModel extends ChangeNotifier {
-  SignInViewModel({required this.authRepository}) {
+  SignInViewModel({required this.authRepository, required this.profileRepository}) {
     _phoneController = TextEditingController();
     _codeController = TextEditingController();
     _phoneController.addListener(_checkIsFormValid);
@@ -10,6 +16,7 @@ class SignInViewModel extends ChangeNotifier {
   }
 
   final IAuthRepository authRepository;
+  final IProfileRepository profileRepository;
 
   late TextEditingController _phoneController;
   late TextEditingController _codeController;
@@ -22,13 +29,65 @@ class SignInViewModel extends ChangeNotifier {
 
   bool get isScreenReady => _isFormValid;
 
+  bool _isCodeRequested = false;
+
+  bool get isCodeRequested => _isCodeRequested;
+
+  String? _error;
+
+  String? get error => _error;
+
+  bool _isActionInProgress = false;
+
+  bool get isActionInProgress => _isActionInProgress;
+
+  String get _phoneNumber => '+7${phoneController.text.replaceAll(' ', '')}';
+
   void onSignInClick(BuildContext context) {
-    authRepository.requestCode("+79999999999");
-    // GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath);
+    _error = null;
+    if (!_isCodeRequested) {
+      _requestCode();
+    } else {
+      _signIn(context);
+    }
+  }
+
+  void _requestCode() async {
+    _isActionInProgress = true;
+    notifyListeners();
+    final result = await authRepository.requestCode(_phoneNumber);
+    switch (result) {
+      case Ok<void>():
+        _isCodeRequested = true;
+      case Error<void>():
+        _error = result.error.getErrorMessage();
+    }
+    _isActionInProgress = false;
+    _checkIsFormValid();
+    notifyListeners();
+  }
+
+  void _signIn(BuildContext context) async {
+    String code = _codeController.text;
+    _isActionInProgress = true;
+    notifyListeners();
+    final result = await authRepository.signIn(_phoneNumber, code);
+    switch (result) {
+      case Ok<AccessTokenResponse>():
+        _isCodeRequested = true;
+        final testProfile = await profileRepository.getProfile(); //remove!!!!!!!!!!!!!!!!!!!!!!!!
+        if (context.mounted) {
+          GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath);
+        }
+      case Error<AccessTokenResponse>():
+        _error = result.error.getErrorMessage();
+    }
+    _isActionInProgress = false;
+    notifyListeners();
   }
 
   void _checkIsFormValid() {
-    final isFormValid = phoneController.text.length == 13 && codeController.text.length == 4;
+    final isFormValid = phoneController.text.length == 13 && (codeController.text.length == 4 || !isCodeRequested);
     if (isFormValid != _isFormValid) {
       _isFormValid = isFormValid;
       notifyListeners();
