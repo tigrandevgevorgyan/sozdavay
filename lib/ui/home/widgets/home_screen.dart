@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:level_up/config/assets.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
+import 'package:level_up/data/services/local_storage.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
@@ -17,11 +18,13 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<HomeViewModel>(
-      create: (context) => HomeViewModel(context, profileRepository: GetIt.I<IProfileRepository>()),
+      create: (context) => HomeViewModel(context, profileRepository: GetIt.I<IProfileRepository>(), localStorage: GetIt.I<ILocalStorage>()),
       child: Consumer<HomeViewModel>(builder: (context, provider, _) {
         return Scaffold(
           appBar: AppBar(
-            title: AppBarTitle(),
+            title: AppBarTitle(
+              onLogoutClicked: () => provider.logout(context),
+            ),
             centerTitle: true,
           ),
           backgroundColor: AppColors.backgroundColor,
@@ -42,7 +45,7 @@ class HomeScreen extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 14, bottom: 8),
                           child: Text('Ноги и пресс', style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor)),
                         ),
-                        BannerButton(imagePath: Assets.startTrainingBanner, text: 'НАЧАТЬ ТРЕНИРОВКУ', onClick: () {}),
+                        BannerButton(imagePath: Assets.startTrainingBanner, text: 'НАЧАТЬ ТРЕНИРОВКУ', onClick: () => provider.onStartWorkoutClicked(context)),
                         Padding(
                           padding: const EdgeInsets.only(top: 14, bottom: 8),
                           child: Text('Статистика и рейтинг', style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor)),
@@ -79,7 +82,9 @@ class HomeScreen extends StatelessWidget {
 }
 
 class AppBarTitle extends StatelessWidget {
-  const AppBarTitle({super.key});
+  const AppBarTitle({super.key, required this.onLogoutClicked});
+
+  final Function() onLogoutClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -88,9 +93,13 @@ class AppBarTitle extends StatelessWidget {
       children: [
         Image.asset(Assets.settingsIcon, height: 24),
         Image.asset(Assets.logo, height: 40),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Image.asset(Assets.logoutIcon, height: 24),
+        GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: onLogoutClicked,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Image.asset(Assets.logoutIcon, height: 24),
+          ),
         ),
       ],
     );

@@ -12,4 +12,5 @@ class AppColors {
   static const Color primaryTextColor = Color(0xFFECECEC);
   static const Color secondaryTextColor = Color(0xFF989898);
   static const Color secondaryDefaultColor = Color(0xFF252527);
+  static const Color timerDoneOrangeColor = Color(0xFFFE453D);
 }

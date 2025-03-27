@@ -19,7 +19,7 @@ class SignInScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return ChangeNotifierProvider<SignInViewModel>(
       create: (BuildContext context) => SignInViewModel(
         authRepository: GetIt.I<IAuthRepository>(),
         profileRepository: GetIt.I<IProfileRepository>(),
@@ -41,7 +41,7 @@ class SignInScreen extends StatelessWidget {
                       hintText: 'Введите номер телефона',
                       focusedHintText: '000 000 00 00',
                       keyboardType: TextInputType.number,
-                      maxLength: 13,
+                      maxLength: 15,
                       prefix: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 3),
                         child: Text("+7", style: Style.ablation15w900),

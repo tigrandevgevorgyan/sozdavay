@@ -6,6 +6,8 @@ import 'package:level_up/ui/rating/widgets/rating_screen.dart';
 import 'package:level_up/ui/signin/widgets/signin_screen.dart';
 import 'package:level_up/ui/splash/widgets/splash_screen.dart';
 import 'package:level_up/ui/text_editing_screen/text_editing_screen.dart';
+import 'package:level_up/ui/workout/screens/video_player_screen.dart';
+import 'package:level_up/ui/workout/screens/workout_base_screen.dart';
 
 class LevelUpRouter {
   static final LevelUpRouter _instance = LevelUpRouter._internal();
@@ -18,8 +20,10 @@ class LevelUpRouter {
   static const String signInPath = '/signin';
   static const String profilePreferencesPath = '/profile_preferences';
   static const String homePath = '/home';
+  static const String workoutPath = '/workout';
   static const String ratingPath = '/rating';
   static const String textEditingPath = '/text_editing';
+  static const String videoPlayerPath = '/video_player';
 
   late GlobalKey<NavigatorState> navigatorKey;
 
@@ -86,12 +90,30 @@ class LevelUpRouter {
                 );
               },
             ),
+            GoRoute(
+              path: workoutPath,
+              pageBuilder: (context, state) {
+                return getPage(
+                  child: const WorkoutBaseScreen(),
+                  state: state,
+                );
+              },
+            ),
           ]),
       GoRoute(
         path: textEditingPath,
         pageBuilder: (context, state) {
           return getPage(
             child: TextEditingScreen(params: state.extra as TextEditingScreenParams),
+            state: state,
+          );
+        },
+      ),
+      GoRoute(
+        path: videoPlayerPath,
+        pageBuilder: (context, state) {
+          return getPage(
+            child: VideoPlayerScreen(params: state.extra as VideoPlayerScreenParams),
             state: state,
           );
         },

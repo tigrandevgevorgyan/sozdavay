@@ -43,9 +43,30 @@ class Style {
     color: Colors.white,
   );
 
+  static const TextStyle ablation12w900 = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w900,
+    fontFamily: "Ablation",
+    color: Colors.white,
+  );
+
   static const TextStyle ablation22w700 = TextStyle(
     fontSize: 22,
     fontWeight: FontWeight.w700,
+    fontFamily: "Ablation",
+    color: Colors.white,
+  );
+
+  static const TextStyle ablation15w800 = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w800,
+    fontFamily: "Ablation",
+    color: Colors.white,
+  );
+
+  static const TextStyle ablation14w800 = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w800,
     fontFamily: "Ablation",
     color: Colors.white,
   );
@@ -74,6 +95,13 @@ class Style {
   static const TextStyle raleway14w400 = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w400,
+    fontFamily: "Raleway",
+    color: Colors.white,
+  );
+
+  static const TextStyle raleway14w300 = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w300,
     fontFamily: "Raleway",
     color: Colors.white,
   );

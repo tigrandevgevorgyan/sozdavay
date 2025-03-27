@@ -41,9 +41,10 @@ class SignInViewModel extends ChangeNotifier {
 
   bool get isActionInProgress => _isActionInProgress;
 
-  String get _phoneNumber => '+7${phoneController.text.replaceAll(' ', '')}';
+  String get _phoneNumber => '+7${phoneController.text.replaceAll(' ', '').replaceAll('(', '').replaceAll(')', '')}';
 
   void onSignInClick(BuildContext context) {
+    FocusScope.of(context).unfocus();
     _error = null;
     if (!_isCodeRequested) {
       _requestCode();
@@ -75,7 +76,7 @@ class SignInViewModel extends ChangeNotifier {
     switch (result) {
       case Ok<AccessTokenResponse>():
         _isCodeRequested = true;
-        final testProfile = await profileRepository.getProfile(); //remove!!!!!!!!!!!!!!!!!!!!!!!!
+        final testProfile = await profileRepository.getProfile(); //TODO: remove!!!!!!!!!!!!!!!!!!!!!!!!
         if (context.mounted) {
           GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath);
         }
@@ -87,7 +88,7 @@ class SignInViewModel extends ChangeNotifier {
   }
 
   void _checkIsFormValid() {
-    final isFormValid = phoneController.text.length == 13 && (codeController.text.length == 4 || !isCodeRequested);
+    final isFormValid = _phoneNumber.length == 12 && (codeController.text.length == 4 || !isCodeRequested);
     if (isFormValid != _isFormValid) {
       _isFormValid = isFormValid;
       notifyListeners();

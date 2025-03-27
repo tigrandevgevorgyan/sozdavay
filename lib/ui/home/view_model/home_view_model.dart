@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/config/dio_client.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
+import 'package:level_up/data/services/local_storage.dart';
 import 'package:level_up/data/services/profile/models/user_profile_response.dart';
 import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/ui/home/widgets/calendar_widget.dart';
@@ -10,10 +11,15 @@ import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  HomeViewModel(BuildContext context, {required this.profileRepository}) {
+  HomeViewModel(
+    BuildContext context, {
+    required this.profileRepository,
+    required this.localStorage,
+  }) {
     _init(context);
   }
 
+  final ILocalStorage localStorage;
   final IProfileRepository profileRepository;
 
   bool _isLoading = true;
@@ -38,6 +44,10 @@ class HomeViewModel extends ChangeNotifier {
     }
     _isLoading = false;
     notifyListeners();
+  }
+
+  void onStartWorkoutClicked(BuildContext context) {
+    GoRouter.of(context).go(LevelUpRouter.homePath + LevelUpRouter.workoutPath);
   }
 
   void onRatingClicked(BuildContext context) {
@@ -71,6 +81,20 @@ class HomeViewModel extends ChangeNotifier {
       result.add(CalendarDayInfo(_getDayName(dayOfWeek.weekday), dayOfWeek.day, i % 2 == 0, dayOfWeek.day == today.day));
     }
     return result;
+  }
+
+  void logout(BuildContext context) async {
+    final result = await localStorage.clearAccessToken();
+    switch (result) {
+      case Ok<void>():
+        if (context.mounted) {
+          GoRouter.of(context).go(LevelUpRouter.signInPath);
+        }
+      case Error<void>():
+        if (context.mounted) {
+          ErrorUtils.showError(context, 'Не удаётся выйти из профиля');
+        }
+    }
   }
 
   String _getDayName(int dayOfWeek) {
