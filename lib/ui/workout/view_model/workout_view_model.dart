@@ -73,8 +73,6 @@ class WorkoutViewModel extends ChangeNotifier {
     index++;
     if (index >= _workout!.length) {
       index = _workout!.length - 1;
-    }
-    if (index > 2) {
       _showFinalDialog(context);
     }
     notifyListeners();
@@ -88,9 +86,27 @@ class WorkoutViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _showFinalDialog(BuildContext context) {
+  void _finishWorkout(BuildContext context) async {
+    _isLoading = true;
+    notifyListeners();
+    final result = await workoutRepository.finishWorkout();
+    _isLoading = false;
+    notifyListeners();
+    switch (result) {
+      case Ok<void>():
+        if (context.mounted) {
+          GoRouter.of(context).pop(true);
+        }
+      case Error<void>():
+        if (context.mounted) {
+          ErrorUtils.showError(context, result.error.getErrorMessage());
+        }
+    }
+  }
+
+  void _showFinalDialog(BuildContext screenContext) {
     showDialog(
-      context: context,
+      context: screenContext,
       // barrierColor: Colors.black.withOpacity(0.5), // Semi-transparent barrier
       builder: (BuildContext context) {
         return BackdropFilter(
@@ -112,7 +128,13 @@ class WorkoutViewModel extends ChangeNotifier {
                     SizedBox(height: 30),
                     Text('Последнее упражнение', style: Style.ablation18w900.copyWith(color: Colors.white)),
                     SizedBox(height: 24),
-                    LevelUpButton(text: 'Закончить тренировку', buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.medium), onClick: () {}),
+                    LevelUpButton(
+                        text: 'Закончить тренировку',
+                        buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.medium),
+                        onClick: () {
+                          GoRouter.of(context).pop();
+                          _finishWorkout(screenContext);
+                        }),
                     SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),

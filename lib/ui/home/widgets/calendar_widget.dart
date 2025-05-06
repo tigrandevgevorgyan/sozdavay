@@ -24,10 +24,7 @@ class CalendarWidget extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        day.dayName,
-                        style: Style.ablation13w700.copyWith(color: _getTextColor(day)),
-                      ),
+                      Text(day.dayName, style: Style.ablation13w700.copyWith(color: _getTextColor(day))),
                       SizedBox(height: 1),
                       Text(day.dayNumber.toString(), style: Style.ablation15w900.copyWith(color: _getTextColor(day))),
                     ],

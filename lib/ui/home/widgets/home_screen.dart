@@ -30,6 +30,7 @@ class HomeScreen extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: AppBarTitle(
+                onProfileClicked: () => provider.onProfileClicked(context),
                 onLogoutClicked: () => provider.logout(context),
               ),
               centerTitle: true,
@@ -39,66 +40,65 @@ class HomeScreen extends StatelessWidget {
                 ? Center(child: LevelUpLoader())
                 : Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: CustomScrollView(
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 20),
-                              CalendarWidget(height: 55, days: provider.getWeekDays()),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 14, bottom: 8),
-                                child: Text(provider.trainingName, style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor)),
-                              ),
-                              BannerButton(imagePath: Assets.startTrainingBanner, text: 'НАЧАТЬ ТРЕНИРОВКУ', onClick: () => provider.onStartWorkoutClicked(context)),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 14, bottom: 8),
-                                child: Text('Статистика и рейтинг', style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor)),
-                              ),
-                              StatisticsTileWidget(
-                                height: 158,
-                                monthlyValue: provider.perMonth,
-                                yearlyValue: provider.perYear,
-                                ratingPercent: 20,
-                                rating: provider.rating,
-                                level: provider.level,
-                                onMonthlyClicked: () {
-                                  provider.onRatingClicked(context);
-                                },
-                                onYearlyClicked: () {
-                                  provider.onRatingClicked(context);
-                                },
-                                onRatingClicked: () {
-                                  provider.onRatingClicked(context);
-                                },
-                              ),
-                              SizedBox(height: 4),
-                            ],
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 20),
+                        CalendarWidget(height: 55, days: provider.getWeekDays()),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 14, bottom: 8),
+                          child: Text(provider.trainingName, style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor)),
+                        ),
+                        Expanded(
+                          flex: 100,
+                          child: BannerButton(
+                            imagePath: Assets.startTrainingBanner,
+                            text: 'НАЧАТЬ ТРЕНИРОВКУ',
+                            onClick: () => provider.onStartWorkoutClicked(context),
                           ),
                         ),
-                        SliverFillRemaining(
-                          hasScrollBody: false,
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: BannerButton(
-                                  imagePath: Assets.measurementsBanner,
-                                  text: 'Замеры',
-                                  onClick: () => provider.onMeasurementsClicked(context),
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Expanded(
-                                child: BannerButton(
-                                  imagePath: Assets.chatBanner,
-                                  text: 'Чат с тренером',
-                                  onClick: provider.onChatClicked,
-                                ),
-                              ),
-                            ],
+                        Padding(
+                          padding: const EdgeInsets.only(top: 14, bottom: 8),
+                          child: Text('Статистика и рейтинг', style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor)),
+                        ),
+                        Expanded(
+                          flex: 131,
+                          child: StatisticsTileWidget(
+                            monthlyValue: provider.perMonth,
+                            yearlyValue: provider.perYear,
+                            ratingPercent: 20,
+                            rating: provider.rating,
+                            level: provider.level,
+                            onMonthlyClicked: () {
+                              provider.onRatingClicked(context);
+                            },
+                            onYearlyClicked: () {
+                              provider.onRatingClicked(context);
+                            },
+                            onRatingClicked: () {
+                              provider.onRatingClicked(context);
+                            },
                           ),
-                        )
+                        ),
+                        SizedBox(height: 4),
+                        Expanded(
+                          flex: 100,
+                          child: BannerButton(
+                            imagePath: Assets.measurementsBanner,
+                            text: 'Замеры',
+                            onClick: () => provider.onMeasurementsClicked(context),
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Expanded(
+                          flex: 100,
+                          child: BannerButton(
+                            imagePath: Assets.chatBanner,
+                            text: 'Чат с тренером',
+                            onClick: provider.onChatClicked,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -110,8 +110,9 @@ class HomeScreen extends StatelessWidget {
 }
 
 class AppBarTitle extends StatelessWidget {
-  const AppBarTitle({super.key, required this.onLogoutClicked});
+  const AppBarTitle({super.key, required this.onLogoutClicked, required this.onProfileClicked});
 
+  final Function() onProfileClicked;
   final Function() onLogoutClicked;
 
   @override
@@ -119,7 +120,11 @@ class AppBarTitle extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Image.asset(Assets.settingsIcon, height: 24),
+        GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: onProfileClicked,
+          child: Image.asset(Assets.settingsIcon, height: 24),
+        ),
         Image.asset(Assets.logo, height: 40),
         GestureDetector(
           behavior: HitTestBehavior.translucent,

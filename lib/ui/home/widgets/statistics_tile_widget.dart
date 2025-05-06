@@ -7,7 +7,6 @@ import 'package:level_up/ui/core/themes/text_styles.dart';
 class StatisticsTileWidget extends StatelessWidget {
   const StatisticsTileWidget(
       {super.key,
-      required this.height,
       required this.monthlyValue,
       required this.yearlyValue,
       required this.ratingPercent,
@@ -17,7 +16,6 @@ class StatisticsTileWidget extends StatelessWidget {
       required this.onRatingClicked,
       required this.rating});
 
-  final double height;
   final int monthlyValue;
   final int yearlyValue;
   final double ratingPercent;
@@ -29,46 +27,44 @@ class StatisticsTileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        height: height,
-        child: Row(
-          children: [
-            Expanded(
-              flex: 1,
-              child: Column(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: GestureDetector(
-                      onTap: onMonthlyClicked,
-                      child: SmallStatisticsTile(number: monthlyValue, label: 'за месяц', onClick: () {}),
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Expanded(
-                    flex: 1,
-                    child: GestureDetector(
-                      onTap: onYearlyClicked,
-                      child: SmallStatisticsTile(number: yearlyValue, label: 'за год', onClick: () {}),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 4),
-            Expanded(
-              flex: 1,
-              child: GestureDetector(
-                onTap: onRatingClicked,
-                child: RatingTile(
-                  level: level,
-                  rating: rating,
-                  ratingPercent: ratingPercent,
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: Column(
+            children: [
+              Expanded(
+                flex: 1,
+                child: GestureDetector(
+                  onTap: onMonthlyClicked,
+                  child: SmallStatisticsTile(number: monthlyValue, label: 'за месяц', onClick: () {}),
                 ),
               ),
+              SizedBox(height: 4),
+              Expanded(
+                flex: 1,
+                child: GestureDetector(
+                  onTap: onYearlyClicked,
+                  child: SmallStatisticsTile(number: yearlyValue, label: 'за год', onClick: () {}),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: 4),
+        Expanded(
+          flex: 1,
+          child: GestureDetector(
+            onTap: onRatingClicked,
+            child: RatingTile(
+              level: level,
+              rating: rating,
+              ratingPercent: ratingPercent,
             ),
-          ],
-        ));
+          ),
+        ),
+      ],
+    );
   }
 }
 

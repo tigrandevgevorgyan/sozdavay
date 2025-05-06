@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:level_up/config/dio_client.dart';
 import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
@@ -76,8 +77,14 @@ class HomeViewModel extends ChangeNotifier {
     return result;
   }
 
-  void onStartWorkoutClicked(BuildContext context) {
-    GoRouter.of(context).go(LevelUpRouter.homePath + LevelUpRouter.workoutPath);
+  void onStartWorkoutClicked(BuildContext context) async {
+    final result = await GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.workoutPath) as bool?;
+    if ((result ?? false) && context.mounted) {
+      final now = DateTime.now();
+      String dayName = '${weekDays[now.weekday]} ${DateFormat('dd.MM.yy').format(now)}';
+      final params = TextEditingScreenParams(title: dayName, initialText: _profile?.data.measurements ?? "", onTextUpdated: _updateMeasurements);
+      GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params);
+    }
   }
 
   void onRatingClicked(BuildContext context) {
@@ -91,6 +98,10 @@ class HomeViewModel extends ChangeNotifier {
 
   void onChatClicked() {
     launchUrl(Uri.parse('http://t.me/Dryk220lbs'));
+  }
+
+  void onProfileClicked(BuildContext context) {
+    GoRouter.of(context).go(LevelUpRouter.homePath + LevelUpRouter.profilePreferencesPath);
   }
 
   void logout(BuildContext context) async {
@@ -146,4 +157,6 @@ class HomeViewModel extends ChangeNotifier {
         }
     }
   }
+
+  final weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
 }

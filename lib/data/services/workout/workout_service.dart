@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:level_up/data/services/workout/models/workout_finish_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -10,6 +11,9 @@ abstract class WorkoutService {
 
   @GET('/workout/start')
   Future<WorkoutResponse> startWorkout();
+
+  @POST('/workout/finish')
+  Future<WorkoutFinishResponse> finishWorkout();
 
   @POST('/workout/change')
   Future<WorkoutResponse> changeExercise(@Field() int id, @Field() bool isSecond);

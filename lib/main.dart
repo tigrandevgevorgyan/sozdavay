@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:level_up/config/dependencies.dart';
 import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/ui/core/themes/themes.dart';
@@ -6,6 +7,10 @@ import 'package:level_up/ui/core/themes/themes.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Dependencies.registerDependencies();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(const MyApp());
 }
 

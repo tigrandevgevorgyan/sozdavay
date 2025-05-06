@@ -82,6 +82,15 @@ class LevelUpRouter {
           },
           routes: [
             GoRoute(
+              path: profilePreferencesPath,
+              pageBuilder: (context, state) {
+                return getPage(
+                  child: const ProfilePreferencesScreen(),
+                  state: state,
+                );
+              },
+            ),
+            GoRoute(
               path: ratingPath,
               pageBuilder: (context, state) {
                 return getPage(

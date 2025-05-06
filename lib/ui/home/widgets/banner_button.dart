@@ -20,7 +20,7 @@ class BannerButton extends StatelessWidget {
           child: Stack(
             fit: StackFit.passthrough,
             children: [
-              Image.asset(imagePath, fit: BoxFit.fitHeight),
+              Image.asset(imagePath, fit: BoxFit.cover),
               Positioned(
                 bottom: 12,
                 left: 16,

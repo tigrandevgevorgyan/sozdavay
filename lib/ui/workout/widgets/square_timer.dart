@@ -29,7 +29,10 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       vsync: this,
       duration: Duration(seconds: widget.secondsDuration),
     )..addListener(() {
-        setState(() {});
+        print('timer test!');
+        if (context.mounted) {
+          setState(() {});
+        }
       });
     _controller!.addStatusListener(
       (status) {

@@ -45,6 +45,33 @@ class _WorkoutService implements WorkoutService {
   }
 
   @override
+  Future<WorkoutFinishResponse> finishWorkout() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<WorkoutFinishResponse>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/workout/finish',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late WorkoutFinishResponse _value;
+    try {
+      _value = WorkoutFinishResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<WorkoutResponse> changeExercise(int id, bool isSecond) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
