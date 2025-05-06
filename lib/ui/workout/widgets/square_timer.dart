@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:level_up/config/assets.dart';
@@ -17,6 +18,7 @@ class SquareTimer extends StatefulWidget {
 }
 
 class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin {
+  final AudioPlayer audioPlayer = AudioPlayer();
   AnimationController? _controller;
   bool _isRunning = false;
 
@@ -27,7 +29,6 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       vsync: this,
       duration: Duration(seconds: widget.secondsDuration),
     )..addListener(() {
-        print("value= " + (_controller?.value ?? 0).toString());
         setState(() {});
       });
     _controller!.addStatusListener(
@@ -35,6 +36,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
         if (status.isCompleted) {
           setState(() {
             _isRunning = false;
+            audioPlayer.play(AssetSource('sounds/gong.mp3'));
           });
         }
       },
@@ -49,8 +51,11 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
         fit: StackFit.expand,
         alignment: Alignment.center,
         children: [
-          CustomPaint(
-            painter: TimerPainter(_controller?.value ?? 0, _controller?.isCompleted ?? false),
+          Padding(
+            padding: const EdgeInsets.only(left: 3, right: 2, top: 2, bottom: 2),
+            child: CustomPaint(
+              painter: TimerPainter(_controller?.value ?? 0, _controller?.isCompleted ?? false),
+            ),
           ),
           Positioned.fill(
             child: Center(
@@ -87,6 +92,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   @override
   void dispose() {
     super.dispose();
+    audioPlayer.dispose();
     _controller?.reset();
     _controller?.dispose();
   }
@@ -112,7 +118,7 @@ class TimerPainter extends CustomPainter {
     }
     canvas.drawLine(Offset(0, size.height), Offset(0, max(0, size.height - size.height * value * 4)), defaultPaint);
     if (value > 0.25) {
-      canvas.drawLine(Offset(0, 0), Offset(min(size.width, size.width * (value - 0.25) * 4), 0), defaultPaint);
+      canvas.drawLine(Offset(0, 0), Offset(min(size.width - 2, size.width * (value - 0.25) * 4), 0), defaultPaint);
     }
     if (value >= 0.5) {
       canvas.drawLine(Offset(size.width - 2, 0), Offset(size.width - 2, min(size.height, size.height * (value - 0.5) * 4)), defaultPaint);

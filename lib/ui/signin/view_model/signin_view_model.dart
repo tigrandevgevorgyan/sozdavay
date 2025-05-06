@@ -29,10 +29,6 @@ class SignInViewModel extends ChangeNotifier {
 
   bool get isScreenReady => _isFormValid;
 
-  bool _isCodeRequested = false;
-
-  bool get isCodeRequested => _isCodeRequested;
-
   String? _error;
 
   String? get error => _error;
@@ -46,20 +42,17 @@ class SignInViewModel extends ChangeNotifier {
   void onSignInClick(BuildContext context) {
     FocusScope.of(context).unfocus();
     _error = null;
-    if (!_isCodeRequested) {
-      _requestCode();
-    } else {
-      _signIn(context);
-    }
+    _signIn(context);
   }
 
-  void _requestCode() async {
+  void requestCode() async {
     _isActionInProgress = true;
     notifyListeners();
     final result = await authRepository.requestCode(_phoneNumber);
     switch (result) {
       case Ok<void>():
-        _isCodeRequested = true;
+        // _isCodeRequested = true;
+        print("12313");
       case Error<void>():
         _error = result.error.getErrorMessage();
     }
@@ -75,7 +68,6 @@ class SignInViewModel extends ChangeNotifier {
     final result = await authRepository.signIn(_phoneNumber, code);
     switch (result) {
       case Ok<AccessTokenResponse>():
-        _isCodeRequested = true;
         final testProfile = await profileRepository.getProfile(); //TODO: remove!!!!!!!!!!!!!!!!!!!!!!!!
         if (context.mounted) {
           GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath);
@@ -88,7 +80,7 @@ class SignInViewModel extends ChangeNotifier {
   }
 
   void _checkIsFormValid() {
-    final isFormValid = _phoneNumber.length == 12 && (codeController.text.length == 4 || !isCodeRequested);
+    final isFormValid = _phoneNumber.length == 12 && (codeController.text.length == 4);
     if (isFormValid != _isFormValid) {
       _isFormValid = isFormValid;
       notifyListeners();

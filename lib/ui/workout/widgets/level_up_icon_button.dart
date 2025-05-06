@@ -11,14 +11,17 @@ class LevelUpIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 64,
-      height: 46,
-      child: LevelUpContainer(
-        color: AppColors.secondaryDefaultColor,
-        child: Padding(
-          padding: const EdgeInsets.all(11.0),
-          child: SvgPicture.asset(iconAsset),
+    return GestureDetector(
+      onTap: onClick,
+      child: SizedBox(
+        width: 64,
+        height: 46,
+        child: LevelUpContainer(
+          color: AppColors.secondaryDefaultColor,
+          child: Padding(
+            padding: const EdgeInsets.all(11.0),
+            child: SvgPicture.asset(iconAsset),
+          ),
         ),
       ),
     );

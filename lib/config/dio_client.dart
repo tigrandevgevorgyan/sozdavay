@@ -1,5 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
+import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
 import 'package:level_up/data/services/local_storage.dart';
+import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/utils/result.dart';
 
 class DioClient {
@@ -9,10 +13,10 @@ class DioClient {
     headers['X-Requested-With'] = 'XMLHttpRequest';
 
     final client = Dio(BaseOptions(
-      baseUrl: 'https://dashboard.levelup-plan.ru/api',
+      baseUrl: 'http://176.123.169.218:8080/api',
       connectTimeout: const Duration(milliseconds: 15000),
       //followRedirects: true,
-      validateStatus: (status) => status == 200,
+      validateStatus: (status) => (status ?? 200) < 500,
       receiveTimeout: const Duration(milliseconds: 15000),
       headers: headers,
     ));
@@ -28,6 +32,13 @@ class DioClient {
       return handler.next(options);
     }));
     interceptors.add(LogInterceptor(request: false, requestBody: true, requestHeader: true, responseBody: true, responseHeader: false, logPrint: (text) => print('$text')));
+    interceptors.add(InterceptorsWrapper(onResponse: (response, handler) async {
+      if (response.data.toString().toLowerCase().contains('пользователь не найден')) {
+        await GetIt.I<IAuthRepository>().deauthorize();
+        GoRouter.of(LevelUpRouter.instance.context).go(LevelUpRouter.splashPath);
+      }
+      return handler.next(response);
+    }));
 
     return client;
   }

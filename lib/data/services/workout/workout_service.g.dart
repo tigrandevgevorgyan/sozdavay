@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'profile_service.dart';
+part of 'workout_service.dart';
 
 // **************************************************************************
 // RetrofitGenerator
@@ -8,8 +8,8 @@ part of 'profile_service.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations
 
-class _ProfileService implements ProfileService {
-  _ProfileService(this._dio, {this.baseUrl, this.errorLogger});
+class _WorkoutService implements WorkoutService {
+  _WorkoutService(this._dio, {this.baseUrl, this.errorLogger});
 
   final Dio _dio;
 
@@ -18,25 +18,25 @@ class _ProfileService implements ProfileService {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<UserProfileExtendedResponse> getProfile() async {
+  Future<WorkoutResponse> startWorkout() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<UserProfileExtendedResponse>(
+    final _options = _setStreamType<WorkoutResponse>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/profile',
+            '/workout/start',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late UserProfileExtendedResponse _value;
+    late WorkoutResponse _value;
     try {
-      _value = UserProfileExtendedResponse.fromJson(_result.data!);
+      _value = WorkoutResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -45,95 +45,68 @@ class _ProfileService implements ProfileService {
   }
 
   @override
-  Future<UserProfileShortResponse> updateMeasurements(
-    String measurements,
+  Future<WorkoutResponse> changeExercise(int id, bool isSecond) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = {'id': id, 'isSecond': isSecond};
+    final _options = _setStreamType<WorkoutResponse>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/workout/change',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late WorkoutResponse _value;
+    try {
+      _value = WorkoutResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<List<HistoryInfo>> addSetResult(
+    int exerciseId,
+    int weight,
+    int repeats,
+    int difficult,
+    int time,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = {'measurements': measurements};
-    final _options = _setStreamType<UserProfileShortResponse>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
-          .compose(
-            _dio.options,
-            '/profile/measurements',
-            queryParameters: queryParameters,
-            data: _data,
-          )
-          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
-    );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late UserProfileShortResponse _value;
-    try {
-      _value = UserProfileShortResponse.fromJson(_result.data!);
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    return _value;
-  }
-
-  @override
-  Future<UserProfileShortResponse> updateRecords(String records) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
-    final _data = {'records': records};
-    final _options = _setStreamType<UserProfileShortResponse>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
-          .compose(
-            _dio.options,
-            '/profile/records',
-            queryParameters: queryParameters,
-            data: _data,
-          )
-          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
-    );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late UserProfileShortResponse _value;
-    try {
-      _value = UserProfileShortResponse.fromJson(_result.data!);
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    return _value;
-  }
-
-  @override
-  Future<UserProfileShortResponse> updateProfile(
-    int category,
-    int days,
-    int experience,
-    int goal, [
-    int? priority,
-  ]) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
-    queryParameters.removeWhere((k, v) => v == null);
-    final _headers = <String, dynamic>{};
     final _data = {
-      'category': category,
-      'days': days,
-      'experience': experience,
-      'goal': goal,
-      'priority': priority,
+      'exercise_id': exerciseId,
+      'weight': weight,
+      'repeats': repeats,
+      'difficult': difficult,
+      'time': time,
     };
-    _data.removeWhere((k, v) => v == null);
-    final _options = _setStreamType<UserProfileShortResponse>(
+    final _options = _setStreamType<List<HistoryInfo>>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/profile',
+            '/workout/set',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late UserProfileShortResponse _value;
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<HistoryInfo> _value;
     try {
-      _value = UserProfileShortResponse.fromJson(_result.data!);
+      _value = _result.data!
+          .map(
+            (dynamic i) => HistoryInfo.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

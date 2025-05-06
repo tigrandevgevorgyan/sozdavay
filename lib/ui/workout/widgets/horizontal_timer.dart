@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:level_up/config/assets.dart';
@@ -15,6 +16,7 @@ class HorizontalTimer extends StatefulWidget {
 }
 
 class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderStateMixin {
+  final AudioPlayer audioPlayer = AudioPlayer();
   AnimationController? _controller;
 
   bool _isRunning = false;
@@ -26,13 +28,16 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
       vsync: this,
       duration: Duration(seconds: widget.secondsToCount),
     )..addListener(() {
-        setState(() {});
+        if (context.mounted) {
+          setState(() {});
+        }
       });
     _controller!.addStatusListener(
       (status) {
         if (status.isCompleted) {
           setState(() {
             _isRunning = false;
+            audioPlayer.play(AssetSource('sounds/gong.mp3'));
           });
         }
       },
@@ -94,6 +99,7 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
   @override
   void dispose() {
     super.dispose();
+    audioPlayer.dispose();
     _controller?.reset();
     _controller?.dispose();
   }

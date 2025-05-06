@@ -19,10 +19,10 @@ abstract class ProfileService {
 
   @POST('/profile')
   Future<UserProfileShortResponse> updateProfile(
-    @Field() String sex,
+    @Field() int category,
     @Field() int days,
     @Field() int experience,
-    @Field() int goals, [
+    @Field() int goal, [
     @Field() int? priority,
   ]);
 }

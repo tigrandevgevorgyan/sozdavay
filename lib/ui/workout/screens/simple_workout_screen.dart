@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:level_up/config/assets.dart';
+import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_container.dart';
+import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_text_field.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
@@ -14,18 +16,21 @@ import 'package:level_up/ui/workout/widgets/workout_top_bar.dart';
 import 'package:provider/provider.dart';
 
 class SimpleWorkoutScreen extends StatelessWidget {
-  const SimpleWorkoutScreen({super.key});
+  const SimpleWorkoutScreen({super.key, required this.workoutInfo});
+
+  final WorkoutInfo workoutInfo;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => SimpleViewModel(),
+      create: (context) => SimpleViewModel(workoutInfo),
       child: Consumer<SimpleViewModel>(builder: (context, provider, _) {
         return Column(
           children: [
             WorkoutTopBar(
-              firstExerciseName: 'Горизонтальный жим сидя параллельным хватом на тренажере',
-              onFirstExerciseRefresh: () {},
+              isUpdatingFirstExercise: provider.isUpdatingExercise,
+              firstExerciseName: workoutInfo.items.first.name,
+              onFirstExerciseRefresh: () => provider.changeExercise(context),
             ),
             SizedBox(height: 10),
             Expanded(
@@ -49,7 +54,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                                       Expanded(
                                           flex: 1,
                                           child: LevelUpContainer(
-                                            child: Text('3 по 15-20', style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
+                                            child: Text(provider.getWorkoutString(workoutInfo.items.first), style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
                                           )),
                                       SizedBox(height: 4),
                                       Expanded(
@@ -57,7 +62,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                                           child: LevelUpContainer(
                                             child: Column(
                                               children: [
-                                                SquareTimer(title: 'отдых до 2 мин', secondsDuration: 4),
+                                                SquareTimer(title: provider.getRestString(workoutInfo.items.first), secondsDuration: workoutInfo.items.first.maxRest * 60),
                                               ],
                                             ),
                                           )),
@@ -69,7 +74,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                       SizedBox(
                         height: 46,
                         child: Row(children: [
-                          LevelUpIconButton(iconAsset: Assets.minusIcon, onClick: () {}),
+                          LevelUpIconButton(iconAsset: Assets.minusIcon, onClick: () => provider.onMinusClicked()),
                           SizedBox(width: 4),
                           Expanded(
                             flex: 1,
@@ -78,7 +83,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                               hintText: 'Вес',
                               textSize: 12,
                               keyboardType: TextInputType.number,
-                              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[+0-9]'))],
+                              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[+0-9]|.'))],
                             ),
                           ),
                           SizedBox(width: 4),
@@ -93,11 +98,17 @@ class SimpleWorkoutScreen extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 4),
-                          LevelUpIconButton(iconAsset: Assets.plusIcon, onClick: () {}),
+                          LevelUpIconButton(iconAsset: Assets.plusIcon, onClick: () => provider.onPlusClicked(context)),
                         ]),
                       ),
                       SizedBox(height: 16),
-                      SixResultsWidget(results: provider.testResults),
+                      provider.isUpdatingHistory
+                          ? Center(child: LevelUpLoader())
+                          : SixResultsWidget(
+                              selectedId: provider.selectedId,
+                              results: provider.generateSixDaysResult(workoutInfo.items.first),
+                              onResultSelected: provider.onResultSelected,
+                            ),
                       SizedBox(height: 16),
                     ],
                   ),

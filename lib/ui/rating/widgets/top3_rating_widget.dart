@@ -6,9 +6,9 @@ import 'package:level_up/ui/core/themes/text_styles.dart';
 class Top3RatingWidget extends StatelessWidget {
   const Top3RatingWidget({super.key, required this.firstPlace, required this.secondPlace, required this.thirdPlace});
 
-  final PersonsScores firstPlace;
-  final PersonsScores secondPlace;
-  final PersonsScores thirdPlace;
+  final PersonsScores? firstPlace;
+  final PersonsScores? secondPlace;
+  final PersonsScores? thirdPlace;
 
   final sideFlex = 1;
   final betweenFlex = 4;
@@ -28,7 +28,7 @@ class Top3RatingWidget extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(height: 20),
-              PodiumPositionWidget(imagePath: Assets.ratingSecondIcon, name: secondPlace.name, score: secondPlace.score),
+              PodiumPositionWidget(imagePath: Assets.ratingSecondIcon, name: secondPlace?.name, score: secondPlace?.score),
             ],
           ),
         ),
@@ -38,7 +38,7 @@ class Top3RatingWidget extends StatelessWidget {
         ),
         Expanded(
           flex: contentFlex,
-          child: PodiumPositionWidget(imagePath: Assets.ratingFirstIcon, name: firstPlace.name, score: firstPlace.score),
+          child: PodiumPositionWidget(imagePath: Assets.ratingFirstIcon, name: firstPlace?.name, score: firstPlace?.score),
         ),
         Expanded(
           flex: betweenFlex,
@@ -49,7 +49,7 @@ class Top3RatingWidget extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(height: 20),
-              PodiumPositionWidget(imagePath: Assets.ratingThirdIcon, name: thirdPlace.name, score: thirdPlace.score),
+              PodiumPositionWidget(imagePath: Assets.ratingThirdIcon, name: thirdPlace?.name, score: thirdPlace?.score),
             ],
           ),
         ),
@@ -66,8 +66,8 @@ class PodiumPositionWidget extends StatelessWidget {
   const PodiumPositionWidget({super.key, required this.imagePath, required this.name, required this.score});
 
   final String imagePath;
-  final String name;
-  final int score;
+  final String? name;
+  final int? score;
 
   @override
   Widget build(BuildContext context) {
@@ -78,9 +78,11 @@ class PodiumPositionWidget extends StatelessWidget {
           child: Image.asset(imagePath),
         ),
         SizedBox(height: 4),
-        Text(name, style: Style.raleway16w400.copyWith(color: AppColors.primaryTextColor), textAlign: TextAlign.center),
-        SizedBox(height: 4),
-        Text(score.toString(), style: Style.ablation14w900.copyWith(color: AppColors.activeButtonColor)),
+        if (name != null && score != null) ...[
+          Text(name!, style: Style.raleway16w400.copyWith(color: AppColors.primaryTextColor), textAlign: TextAlign.center),
+          SizedBox(height: 4),
+          Text(score.toString(), style: Style.ablation14w900.copyWith(color: AppColors.activeButtonColor)),
+        ]
       ],
     );
   }

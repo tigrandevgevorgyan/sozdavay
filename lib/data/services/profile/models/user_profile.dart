@@ -8,8 +8,9 @@ class UserProfile {
   final int id;
   final String name;
   final String phone;
-  final String? sex;
+  // final String? sex;
   final int? days;
+  final IdNamePairWithPriority? category;
   final IdNamePairWithPriority? age;
   final IdNamePairWithPriority? experience;
   final IdNamePairWithPriority? goal;
@@ -21,7 +22,7 @@ class UserProfile {
       {required this.id,
       required this.name,
       required this.phone,
-      required this.sex,
+      required this.category,
       required this.days,
       required this.age,
       required this.experience,

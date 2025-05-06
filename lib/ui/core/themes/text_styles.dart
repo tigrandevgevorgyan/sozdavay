@@ -78,9 +78,30 @@ class Style {
     color: Colors.white,
   );
 
+  static const TextStyle raleway17w700 = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Raleway",
+    color: Colors.white,
+  );
+
   static const TextStyle raleway16w400 = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w400,
+    fontFamily: "Raleway",
+    color: Colors.white,
+  );
+
+  static const TextStyle raleway16w300 = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w300,
+    fontFamily: "Raleway",
+    color: Colors.white,
+  );
+
+  static const TextStyle raleway15w500 = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w500,
     fontFamily: "Raleway",
     color: Colors.white,
   );

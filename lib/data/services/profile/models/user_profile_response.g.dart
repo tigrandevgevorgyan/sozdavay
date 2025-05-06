@@ -25,10 +25,6 @@ UserProfileExtendedResponse _$UserProfileExtendedResponseFromJson(
     UserProfileExtendedResponse(
       json['message'] as String?,
       UserProfile.fromJson(json['data'] as Map<String, dynamic>),
-      (json['ages'] as List<dynamic>)
-          .map(
-              (e) => IdNamePairWithPriority.fromJson(e as Map<String, dynamic>))
-          .toList(),
       (json['experiences'] as List<dynamic>)
           .map(
               (e) => IdNamePairWithPriority.fromJson(e as Map<String, dynamic>))
@@ -42,6 +38,10 @@ UserProfileExtendedResponse _$UserProfileExtendedResponseFromJson(
           .map(
               (e) => IdNamePairWithPriority.fromJson(e as Map<String, dynamic>))
           .toList(),
+      (json['categories'] as List<dynamic>)
+          .map(
+              (e) => IdNamePairWithPriority.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$UserProfileExtendedResponseToJson(
@@ -49,11 +49,11 @@ Map<String, dynamic> _$UserProfileExtendedResponseToJson(
     <String, dynamic>{
       'message': instance.message,
       'data': instance.data,
-      'ages': instance.ages,
       'experiences': instance.experiences,
       'goals': instance.goals,
       'days': const DaysConverter().toJson(instance.days),
       'priorites': instance.priorities,
+      'categories': instance.categories,
     };
 
 IdNamePairWithPriority _$IdNamePairWithPriorityFromJson(

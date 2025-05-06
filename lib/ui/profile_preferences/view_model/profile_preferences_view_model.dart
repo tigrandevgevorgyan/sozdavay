@@ -11,26 +11,14 @@ import 'package:level_up/utils/result.dart';
 class ProfilePreferencesViewModel extends ChangeNotifier {
   final IProfileRepository profileRepository;
 
-  // final genderWeightDialogContent = PreferencesOptionsDialogContent(
-  //   'пол и весовая категория',
-  //   ['Женский до 55 кг', 'Женский 55+ кг', 'Мужской до 85 кг', 'Мужской 85+ кг'],
-  // );
+  final levelDialogContent = PreferencesOptionsDialogContent('Ваш Уровень подготовки');
 
-  final levelDialogContent = PreferencesOptionsDialogContent('Ваш Уровень подготовки'
-      //  ['Начинающий', 'Опытный', 'Легендарный'],
-      );
+  final goalDialogContent = PreferencesOptionsDialogContent('ЦЕль');
 
-  final goalDialogContent = PreferencesOptionsDialogContent('ЦЕль'
-      //['Хочу похудеть', 'Поддерживаю форму', 'Набрать вес'],
-      );
+  final priorityDialogContent = PreferencesOptionsDialogContent('Приоритет в тренировках');
 
-  final priorityDialogContent = PreferencesOptionsDialogContent('Приоритет в тренировках'
-      // ['Низ тела', 'Баланс в тренировках', 'Верх тела'],
-      );
-
-  final trainingWeeklyDialogContent = PreferencesOptionsDialogContent('кол-во тренировок в неделю'
-      // ['2 тренировки', '3 тренировки', '4 тренировки'],
-      );
+  final trainingWeeklyDialogContent = PreferencesOptionsDialogContent('кол-во тренировок в неделю');
+  final categoriesDialogContent = PreferencesOptionsDialogContent('Выберите ваш пол и вес');
 
   ProfilePreferencesViewModel(BuildContext context, {required this.profileRepository}) {
     _nameController = TextEditingController();
@@ -49,9 +37,9 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   TextEditingController get nameController => _nameController;
 
-  String? _genderWeightSelection;
+  int? _categorySelection;
 
-  String? get genderWeightSelection => _genderWeightSelection;
+  String? get categorySelection => categoriesDialogContent.getOptionById(_categorySelection);
 
   int? _levelSelection;
 
@@ -75,14 +63,13 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   bool get isPriorityAvailable => priorityDialogContent.hasPriorityById(_prioritySelection);
 
-  //TODO: update once api is ready
-  // void onGenderWeightClicked(BuildContext context) async {
-  //   final result = await OptionsDialog.showDialog(context, _genderWeightSelection, genderWeightDialogContent.title, genderWeightDialogContent.options);
-  //   if (result != null) {
-  //     _genderWeightSelection = result;
-  //     notifyListeners();
-  //   }
-  // }
+  void onGenderWeightClicked(BuildContext context) async {
+    final result = await OptionsDialog.showDialog(context, categorySelection, categoriesDialogContent.title, categoriesDialogContent.optionsValues);
+    if (result != null) {
+      _categorySelection = categoriesDialogContent.getIdByValue(result);
+      notifyListeners();
+    }
+  }
 
   void onLevelClicked(BuildContext context) async {
     final result = await OptionsDialog.showDialog(context, levelSelection, levelDialogContent.title, levelDialogContent.optionsValues);
@@ -126,7 +113,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
     }
     _isUpdating = true;
     notifyListeners();
-    final result = await profileRepository.updateProfile('male', _trainingWeeklySelection!, _levelSelection!, _goalSelection!, _prioritySelection);
+    final result = await profileRepository.updateProfile(_categorySelection!, _trainingWeeklySelection!, _levelSelection!, _goalSelection!, _prioritySelection);
     switch (result) {
       case Ok<UserProfileShortResponse>():
         if (context.mounted) {
@@ -145,14 +132,17 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
     final profile = await profileRepository.getProfile();
     switch (profile) {
       case Ok<UserProfileExtendedResponse>():
+        categoriesDialogContent.setOptions(profile.value.categories);
         levelDialogContent.setOptions(profile.value.experiences);
         goalDialogContent.setOptions(profile.value.goals);
         priorityDialogContent.setOptions(profile.value.priorities);
         trainingWeeklyDialogContent.setOptions(profile.value.days);
+        _categorySelection = profile.value.data.category?.id;
         _levelSelection = profile.value.data.experience?.id;
         _goalSelection = profile.value.data.goal?.id;
         _prioritySelection = profile.value.data.priority?.id;
         _trainingWeeklySelection = profile.value.data.days;
+        _nameController.text = profile.value.data.name;
       case Error<UserProfileExtendedResponse>():
         if (context.mounted) {
           ErrorUtils.showError(context, profile.error.getErrorMessage());

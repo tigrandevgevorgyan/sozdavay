@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'profile_service.dart';
+part of 'data_service.dart';
 
 // **************************************************************************
 // RetrofitGenerator
@@ -8,8 +8,8 @@ part of 'profile_service.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations
 
-class _ProfileService implements ProfileService {
-  _ProfileService(this._dio, {this.baseUrl, this.errorLogger});
+class _DataService implements DataService {
+  _DataService(this._dio, {this.baseUrl, this.errorLogger});
 
   final Dio _dio;
 
@@ -18,25 +18,25 @@ class _ProfileService implements ProfileService {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<UserProfileExtendedResponse> getProfile() async {
+  Future<MainResponse> getMainScreenInfo() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<UserProfileExtendedResponse>(
+    final _options = _setStreamType<MainResponse>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/profile',
+            '/main',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late UserProfileExtendedResponse _value;
+    late MainResponse _value;
     try {
-      _value = UserProfileExtendedResponse.fromJson(_result.data!);
+      _value = MainResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -45,27 +45,25 @@ class _ProfileService implements ProfileService {
   }
 
   @override
-  Future<UserProfileShortResponse> updateMeasurements(
-    String measurements,
-  ) async {
+  Future<RatingResponse> getRating() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = {'measurements': measurements};
-    final _options = _setStreamType<UserProfileShortResponse>(
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<RatingResponse>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/profile/measurements',
+            '/rating',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late UserProfileShortResponse _value;
+    late RatingResponse _value;
     try {
-      _value = UserProfileShortResponse.fromJson(_result.data!);
+      _value = RatingResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -74,66 +72,25 @@ class _ProfileService implements ProfileService {
   }
 
   @override
-  Future<UserProfileShortResponse> updateRecords(String records) async {
+  Future<RatingResponse> getRatingFiltered(int category, int periods) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = {'records': records};
-    final _options = _setStreamType<UserProfileShortResponse>(
+    final _data = {'category': category, 'periods': periods};
+    final _options = _setStreamType<RatingResponse>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/profile/records',
+            '/rating',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late UserProfileShortResponse _value;
+    late RatingResponse _value;
     try {
-      _value = UserProfileShortResponse.fromJson(_result.data!);
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    return _value;
-  }
-
-  @override
-  Future<UserProfileShortResponse> updateProfile(
-    int category,
-    int days,
-    int experience,
-    int goal, [
-    int? priority,
-  ]) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
-    queryParameters.removeWhere((k, v) => v == null);
-    final _headers = <String, dynamic>{};
-    final _data = {
-      'category': category,
-      'days': days,
-      'experience': experience,
-      'goal': goal,
-      'priority': priority,
-    };
-    _data.removeWhere((k, v) => v == null);
-    final _options = _setStreamType<UserProfileShortResponse>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
-          .compose(
-            _dio.options,
-            '/profile',
-            queryParameters: queryParameters,
-            data: _data,
-          )
-          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
-    );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late UserProfileShortResponse _value;
-    try {
-      _value = UserProfileShortResponse.fromJson(_result.data!);
+      _value = RatingResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

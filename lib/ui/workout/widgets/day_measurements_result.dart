@@ -5,10 +5,12 @@ import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 
 class DayMeasurementsResult extends StatelessWidget {
-  const DayMeasurementsResult({super.key, required this.title, required this.result});
+  const DayMeasurementsResult({super.key, required this.title, required this.results, this.selectedId, required this.onResultSelected});
 
   final String title;
-  final List<String> result;
+  final int? selectedId;
+  final List<DayResultInfo> results;
+  final Function(int id) onResultSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -16,21 +18,36 @@ class DayMeasurementsResult extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SvgPicture.asset(Assets.pencilIcon),
             SizedBox(width: 4),
-            Text(title, style: Style.ablation12w900.copyWith(color: AppColors.tertiaryHintColor)),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Text(title, style: Style.raleway15w500.copyWith(color: AppColors.tertiaryHintColor)),
+            ),
           ],
         ),
-        for (String result in result)
-          Padding(
-            padding: const EdgeInsets.only(left: 18, top: 1.5, bottom: 1.5),
-            child: Text(
-              result,
-              style: Style.ablation15w800.copyWith(color: AppColors.primaryTextColor),
+        for (DayResultInfo result in results)
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => onResultSelected(result.id),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 18, top: 1.5, bottom: 1.5),
+              child: Text(
+                result.result,
+                style: Style.raleway15w400.copyWith(color: ((selectedId ?? -1) != result.id) ? AppColors.primaryTextColor : AppColors.activeButtonColor),
+              ),
             ),
           ),
       ],
     );
   }
+}
+
+class DayResultInfo {
+  final int id;
+  final String result;
+
+  DayResultInfo(this.id, this.result);
 }

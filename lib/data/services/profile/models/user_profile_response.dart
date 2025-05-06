@@ -17,16 +17,16 @@ class UserProfileShortResponse extends BaseResponse {
 
 @JsonSerializable()
 class UserProfileExtendedResponse extends BaseResponse {
-  UserProfileExtendedResponse(super.message, this.data, this.ages, this.experiences, this.goals, this.days, this.priorities);
+  UserProfileExtendedResponse(super.message, this.data, this.experiences, this.goals, this.days, this.priorities, this.categories);
 
   UserProfile data;
-  final List<IdNamePairWithPriority> ages;
   final List<IdNamePairWithPriority> experiences;
   final List<IdNamePairWithPriority> goals;
   @DaysConverter()
   final List<IdNamePairWithPriority> days;
   @JsonKey(name: 'priorites')
   final List<IdNamePairWithPriority> priorities;
+  final List<IdNamePairWithPriority> categories;
 
   factory UserProfileExtendedResponse.fromJson(Map<String, dynamic> json) => _$UserProfileExtendedResponseFromJson(json);
 

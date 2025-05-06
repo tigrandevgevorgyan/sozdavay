@@ -17,18 +17,21 @@ class CalendarWidget extends StatelessWidget {
           for (CalendarDayInfo day in days)
             Expanded(
               flex: 1,
-              child: Container(
-                decoration: BoxDecoration(color: _getBackgroundColor(day), borderRadius: BorderRadius.circular(4)),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      day.dayName,
-                      style: Style.ablation13w700.copyWith(color: _getTextColor(day)),
-                    ),
-                    SizedBox(height: 1),
-                    Text(day.dayNumber.toString(), style: Style.ablation15w900.copyWith(color: _getTextColor(day))),
-                  ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: Container(
+                  decoration: BoxDecoration(color: _getBackgroundColor(day), borderRadius: BorderRadius.circular(4)),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        day.dayName,
+                        style: Style.ablation13w700.copyWith(color: _getTextColor(day)),
+                      ),
+                      SizedBox(height: 1),
+                      Text(day.dayNumber.toString(), style: Style.ablation15w900.copyWith(color: _getTextColor(day))),
+                    ],
+                  ),
                 ),
               ),
             ),

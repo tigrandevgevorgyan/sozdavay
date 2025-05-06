@@ -8,7 +8,7 @@ abstract class IProfileRepository {
 
   Future<Result<UserProfileExtendedResponse>> reloadProfile();
 
-  Future<Result<UserProfileShortResponse>> updateProfile(String sex, int days, int experience, int goals, int? priority);
+  Future<Result<UserProfileShortResponse>> updateProfile(int category, int days, int experience, int goals, int? priority);
 
   Future<Result<UserProfileShortResponse>> updateMeasurements(String measurements);
 
@@ -42,13 +42,13 @@ class ProfileRepositoryImpl extends IProfileRepository {
   }
 
   @override
-  Future<Result<UserProfileShortResponse>> updateProfile(String sex, int days, int experience, int goals, int? priority) async {
+  Future<Result<UserProfileShortResponse>> updateProfile(int category, int days, int experience, int goals, int? priority) async {
     try {
       UserProfileShortResponse result;
       if (priority == null) {
-        result = await _profileService.updateProfile(sex, days, experience, goals);
+        result = await _profileService.updateProfile(category, days, experience, goals);
       } else {
-        result = await _profileService.updateProfile(sex, days, experience, goals, priority);
+        result = await _profileService.updateProfile(category, days, experience, goals, priority);
       }
       if (_profileResponse != null) {
         _profileResponse!.data = result.data;

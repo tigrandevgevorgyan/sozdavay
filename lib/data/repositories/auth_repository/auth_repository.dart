@@ -12,6 +12,8 @@ abstract class IAuthRepository {
   Future<Result<AccessTokenResponse>> signIn(String phoneNumber, String code);
 
   Future<Result<void>> logout();
+
+  Future<Result<void>> deauthorize();
 }
 
 class AuthRepository extends IAuthRepository {
@@ -51,6 +53,17 @@ class AuthRepository extends IAuthRepository {
   Future<Result<void>> logout() async {
     try {
       await _authService.logout();
+      _token = null;
+      await _localStorage.clearAccessToken();
+      return Result.ok(Object());
+    } on DioException catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<void>> deauthorize() async {
+    try {
       _token = null;
       await _localStorage.clearAccessToken();
       return Result.ok(Object());

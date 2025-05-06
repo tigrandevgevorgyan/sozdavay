@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/config/dio_client.dart';
+import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/local_storage.dart';
 import 'package:level_up/data/services/profile/models/user_profile_response.dart';
@@ -9,10 +10,14 @@ import 'package:level_up/ui/home/widgets/calendar_widget.dart';
 import 'package:level_up/ui/text_editing_screen/text_editing_screen.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../data/services/data/models/main_response.dart';
 
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel(
     BuildContext context, {
+    required this.dataRepository,
     required this.profileRepository,
     required this.localStorage,
   }) {
@@ -21,29 +26,54 @@ class HomeViewModel extends ChangeNotifier {
 
   final ILocalStorage localStorage;
   final IProfileRepository profileRepository;
+  final IDataRepository dataRepository;
 
   bool _isLoading = true;
 
   bool get isLoading => _isLoading;
 
   UserProfileExtendedResponse? _profile;
+  MainInfo? _mainInfo;
 
-  void _init(BuildContext context) {
-    _loadProfile(context);
-  }
+  String get level => _mainInfo?.label ?? '';
 
-  void _loadProfile(BuildContext? context) async {
-    final profile = await profileRepository.getProfile();
-    switch (profile) {
-      case Ok<UserProfileExtendedResponse>():
-        _profile = profile.value;
-      case Error<UserProfileExtendedResponse>():
-        if (context != null && context.mounted) {
-          ErrorUtils.showError(context, profile.error.getErrorMessage());
-        }
+  int get rating => _mainInfo?.rating ?? 0;
+
+  int get perMonth => _mainInfo?.workout.month ?? 0;
+
+  int get perYear => _mainInfo?.workout.year ?? 0;
+
+  String get trainingName =>
+      _mainInfo?.schedule
+          .where(
+            (day) => day.isActive,
+          )
+          .firstOrNull
+          ?.name ??
+      '';
+
+  void _init(BuildContext context) async {
+    final isSuccess = await _loadProfile(context);
+    if (isSuccess && context.mounted) {
+      await _loadMainInfo(context);
     }
     _isLoading = false;
     notifyListeners();
+  }
+
+  List<CalendarDayInfo> getWeekDays() {
+    if (_mainInfo == null) {
+      return [];
+    }
+    final List<CalendarDayInfo> result = [];
+    final today = DateTime.now();
+    final monday = today.subtract(Duration(days: today.weekday - 1));
+    for (int i = 0; i < 7; i++) {
+      final dayOfWeek = monday.add(Duration(days: i));
+      final DayInfo dayInfo = _mainInfo!.schedule[i];
+      result.add(CalendarDayInfo(dayInfo.day, dayOfWeek.day, dayInfo.name != null, dayInfo.isActive));
+    }
+    return result;
   }
 
   void onStartWorkoutClicked(BuildContext context) {
@@ -59,28 +89,8 @@ class HomeViewModel extends ChangeNotifier {
     GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params);
   }
 
-  Future<Result<bool>> _updateMeasurements(String measurements) async {
-    final result = await profileRepository.updateMeasurements(measurements);
-    switch (result) {
-      case Ok<UserProfileShortResponse>():
-        if (LevelUpRouter.instance.context.mounted) {
-          _loadProfile(LevelUpRouter.instance.context);
-        }
-        return Result.ok(true);
-      case Error<UserProfileShortResponse>():
-        return Result.error(result.error);
-    }
-  }
-
-  List<CalendarDayInfo> getWeekDays() {
-    final List<CalendarDayInfo> result = [];
-    final today = DateTime.now();
-    final monday = today.subtract(Duration(days: today.weekday - 1));
-    for (int i = 0; i < 7; i++) {
-      final dayOfWeek = monday.add(Duration(days: i));
-      result.add(CalendarDayInfo(_getDayName(dayOfWeek.weekday), dayOfWeek.day, i % 2 == 0, dayOfWeek.day == today.day));
-    }
-    return result;
+  void onChatClicked() {
+    launchUrl(Uri.parse('http://t.me/Dryk220lbs'));
   }
 
   void logout(BuildContext context) async {
@@ -97,23 +107,43 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  String _getDayName(int dayOfWeek) {
-    switch (dayOfWeek) {
-      case 1:
-        return 'ПН';
-      case 2:
-        return 'ВТ';
-      case 3:
-        return 'СР';
-      case 4:
-        return 'ЧТ';
-      case 5:
-        return 'ПТ';
-      case 6:
-        return 'СБ';
-      case 7:
-        return 'ВС';
+  Future<Result<bool>> _updateMeasurements(String measurements) async {
+    final result = await profileRepository.updateMeasurements(measurements);
+    switch (result) {
+      case Ok<UserProfileShortResponse>():
+        if (LevelUpRouter.instance.context.mounted) {
+          _loadProfile(LevelUpRouter.instance.context);
+        }
+        return Result.ok(true);
+      case Error<UserProfileShortResponse>():
+        return Result.error(result.error);
     }
-    return '?';
+  }
+
+  Future<bool> _loadProfile(BuildContext? context) async {
+    final profile = await profileRepository.getProfile();
+    switch (profile) {
+      case Ok<UserProfileExtendedResponse>():
+        _profile = profile.value;
+        return true;
+      case Error<UserProfileExtendedResponse>():
+        if (context != null && context.mounted) {
+          ErrorUtils.showError(context, profile.error.getErrorMessage());
+          return false;
+        }
+    }
+    return false;
+  }
+
+  Future<void> _loadMainInfo(BuildContext? context) async {
+    final mainInfo = await dataRepository.getMainInfo();
+    switch (mainInfo) {
+      case Ok<MainResponse>():
+        _mainInfo = mainInfo.value.data;
+      case Error<MainResponse>():
+        if (context != null && context.mounted) {
+          ErrorUtils.showError(context, mainInfo.error.getErrorMessage());
+        }
+    }
   }
 }

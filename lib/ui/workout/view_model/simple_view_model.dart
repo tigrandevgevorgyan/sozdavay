@@ -1,22 +1,42 @@
 import 'package:flutter/widgets.dart';
-import 'package:level_up/ui/workout/widgets/six_results_widget.dart';
+import 'package:level_up/ui/workout/view_model/base_view_model.dart';
 
-class SimpleViewModel extends ChangeNotifier {
+class SimpleViewModel extends BaseViewModel {
   late TextEditingController weightController;
   late TextEditingController repeatsController;
 
-  final List<SixResultsDayInfo> testResults = [
-    SixResultsDayInfo('пн 1.04.22', ['120/35', '120/35', '120/35']),
-    SixResultsDayInfo('вт 2.04.22', ['120/35', '120/35', '120/35']),
-    SixResultsDayInfo('ср 3.04.22', ['120/35', '120/35', '120/35']),
-    SixResultsDayInfo('чт 4.04.22', ['120/35', '120/35', '120/35']),
-    SixResultsDayInfo('пт 5.04.22', ['120/35', '120/35', '120/35']),
-    SixResultsDayInfo('сб 6.04.22', ['120/35', '120/35', '120/35']),
-  ];
-
-  SimpleViewModel() {
+  SimpleViewModel(super.workout) {
     weightController = TextEditingController();
     repeatsController = TextEditingController();
+  }
+
+  @override
+  void onResultSelected(int id) {
+    super.onResultSelected(id);
+    final value = findResultById(id);
+    if (value != null) {
+      weightController.text = value.weight.toString();
+      repeatsController.text = value.repeats.toString();
+    }
+    notifyListeners();
+  }
+
+  void onPlusClicked(BuildContext context) {
+    super.addOrUpdateSetResult(context, workout.items.first.id, int.parse(repeatsController.text), int.parse(weightController.text));
+    _resetText();
+  }
+
+  void onMinusClicked() {
+    if (super.selectedId == null) {
+      _resetText();
+    } else {
+      //execute delete action
+    }
+  }
+
+  void _resetText() {
+    weightController.clear();
+    repeatsController.clear();
   }
 
   @override

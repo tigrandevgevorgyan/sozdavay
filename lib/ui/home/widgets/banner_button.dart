@@ -11,17 +11,24 @@ class BannerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onClick,
-      child: Stack(
-        children: [
-          Image.asset(imagePath),
-          Positioned(
-            bottom: 12,
-            left: 16,
-            child: Text(text, style: Style.ablation15w900.copyWith(color: AppColors.primaryTextColor)),
+    return SizedBox(
+      width: double.infinity,
+      child: GestureDetector(
+        onTap: onClick,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: Stack(
+            fit: StackFit.passthrough,
+            children: [
+              Image.asset(imagePath, fit: BoxFit.fitHeight),
+              Positioned(
+                bottom: 12,
+                left: 16,
+                child: Text(text, style: Style.ablation15w900.copyWith(color: AppColors.primaryTextColor)),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

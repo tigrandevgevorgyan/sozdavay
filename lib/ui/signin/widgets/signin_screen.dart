@@ -48,25 +48,28 @@ class SignInScreen extends StatelessWidget {
                       ),
                       inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[+0-9]')), PhoneMaskFormatter()],
                     ),
-                    if (provider.isCodeRequested) SizedBox(height: 12),
-                    if (provider.isCodeRequested)
-                      LevelUpTextField(
-                        controller: provider.codeController,
-                        hintText: 'Введите код-пароль',
-                        keyboardType: TextInputType.number,
-                        maxLength: 4,
-                      ),
+                    SizedBox(height: 12),
+                    LevelUpTextField(
+                      controller: provider.codeController,
+                      hintText: 'Введите код-пароль',
+                      keyboardType: TextInputType.number,
+                      maxLength: 4,
+                    ),
                     SizedBox(height: 16),
                     ErrorTextWidget(error: provider.error),
                     provider.isActionInProgress
                         ? LevelUpLoader()
                         : LevelUpButton(
                             isEnabled: provider.isScreenReady,
-                            text: provider.isCodeRequested ? 'войти' : 'запросить код',
+                            text: 'войти',
                             buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.tall),
                             onClick: () => provider.isScreenReady ? provider.onSignInClick(context) : null,
                           ),
                     SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: provider.requestCode,
+                      child: Text('получить код пароль', style: Style.ablation14w900),
+                    )
                   ],
                 ),
               ),

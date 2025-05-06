@@ -22,7 +22,7 @@ class ComplexWorkoutScreen extends StatelessWidget {
       child: Consumer<ComplexViewModel>(builder: (context, provider, _) {
         return Column(
           children: [
-            WorkoutTopBar(firstExerciseName: 'Комлпекс номер 1', onFirstExerciseRefresh: () {}),
+            WorkoutTopBar(isUpdatingFirstExercise: false, firstExerciseName: 'Комлпекс номер 1', onFirstExerciseRefresh: () {}),
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
@@ -42,8 +42,8 @@ class ComplexWorkoutScreen extends StatelessWidget {
                             Expanded(
                               flex: 1,
                               child: GridView.builder(
-                                itemCount: 5,
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 4, mainAxisSpacing: 4),
+                                itemCount: 8,
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 4, mainAxisSpacing: 4, childAspectRatio: 1),
                                 itemBuilder: (context, index) => VideoPreview(),
                               ),
                             )
@@ -56,7 +56,7 @@ class ComplexWorkoutScreen extends StatelessWidget {
                           padding: const EdgeInsets.all(12),
                           child: Text(
                             'Символизм продолжает фактографический метод кластерного анализа. Художественный ритуал имитирует непосредственный романтизм, таким образом, второй комплекс движущих сил получил разработку в трудах А.Берталанфи и Ш.Бюлера. Герменевтика, на первый взгляд',
-                            style: Style.raleway14w300.copyWith(color: AppColors.primaryTextColor),
+                            style: Style.raleway16w300.copyWith(color: AppColors.primaryTextColor),
                           ),
                         ),
                       ),
@@ -70,7 +70,7 @@ class ComplexWorkoutScreen extends StatelessWidget {
                             Expanded(
                               child: LevelUpTextField(
                                 controller: provider.textController,
-                                hintText: 'время/раунды',
+                                hintText: 'время',
                                 textSize: 15,
                                 keyboardType: TextInputType.datetime,
                                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9,/]'))],
@@ -81,8 +81,32 @@ class ComplexWorkoutScreen extends StatelessWidget {
                           ],
                         ),
                       ),
+                      SizedBox(height: 8),
+                      SizedBox(
+                        height: 46,
+                        child: Row(
+                          children: [
+                            LevelUpIconButton(iconAsset: Assets.minusIcon, onClick: () {}),
+                            SizedBox(width: 4),
+                            Expanded(
+                              child: LevelUpTextField(
+                                controller: provider.textController,
+                                hintText: 'раунды',
+                                textSize: 15,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9,/]'))],
+                              ),
+                            ),
+                            SizedBox(width: 4),
+                            LevelUpIconButton(iconAsset: Assets.plusIcon, onClick: () {}),
+                          ],
+                        ),
+                      ),
                       SizedBox(height: 16),
-                      SixResultsWidget(results: provider.testResults),
+                      SixResultsWidget(
+                        results: provider.testResults,
+                        onResultSelected: (id) {},
+                      ),
                       SizedBox(height: 16),
                     ],
                   ),

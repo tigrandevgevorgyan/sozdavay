@@ -1,10 +1,14 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:level_up/ui/workout/widgets/day_measurements_result.dart';
 
 class SixResultsWidget extends StatelessWidget {
-  const SixResultsWidget({super.key, required this.results});
+  const SixResultsWidget({super.key, required this.results, this.selectedId, required this.onResultSelected});
 
+  final int? selectedId;
   final List<SixResultsDayInfo> results;
+  final Function(int id) onResultSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -12,20 +16,30 @@ class SixResultsWidget extends StatelessWidget {
       children: [
         Row(
           children: [
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < min(3, results.length); i++)
               Expanded(
                 flex: 1,
-                child: DayMeasurementsResult(title: results[i].title, result: results[i].results),
+                child: DayMeasurementsResult(
+                  title: results[i].title,
+                  results: results[i].results,
+                  selectedId: selectedId,
+                  onResultSelected: onResultSelected,
+                ),
               ),
           ],
         ),
         SizedBox(height: 12),
         Row(
           children: [
-            for (int i = 3; i < 6; i++)
+            for (int i = 3; i < min(6, results.length); i++)
               Expanded(
                 flex: 1,
-                child: DayMeasurementsResult(title: results[i].title, result: results[i].results),
+                child: DayMeasurementsResult(
+                  title: results[i].title,
+                  results: results[i].results,
+                  selectedId: selectedId,
+                  onResultSelected: onResultSelected,
+                ),
               ),
           ],
         ),
@@ -36,7 +50,7 @@ class SixResultsWidget extends StatelessWidget {
 
 class SixResultsDayInfo {
   final String title;
-  final List<String> results;
+  final List<DayResultInfo> results;
 
   SixResultsDayInfo(this.title, this.results);
 }

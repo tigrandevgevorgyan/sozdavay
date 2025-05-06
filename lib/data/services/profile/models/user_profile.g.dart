@@ -12,7 +12,10 @@ UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => UserProfile(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       phone: json['phone'] as String,
-      sex: json['sex'] as String?,
+      category: json['category'] == null
+          ? null
+          : IdNamePairWithPriority.fromJson(
+              json['category'] as Map<String, dynamic>),
       days: (json['days'] as num?)?.toInt(),
       age: json['age'] == null
           ? null
@@ -37,8 +40,8 @@ Map<String, dynamic> _$UserProfileToJson(UserProfile instance) =>
       'id': instance.id,
       'name': instance.name,
       'phone': instance.phone,
-      'sex': instance.sex,
       'days': instance.days,
+      'category': instance.category,
       'age': instance.age,
       'experience': instance.experience,
       'goal': instance.goal,

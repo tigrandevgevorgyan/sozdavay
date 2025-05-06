@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/config/assets.dart';
+import 'package:level_up/data/repositories/workout_repository/workout_repository.dart';
+import 'package:level_up/data/services/workout/models/workout_response.dart';
+import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/workout/screens/complex_workout_screen.dart';
 import 'package:level_up/ui/workout/screens/double_workout_screen.dart';
 import 'package:level_up/ui/workout/screens/simple_workout_screen.dart';
+import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
+import 'package:provider/provider.dart';
 
 class WorkoutBaseScreen extends StatefulWidget {
   const WorkoutBaseScreen({super.key});
@@ -19,49 +25,42 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(backgroundColor: AppColors.backgroundContentColor, toolbarHeight: 0),
-      backgroundColor: AppColors.backgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: _getScreenByIndex(index),
-            ),
-            BottomBar(
-              onLeftArrowClicked: () => _changeIndex(-1),
-              onRightArrowClicked: () => _changeIndex(1),
-              onHomeClicked: () => GoRouter.of(context).pop(),
-            ),
-            SizedBox(height: 10),
-          ],
-        ),
-      ),
+    return ChangeNotifierProvider<WorkoutViewModel>(
+      create: (BuildContext context) => WorkoutViewModel(context, GetIt.I<IWorkoutRepository>()),
+      child: Consumer<WorkoutViewModel>(builder: (context, provider, __) {
+        return Scaffold(
+          appBar: AppBar(backgroundColor: AppColors.backgroundContentColor, toolbarHeight: 0),
+          backgroundColor: AppColors.backgroundColor,
+          body: SafeArea(
+            child: provider.isLoading
+                ? Center(child: LevelUpLoader())
+                : Column(
+                    children: [
+                      Expanded(
+                        child: _getScreenByWorkout(provider.currentWorkout),
+                      ),
+                      BottomBar(
+                        onLeftArrowClicked: provider.onPreviousClicked,
+                        onRightArrowClicked: () => provider.onNextClicked(context),
+                        onHomeClicked: () => GoRouter.of(context).pop(),
+                      ),
+                      SizedBox(height: 10),
+                    ],
+                  ),
+          ),
+        );
+      }),
     );
   }
 
-  Widget _getScreenByIndex(int index) {
-    switch (index) {
-      case 0:
-        return SimpleWorkoutScreen();
-      case 1:
-        return DoubleWorkoutScreen();
-      case 2:
-        return ComplexWorkoutScreen();
+  Widget _getScreenByWorkout(WorkoutInfo workout) {
+    if (workout.isComplex) {
+      return ComplexWorkoutScreen();
     }
-    return SimpleWorkoutScreen();
-  }
-
-  void _changeIndex(int increment) {
-    setState(() {
-      index += increment;
-      if (index < 0) {
-        index = 0;
-      }
-      if (index > 2) {
-        index = 2;
-      }
-    });
+    if (workout.isDouble) {
+      return DoubleWorkoutScreen(workoutInfo: workout);
+    }
+    return SimpleWorkoutScreen(workoutInfo: workout);
   }
 }
 
@@ -82,23 +81,26 @@ class BottomBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: onLeftArrowClicked,
             child: Padding(
-              padding: const EdgeInsets.all(4.0),
+              padding: const EdgeInsets.all(6.0),
               child: SvgPicture.asset(Assets.leftArrowIcon),
             ),
           ),
           GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: onHomeClicked,
             child: Padding(
-              padding: const EdgeInsets.all(4.0),
+              padding: const EdgeInsets.all(6.0),
               child: SvgPicture.asset(Assets.homeIcon),
             ),
           ),
           GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: onRightArrowClicked,
             child: Padding(
-              padding: const EdgeInsets.all(4.0),
+              padding: const EdgeInsets.all(6.0),
               child: SvgPicture.asset(Assets.rightArrowIcon),
             ),
           ),

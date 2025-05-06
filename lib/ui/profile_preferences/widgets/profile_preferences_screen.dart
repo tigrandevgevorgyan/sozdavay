@@ -49,8 +49,8 @@ class ProfilePreferencesScreen extends StatelessWidget {
                               SizedBox(height: 14),
                               OptionsBlocWidget(
                                 title: 'Выберите ваш пол и вес',
-                                value: provider.genderWeightSelection,
-                                onClick: () {}, //=> provider.onGenderWeightClicked(context),
+                                value: provider.categorySelection,
+                                onClick: () => provider.onGenderWeightClicked(context),
                               ),
                               SizedBox(height: 12),
                               OptionsBlocWidget(
