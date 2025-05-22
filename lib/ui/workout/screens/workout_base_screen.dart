@@ -22,11 +22,22 @@ class WorkoutBaseScreen extends StatefulWidget {
 
 class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
   int index = 0;
+  late final int dayIndex;
+  bool _didInit = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didInit) {
+      dayIndex = GoRouterState.of(context).extra as int;
+      _didInit = true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<WorkoutViewModel>(
-      create: (BuildContext context) => WorkoutViewModel(context, GetIt.I<IWorkoutRepository>()),
+      create: (BuildContext context) => WorkoutViewModel(context, GetIt.I<IWorkoutRepository>(), dayIndex: dayIndex),
       child: Consumer<WorkoutViewModel>(builder: (context, provider, __) {
         return Scaffold(
           appBar: AppBar(backgroundColor: AppColors.backgroundContentColor, toolbarHeight: 0),

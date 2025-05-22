@@ -1,8 +1,14 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:level_up/config/dependencies.dart';
+import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
 import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/ui/core/themes/themes.dart';
+
+import 'data/services/auth/auth_service.dart';
+import 'data/services/local_storage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
