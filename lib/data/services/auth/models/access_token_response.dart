@@ -6,7 +6,7 @@ part 'access_token_response.g.dart';
 @JsonSerializable()
 class AccessTokenResponse extends BaseResponse {
   @JsonKey(name: 'access_token')
-  final String accessToken;
+  final String? accessToken;
 
   AccessTokenResponse(super.message, this.accessToken);
 

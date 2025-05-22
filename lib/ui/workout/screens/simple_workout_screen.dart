@@ -23,7 +23,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => SimpleViewModel(workoutInfo),
+      create: (context) => SimpleViewModel(),
       child: Consumer<SimpleViewModel>(builder: (context, provider, _) {
         return Column(
           children: [
@@ -45,7 +45,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                           height: 259,
                           child: Row(
                             children: [
-                              Expanded(flex: 1, child: VideoPlayerCard(videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')),
+                              Expanded(flex: 1, child: VideoPlayerCard(videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4')),
                               SizedBox(width: 4),
                               Expanded(
                                   flex: 1,
@@ -54,7 +54,8 @@ class SimpleWorkoutScreen extends StatelessWidget {
                                       Expanded(
                                           flex: 1,
                                           child: LevelUpContainer(
-                                            child: Text(provider.getWorkoutString(workoutInfo.items.first), style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
+                                            child:
+                                                Text(provider.getWorkoutString(workoutInfo.items.first), style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
                                           )),
                                       SizedBox(height: 4),
                                       Expanded(
@@ -74,7 +75,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                       SizedBox(
                         height: 46,
                         child: Row(children: [
-                          LevelUpIconButton(iconAsset: Assets.minusIcon, onClick: () => provider.onMinusClicked()),
+                          LevelUpIconButton(iconAsset: Assets.minusIcon, onClick: () => provider.onMinusClicked(context)),
                           SizedBox(width: 4),
                           Expanded(
                             flex: 1,
@@ -107,7 +108,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                           : SixResultsWidget(
                               selectedId: provider.selectedId,
                               results: provider.generateSixDaysResult(workoutInfo.items.first),
-                              onResultSelected: provider.onResultSelected,
+                              onResultSelected: (id) => provider.onResultSelected(context, id),
                             ),
                       SizedBox(height: 16),
                     ],

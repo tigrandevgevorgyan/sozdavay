@@ -50,6 +50,6 @@ extension ErrorParsing on Exception {
       final dioException = this as DioException;
       return dioException.response?.data['message'] ?? 'Неизвестная ошибка при отправке запроса';
     }
-    return toString();
+    return toString().replaceAll('Exception:', '');
   }
 }

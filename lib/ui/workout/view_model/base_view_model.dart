@@ -6,9 +6,7 @@ import 'package:level_up/ui/workout/widgets/six_results_widget.dart';
 import 'package:provider/provider.dart';
 
 class BaseViewModel extends ChangeNotifier {
-  BaseViewModel(this.workout);
-
-  final WorkoutInfo workout;
+  BaseViewModel();
 
   bool _isUpdatingHistory = false;
 
@@ -20,7 +18,7 @@ class BaseViewModel extends ChangeNotifier {
 
   int? get selectedId => _selectedId;
 
-  void onResultSelected(int id) {
+  void onResultSelected(BuildContext context, int id) {
     _selectedId = id;
   }
 
@@ -29,6 +27,7 @@ class BaseViewModel extends ChangeNotifier {
   }
 
   void changeExercise(BuildContext context) async {
+    final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     isUpdatingExercise = true;
     notifyListeners();
     await Provider.of<WorkoutViewModel>(context, listen: false).updateExercise(context, workout.items.first.id);
@@ -37,8 +36,13 @@ class BaseViewModel extends ChangeNotifier {
   }
 
   void addOrUpdateSetResult(BuildContext context, int exerciseId, int repeats, int weight) async {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (_selectedId != null) {
-      //updating workout
+      _isUpdatingHistory = true;
+      notifyListeners();
+      await Provider.of<WorkoutViewModel>(context, listen: false).updateSetResult(context, selectedId!, exerciseId, weight, repeats, 1, 1);
+      _isUpdatingHistory = false;
+      notifyListeners();
     } else {
       _isUpdatingHistory = true;
       notifyListeners();
@@ -46,9 +50,23 @@ class BaseViewModel extends ChangeNotifier {
       _isUpdatingHistory = false;
       notifyListeners();
     }
+    deselectResult();
   }
 
-  ResultValue? findResultById(int id) {
+  void deleteSetResult(BuildContext context) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    if (_selectedId != null) {
+      _isUpdatingHistory = true;
+      notifyListeners();
+      await Provider.of<WorkoutViewModel>(context, listen: false).deleteSetResult(context, selectedId!);
+      _isUpdatingHistory = false;
+      notifyListeners();
+    }
+    deselectResult();
+  }
+
+  ResultValue? findResultById(BuildContext context, int id) {
+    final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     for (ExerciseInfo exerciseInfo in workout.items) {
       for (HistoryInfo historyInfo in exerciseInfo.history) {
         final result = historyInfo.values

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:level_up/config/dio_client.dart';
+import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
 import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/local_storage.dart';
@@ -80,10 +82,12 @@ class HomeViewModel extends ChangeNotifier {
   void onStartWorkoutClicked(BuildContext context) async {
     final result = await GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.workoutPath) as bool?;
     if ((result ?? false) && context.mounted) {
+      await _loadMainInfo(context);
       final now = DateTime.now();
       String dayName = '${weekDays[now.weekday]} ${DateFormat('dd.MM.yy').format(now)}';
       final params = TextEditingScreenParams(title: dayName, initialText: _profile?.data.measurements ?? "", onTextUpdated: _updateMeasurements);
       GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params);
+      notifyListeners();
     }
   }
 
@@ -105,9 +109,14 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void logout(BuildContext context) async {
-    final result = await localStorage.clearAccessToken();
+    _isLoading = true;
+    notifyListeners();
+    final result = await GetIt.I<IAuthRepository>().logout();
+    _isLoading = false;
+    notifyListeners();
     switch (result) {
       case Ok<void>():
+        GetIt.I<IProfileRepository>().onLogout();
         if (context.mounted) {
           GoRouter.of(context).go(LevelUpRouter.signInPath);
         }

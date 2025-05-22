@@ -9,7 +9,7 @@ part of 'access_token_response.dart';
 AccessTokenResponse _$AccessTokenResponseFromJson(Map<String, dynamic> json) =>
     AccessTokenResponse(
       json['message'] as String?,
-      json['access_token'] as String,
+      json['access_token'] as String?,
     );
 
 Map<String, dynamic> _$AccessTokenResponseToJson(

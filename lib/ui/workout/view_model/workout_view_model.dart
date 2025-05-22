@@ -69,6 +69,34 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> updateSetResult(BuildContext context, int id, int exerciseId, int weight, int repeats, int difficult, int time) async {
+    final result = await workoutRepository.updateSetResult(id, exerciseId, weight, repeats, difficult, time);
+    switch (result) {
+      case Ok<List<WorkoutInfo>>():
+        _workout = result.value;
+        notifyListeners();
+      case Error<List<WorkoutInfo>>():
+        if (context.mounted) {
+          notifyListeners();
+          ErrorUtils.showError(context, result.error.getErrorMessage());
+        }
+    }
+  }
+
+  Future<void> deleteSetResult(BuildContext context, int id) async {
+    final result = await workoutRepository.deleteSetResult(id);
+    switch (result) {
+      case Ok<List<WorkoutInfo>>():
+        _workout = result.value;
+        notifyListeners();
+      case Error<List<WorkoutInfo>>():
+        if (context.mounted) {
+          notifyListeners();
+          ErrorUtils.showError(context, result.error.getErrorMessage());
+        }
+    }
+  }
+
   void onNextClicked(BuildContext context) {
     index++;
     if (index >= _workout!.length) {

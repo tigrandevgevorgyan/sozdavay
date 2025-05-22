@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:level_up/config/assets.dart';
@@ -19,12 +20,15 @@ class DayMeasurementsResult extends StatelessWidget {
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             SvgPicture.asset(Assets.pencilIcon),
             SizedBox(width: 4),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 2),
-              child: Text(title, style: Style.raleway15w500.copyWith(color: AppColors.tertiaryHintColor)),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: AutoSizeText(title, style: Style.raleway15w500.copyWith(color: AppColors.tertiaryHintColor), maxLines: 1),
+              ),
             ),
           ],
         ),
@@ -34,7 +38,7 @@ class DayMeasurementsResult extends StatelessWidget {
             onTap: () => onResultSelected(result.id),
             child: Padding(
               padding: const EdgeInsets.only(left: 18, top: 1.5, bottom: 1.5),
-              child: Text(
+              child: AutoSizeText(
                 result.result,
                 style: Style.raleway15w400.copyWith(color: ((selectedId ?? -1) != result.id) ? AppColors.primaryTextColor : AppColors.activeButtonColor),
               ),

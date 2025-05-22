@@ -42,6 +42,9 @@ class AuthRepository extends IAuthRepository {
     try {
       final result = await _authService.authConfirm(phoneNumber, code, 'android', '1.0');
       _token = result.accessToken;
+      if (_token == null) {
+        return Result.error(Exception(result.message ?? ' Неизвестная ошибка'));
+      }
       await _localStorage.saveAccessToken(_token!);
       return Result.ok(result);
     } on DioException catch (e) {

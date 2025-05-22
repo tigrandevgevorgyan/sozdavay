@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_container.dart';
+import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_text_field.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
@@ -23,7 +24,7 @@ class DoubleWorkoutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<DoubleViewModel>(
-      create: (context) => DoubleViewModel(context, workoutInfo),
+      create: (context) => DoubleViewModel(context),
       child: Consumer<DoubleViewModel>(builder: (context, provider, _) {
         return Scaffold(
           backgroundColor: AppColors.backgroundColor,
@@ -84,7 +85,9 @@ class DoubleWorkoutScreen extends StatelessWidget {
                               ],
                             ),
                             SizedBox(height: 4),
-                            HorizontalTimer(title: provider.getRestString(workoutInfo.items.last), secondsToCount: 4),
+                            HorizontalTimer(
+                                title: provider.getRestString(workoutInfo.items.last),
+                                secondsToCount: max(workoutInfo.items.first.maxRest * 60, workoutInfo.items.last.maxRest * 60)),
                             SizedBox(height: 8),
                             SizedBox(
                               height: 84,
@@ -95,8 +98,12 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                     child: DoubleResultsRecording(
                                         weightEditingController: provider.weightFirstController,
                                         repeatsEditingController: provider.repeatsFirstController,
-                                        onPlusClicked: () {},
-                                        onMinusClicked: () {}),
+                                        onPlusClicked: () {
+                                          provider.onFirstPlusClicked(context);
+                                        },
+                                        onMinusClicked: () {
+                                          provider.onMinusClicked(context);
+                                        }),
                                   ),
                                   SizedBox(width: 4),
                                   Expanded(
@@ -104,8 +111,12 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                     child: DoubleResultsRecording(
                                         weightEditingController: provider.weightSecondController,
                                         repeatsEditingController: provider.repeatsSecondController,
-                                        onPlusClicked: () {},
-                                        onMinusClicked: () {}),
+                                        onPlusClicked: () {
+                                          provider.onSecondPlusClicked(context);
+                                        },
+                                        onMinusClicked: () {
+                                          provider.onMinusClicked(context);
+                                        }),
                                   )
                                 ],
                               ),
@@ -115,38 +126,43 @@ class DoubleWorkoutScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SliverList.builder(
-                      itemCount: max(workoutInfo.items.first.history.length, workoutInfo.items.last.history.length),
-                      itemBuilder: (context, index) {
-                        final firstHistoryItem = workoutInfo.items.first.history.elementAtOrNull(index);
-                        final secondHistoryItem = workoutInfo.items.last.history.elementAtOrNull(index);
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: firstHistoryItem != null
-                                    ? DayMeasurementsResult(
-                                        title: '${firstHistoryItem.day} ${firstHistoryItem.date}',
-                                        results: generateSingleDayResult(firstHistoryItem),
-                                        onResultSelected: provider.onFirstIdSelected,
-                                      )
-                                    : SizedBox.shrink(),
-                              ),
-                              Expanded(
-                                child: secondHistoryItem != null
-                                    ? DayMeasurementsResult(
-                                        title: '${secondHistoryItem.day} ${secondHistoryItem.date}',
-                                        results: generateSingleDayResult(secondHistoryItem),
-                                        onResultSelected: provider.onFirstIdSelected,
-                                      )
-                                    : SizedBox.shrink(),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    )
+                    provider.isUpdatingHistory
+                        ? SliverToBoxAdapter(
+                            child: Center(child: LevelUpLoader()),
+                          )
+                        : SliverList.builder(
+                            itemCount: max(workoutInfo.items.first.history.length, workoutInfo.items.last.history.length),
+                            itemBuilder: (context, index) {
+                              final firstHistoryItem = workoutInfo.items.first.history.elementAtOrNull(index);
+                              final secondHistoryItem = workoutInfo.items.last.history.elementAtOrNull(index);
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 14),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: firstHistoryItem != null
+                                          ? DayMeasurementsResult(
+                                              title: '${firstHistoryItem.day} ${firstHistoryItem.date}',
+                                              results: generateSingleDayResult(firstHistoryItem),
+                                              onResultSelected: (id) => provider.onFirstIdSelected(context, id),
+                                            )
+                                          : SizedBox.shrink(),
+                                    ),
+                                    Expanded(
+                                      child: secondHistoryItem != null
+                                          ? DayMeasurementsResult(
+                                              title: '${secondHistoryItem.day} ${secondHistoryItem.date}',
+                                              results: generateSingleDayResult(secondHistoryItem),
+                                              onResultSelected: (id) => provider.onSecondIdSelected(context, id),
+                                            )
+                                          : SizedBox.shrink(),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          )
                   ],
                 ),
               ),

@@ -50,6 +50,7 @@ ExerciseInfo _$ExerciseInfoFromJson(Map<String, dynamic> json) => ExerciseInfo(
       (json['min_rest'] as num).toInt(),
       (json['max_rest'] as num).toInt(),
       json['last_sets_full'] as bool,
+      json['description'] as String?,
     );
 
 Map<String, dynamic> _$ExerciseInfoToJson(ExerciseInfo instance) =>
@@ -63,6 +64,7 @@ Map<String, dynamic> _$ExerciseInfoToJson(ExerciseInfo instance) =>
       'min_rest': instance.minRest,
       'max_rest': instance.maxRest,
       'last_sets_full': instance.lastSetsFull,
+      'description': instance.description,
       'history': instance.history,
     };
 

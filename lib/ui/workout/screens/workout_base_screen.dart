@@ -55,7 +55,7 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
 
   Widget _getScreenByWorkout(WorkoutInfo workout) {
     if (workout.isComplex) {
-      return ComplexWorkoutScreen();
+      return ComplexWorkoutScreen(workoutInfo: workout);
     }
     if (workout.isDouble) {
       return DoubleWorkoutScreen(workoutInfo: workout);

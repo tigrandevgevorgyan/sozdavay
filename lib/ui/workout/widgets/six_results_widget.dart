@@ -15,6 +15,7 @@ class SixResultsWidget extends StatelessWidget {
     return Column(
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             for (int i = 0; i < min(3, results.length); i++)
               Expanded(
@@ -30,6 +31,7 @@ class SixResultsWidget extends StatelessWidget {
         ),
         SizedBox(height: 12),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             for (int i = 3; i < min(6, results.length); i++)
               Expanded(

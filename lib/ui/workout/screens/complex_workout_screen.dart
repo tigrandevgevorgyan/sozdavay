@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:level_up/config/assets.dart';
+import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_container.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_text_field.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
@@ -13,7 +14,9 @@ import 'package:level_up/ui/workout/widgets/workout_top_bar.dart';
 import 'package:provider/provider.dart';
 
 class ComplexWorkoutScreen extends StatelessWidget {
-  const ComplexWorkoutScreen({super.key});
+  const ComplexWorkoutScreen({super.key, required this.workoutInfo});
+
+  final WorkoutInfo workoutInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +58,7 @@ class ComplexWorkoutScreen extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.all(12),
                           child: Text(
-                            'Символизм продолжает фактографический метод кластерного анализа. Художественный ритуал имитирует непосредственный романтизм, таким образом, второй комплекс движущих сил получил разработку в трудах А.Берталанфи и Ш.Бюлера. Герменевтика, на первый взгляд',
+                            workoutInfo.items.first.description ?? '',
                             style: Style.raleway16w300.copyWith(color: AppColors.primaryTextColor),
                           ),
                         ),
@@ -104,7 +107,7 @@ class ComplexWorkoutScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 16),
                       SixResultsWidget(
-                        results: provider.testResults,
+                        results: provider.generateSixDaysResult(workoutInfo.items.first),
                         onResultSelected: (id) {},
                       ),
                       SizedBox(height: 16),

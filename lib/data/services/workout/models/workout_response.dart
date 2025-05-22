@@ -39,11 +39,12 @@ class ExerciseInfo {
   final int minRest;
   final int maxRest;
   final bool lastSetsFull;
+  final String? description;
   final List<HistoryInfo> history;
 
   factory ExerciseInfo.fromJson(Map<String, dynamic> json) => _$ExerciseInfoFromJson(json);
 
-  ExerciseInfo(this.id, this.name, this.history, this.minRepeats, this.maxRepeats, this.minSets, this.maxSets, this.minRest, this.maxRest, this.lastSetsFull);
+  ExerciseInfo(this.id, this.name, this.history, this.minRepeats, this.maxRepeats, this.minSets, this.maxSets, this.minRest, this.maxRest, this.lastSetsFull, this.description);
 
   Map<String, dynamic> toJson() => _$ExerciseInfoToJson(this);
 }
