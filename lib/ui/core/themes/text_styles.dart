@@ -81,7 +81,7 @@ class Style {
   static TextStyle outfit17w700 = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w700,
-    fontFamily: "Raleway",
+    fontFamily: "Outfit",
     color: Colors.white,
   );
 
