@@ -10,7 +10,7 @@ abstract class WorkoutService {
   factory WorkoutService(Dio dio, {String? baseUrl}) = _WorkoutService;
 
   @GET('/workout/start')
-  Future<WorkoutResponse> startWorkout();
+  Future<WorkoutResponse> startWorkout(@Query('day') int dayIndex);
 
   @POST('/workout/finish')
   Future<WorkoutFinishResponse> finishWorkout();

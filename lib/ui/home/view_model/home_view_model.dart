@@ -64,6 +64,13 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  int? _selectedDayIndex;
+
+  void selectDay(int index) {
+    _selectedDayIndex = index;
+    notifyListeners();
+  }
+
   List<CalendarDayInfo> getWeekDays() {
     if (_mainInfo == null) {
       return [];
@@ -74,13 +81,35 @@ class HomeViewModel extends ChangeNotifier {
     for (int i = 0; i < 7; i++) {
       final dayOfWeek = monday.add(Duration(days: i));
       final DayInfo dayInfo = _mainInfo!.schedule[i];
-      result.add(CalendarDayInfo(dayInfo.day, dayOfWeek.day, dayInfo.name != null, dayInfo.isActive));
+      final bool isToday = dayOfWeek.year == today.year &&
+          dayOfWeek.month == today.month &&
+          dayOfWeek.day == today.day;
+      final isSelected = _selectedDayIndex != null
+          ? _selectedDayIndex == i
+          : isToday;
+      result.add(CalendarDayInfo(dayInfo.day, dayOfWeek.day, dayInfo.isActive, isToday, isSelected));
     }
     return result;
   }
 
+  String get selectedTrainingName {
+    if (_mainInfo == null) return '';
+
+    final schedule = _mainInfo!.schedule;
+    final int todayIndex = DateTime.now().weekday - 1;
+    final index = _selectedDayIndex ?? todayIndex;
+
+    if (index < 0 || index >= schedule.length) return '';
+
+    final dayInfo = schedule[index];
+
+    return dayInfo.name ?? (dayInfo.isActive ? 'НАЧАТЬ ТРЕНИРОВКУ' : '');
+
+  }
+
   void onStartWorkoutClicked(BuildContext context) async {
-    final result = await GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.workoutPath) as bool?;
+    final dayIndex = (_selectedDayIndex ?? DateTime.now().weekday - 1) + 1;
+    final result = await GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.workoutPath, extra: dayIndex) as bool?;
     if ((result ?? false) && context.mounted) {
       await _loadMainInfo(context);
       final now = DateTime.now();

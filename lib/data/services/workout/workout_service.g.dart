@@ -18,9 +18,9 @@ class _WorkoutService implements WorkoutService {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<WorkoutResponse> startWorkout() async {
+  Future<WorkoutResponse> startWorkout(int dayIndex) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'day': dayIndex};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<WorkoutResponse>(
