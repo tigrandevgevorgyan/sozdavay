@@ -13,7 +13,7 @@ class ErrorTextWidget extends StatelessWidget {
     }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Text(error!, style: Style.raleway16w400.copyWith(color: Colors.red)),
+      child: Text(error!, style: Style.outfit16w400.copyWith(color: Colors.red)),
     );
   }
 }

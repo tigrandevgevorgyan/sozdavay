@@ -59,7 +59,7 @@ class ComplexWorkoutScreen extends StatelessWidget {
                           padding: const EdgeInsets.all(12),
                           child: Text(
                             workoutInfo.items.first.description ?? '',
-                            style: Style.raleway16w300.copyWith(color: AppColors.primaryTextColor),
+                            style: Style.outfit16w300.copyWith(color: AppColors.primaryTextColor),
                           ),
                         ),
                       ),

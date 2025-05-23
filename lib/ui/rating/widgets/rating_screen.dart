@@ -39,7 +39,7 @@ class RatingScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(height: 10),
-                        Text('Рейтинг по', style: Style.raleway14w400.copyWith(color: AppColors.primaryTextColor)),
+                        Text('Рейтинг по', style: Style.outfit14w400.copyWith(color: AppColors.primaryTextColor)),
                         SizedBox(height: 8),
                         OptionsInputField(
                           hint: 'Категория',
@@ -71,7 +71,7 @@ class RatingScreen extends StatelessWidget {
                         SizedBox(height: 10),
                         provider.ratings.isEmpty
                             ? Center(
-                                child: Text('Ничего не найдено', style: Style.raleway16w400),
+                                child: Text('Ничего не найдено', style: Style.outfit16w400),
                               )
                             : ListView.builder(
                                 shrinkWrap: true,
