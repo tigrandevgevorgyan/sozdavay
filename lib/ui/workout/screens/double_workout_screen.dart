@@ -87,7 +87,11 @@ class DoubleWorkoutScreen extends StatelessWidget {
                             SizedBox(height: 4),
                             HorizontalTimer(
                                 title: provider.getRestString(workoutInfo.items.last),
-                                secondsToCount: max(workoutInfo.items.first.maxRest * 60, workoutInfo.items.last.maxRest * 60)),
+                              secondsToCount: max(
+                                workoutInfo.items.first.restSeconds,
+                                workoutInfo.items.last.restSeconds,
+                              ),
+                            ),
                             SizedBox(height: 8),
                             SizedBox(
                               height: 84,

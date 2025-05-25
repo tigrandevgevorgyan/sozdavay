@@ -95,34 +95,54 @@ class BaseViewModel extends ChangeNotifier {
   }
 
   String getRestString(ExerciseInfo exerciseInfo) {
-    if (exerciseInfo.minRest == 0 && exerciseInfo.maxRest == 0) {
+    final restSec = exerciseInfo.restSeconds.abs();
+
+    if (restSec == 0) {
       return 'Без отдыха';
     }
-    if (exerciseInfo.minRest != 0 && exerciseInfo.maxRest == 0) {
-      return 'Отдых от ${exerciseInfo.maxRest} мин';
+
+    final minutes = restSec ~/ 60;
+    final seconds = restSec % 60;
+
+    if (minutes > 0 && seconds > 0) {
+      return 'Отдых $minutes мин $seconds сек';
+    } else if (minutes > 0) {
+      return 'Отдых $minutes мин';
+    } else {
+      return 'Отдых $seconds сек';
     }
-    if (exerciseInfo.minRest == 0 && exerciseInfo.maxRest != 0) {
-      return 'Отдых до ${exerciseInfo.maxRest} мин';
-    }
-    if (exerciseInfo.minRest != 0 && exerciseInfo.maxRest != 0) {
-      return 'Отдых ${exerciseInfo.minRest} - ${exerciseInfo.maxRest} мин';
-    }
-    return '';
   }
 
   String getWorkoutString(ExerciseInfo exerciseInfo) {
-    String result = '';
-    if (exerciseInfo.minSets != 0 || exerciseInfo.maxSets != 0) {
-      result += getRangeString(exerciseInfo.minSets, exerciseInfo.maxSets);
-      result += ' по ';
-    }
-    result += getRangeString(exerciseInfo.minRepeats, exerciseInfo.maxRepeats);
-    if (exerciseInfo.lastSetsFull) {
-      result += '\n1 в отказ';
-    }
+    if (exerciseInfo.sets.isEmpty) return '';
 
-    return result;
+    return exerciseInfo.sets.map((set) {
+      final setsCount = set.setsCount?.abs() ?? 0;
+      final from = set.repeatsFrom?.abs();
+      final to = set.repeatsTo?.abs();
+      final isHard = (set.asMuchAsPossible ?? 0) == 1;
+
+      if (setsCount == 0 || ((from ?? 0) == 0 && (to ?? 0) == 0)) {
+        return '';
+      }
+
+      String repeatsText;
+      if (from != null && to != null) {
+        repeatsText = from == to || to == 0 ? '$from' : '$from–$to';
+      } else if (from != null) {
+        repeatsText = '$from';
+      } else if (to != null) {
+        repeatsText = '$to';
+      } else {
+        repeatsText = '-';
+      }
+
+      final hardText = isHard ? '\n1 в отказ' : '';
+
+      return '$setsCount по $repeatsText$hardText';
+    }).where((s) => s.isNotEmpty).join('\n\n');
   }
+
 
   String getRangeString(int minValue, int maxValue) {
     if (minValue != 0 && maxValue != 0) {

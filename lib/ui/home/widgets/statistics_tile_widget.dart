@@ -92,7 +92,7 @@ class SmallStatisticsTile extends StatelessWidget {
               number.toString(),
               style: Style.ablation32w900.copyWith(color: AppColors.primaryTextColor),
             ),
-            Transform.translate(offset: Offset(0, -6), child: Text(label, style: Style.raleway16w400.copyWith(color: AppColors.secondaryTextColor))),
+            Transform.translate(offset: Offset(0, -6), child: Text(label, style: Style.outfit16w400.copyWith(color: AppColors.secondaryTextColor))),
           ],
         ),
       ),
@@ -168,7 +168,7 @@ class RatingPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - 10) / 2;
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius), 0, 2 * pi, false, backgroundArcPaint);
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), -pi / 2, (2 * pi) * percent / 100, false, foregroundArcPaint);
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), -pi / 2, (2 * pi) * percent / 3500, false, foregroundArcPaint);
   }
 
   @override

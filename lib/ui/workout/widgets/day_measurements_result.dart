@@ -27,7 +27,7 @@ class DayMeasurementsResult extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 2),
-                child: AutoSizeText(title, style: Style.raleway15w500.copyWith(color: AppColors.tertiaryHintColor), maxLines: 1),
+                child: AutoSizeText(title, style: Style.outfit15w500.copyWith(color: AppColors.tertiaryHintColor), maxLines: 1),
               ),
             ),
           ],
@@ -40,7 +40,7 @@ class DayMeasurementsResult extends StatelessWidget {
               padding: const EdgeInsets.only(left: 18, top: 1.5, bottom: 1.5),
               child: AutoSizeText(
                 result.result,
-                style: Style.raleway15w400.copyWith(color: ((selectedId ?? -1) != result.id) ? AppColors.primaryTextColor : AppColors.activeButtonColor),
+                style: Style.outfit15w400.copyWith(color: ((selectedId ?? -1) != result.id) ? AppColors.primaryTextColor : AppColors.activeButtonColor),
               ),
             ),
           ),

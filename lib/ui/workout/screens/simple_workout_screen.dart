@@ -63,7 +63,10 @@ class SimpleWorkoutScreen extends StatelessWidget {
                                           child: LevelUpContainer(
                                             child: Column(
                                               children: [
-                                                SquareTimer(title: provider.getRestString(workoutInfo.items.first), secondsDuration: workoutInfo.items.first.maxRest * 60),
+                                                SquareTimer(
+                                                  title: provider.getRestString(workoutInfo.items.first),
+                                                  secondsDuration: workoutInfo.items.first.restSeconds,
+                                                ),
                                               ],
                                             ),
                                           )),

@@ -64,6 +64,16 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> reloadMainInfo(BuildContext context) async {
+    _isLoading = true;
+    notifyListeners();
+
+    await _loadMainInfo(context);
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
   int? _selectedDayIndex;
 
   void selectDay(int index) {

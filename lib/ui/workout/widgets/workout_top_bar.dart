@@ -67,7 +67,7 @@ class ExerciseRow extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: Text(title, style: Style.raleway17w700.copyWith(color: AppColors.primaryTextColor)),
+          child: Text(title, style: Style.outfit17w700.copyWith(color: AppColors.primaryTextColor)),
         ),
       ],
     );

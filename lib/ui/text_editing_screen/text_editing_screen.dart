@@ -53,7 +53,7 @@ class _TextEditingScreenState extends State<TextEditingScreen> {
                 keyboardType: TextInputType.multiline,
                 maxLines: null,
                 autocorrect: false,
-                style: Style.raleway16w400,
+                style: Style.outfit16w400,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   isDense: true,
