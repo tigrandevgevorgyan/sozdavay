@@ -97,7 +97,8 @@ class HomeViewModel extends ChangeNotifier {
       final isSelected = _selectedDayIndex != null
           ? _selectedDayIndex == i
           : isToday;
-      result.add(CalendarDayInfo(dayInfo.day, dayOfWeek.day, dayInfo.isActive, isToday, isSelected));
+      final bool isTrainingDay = dayInfo.name?.isNotEmpty ?? false;
+      result.add(CalendarDayInfo(dayInfo.day, dayOfWeek.day,  isTrainingDay, isToday, isSelected));
     }
     return result;
   }
