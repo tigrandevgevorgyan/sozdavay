@@ -79,7 +79,7 @@ class PodiumPositionWidget extends StatelessWidget {
         ),
         SizedBox(height: 4),
         if (name != null && score != null) ...[
-          Text(name!, style: Style.raleway16w400.copyWith(color: AppColors.primaryTextColor), textAlign: TextAlign.center),
+          Text(name!, style: Style.outfit16w400.copyWith(color: AppColors.primaryTextColor), textAlign: TextAlign.center),
           SizedBox(height: 4),
           Text(score.toString(), style: Style.ablation14w900.copyWith(color: AppColors.activeButtonColor)),
         ]

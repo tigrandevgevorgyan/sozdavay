@@ -33,7 +33,7 @@ class LevelUpRadioButton extends StatelessWidget {
             ),
           ),
           SizedBox(width: 14),
-          Text(value, style: Style.raleway14w400),
+          Text(value, style: Style.outfit14w400),
         ],
       ),
     );

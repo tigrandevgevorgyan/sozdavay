@@ -13,6 +13,8 @@ abstract class IProfileRepository {
   Future<Result<UserProfileShortResponse>> updateMeasurements(String measurements);
 
   Future<Result<UserProfileShortResponse>> updateRecords(String records);
+
+  void onLogout();
 }
 
 class ProfileRepositoryImpl extends IProfileRepository {
@@ -83,5 +85,10 @@ class ProfileRepositoryImpl extends IProfileRepository {
     } on DioException catch (e) {
       return Result.error(e);
     }
+  }
+
+  @override
+  void onLogout() {
+    _profileResponse = null;
   }
 }

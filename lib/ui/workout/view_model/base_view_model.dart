@@ -6,9 +6,7 @@ import 'package:level_up/ui/workout/widgets/six_results_widget.dart';
 import 'package:provider/provider.dart';
 
 class BaseViewModel extends ChangeNotifier {
-  BaseViewModel(this.workout);
-
-  final WorkoutInfo workout;
+  BaseViewModel();
 
   bool _isUpdatingHistory = false;
 
@@ -20,8 +18,9 @@ class BaseViewModel extends ChangeNotifier {
 
   int? get selectedId => _selectedId;
 
-  void onResultSelected(int id) {
+  void onResultSelected(BuildContext context, int id) {
     _selectedId = id;
+    notifyListeners();
   }
 
   void deselectResult() {
@@ -29,6 +28,7 @@ class BaseViewModel extends ChangeNotifier {
   }
 
   void changeExercise(BuildContext context) async {
+    final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     isUpdatingExercise = true;
     notifyListeners();
     await Provider.of<WorkoutViewModel>(context, listen: false).updateExercise(context, workout.items.first.id);
@@ -36,19 +36,38 @@ class BaseViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addOrUpdateSetResult(BuildContext context, int exerciseId, int repeats, int weight) async {
+  void addOrUpdateSetResult(BuildContext context, int exerciseId, int repeats, int weight, int time) async {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (_selectedId != null) {
-      //updating workout
+      _isUpdatingHistory = true;
+      notifyListeners();
+      await Provider.of<WorkoutViewModel>(context, listen: false).updateSetResult(context, selectedId!, exerciseId, weight, repeats, 1, time);
+      _isUpdatingHistory = false;
+      notifyListeners();
     } else {
       _isUpdatingHistory = true;
       notifyListeners();
-      await Provider.of<WorkoutViewModel>(context, listen: false).addSetResult(context, exerciseId, weight, repeats, 1, 1);
+      await Provider.of<WorkoutViewModel>(context, listen: false).addSetResult(context, exerciseId, weight, repeats, 1, time);
       _isUpdatingHistory = false;
       notifyListeners();
     }
+    deselectResult();
   }
 
-  ResultValue? findResultById(int id) {
+  void deleteSetResult(BuildContext context) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    if (_selectedId != null) {
+      _isUpdatingHistory = true;
+      notifyListeners();
+      await Provider.of<WorkoutViewModel>(context, listen: false).deleteSetResult(context, selectedId!);
+      _isUpdatingHistory = false;
+      notifyListeners();
+    }
+    deselectResult();
+  }
+
+  ResultValue? findResultById(BuildContext context, int id) {
+    final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     for (ExerciseInfo exerciseInfo in workout.items) {
       for (HistoryInfo historyInfo in exerciseInfo.history) {
         final result = historyInfo.values
@@ -77,33 +96,55 @@ class BaseViewModel extends ChangeNotifier {
   }
 
   String getRestString(ExerciseInfo exerciseInfo) {
-    if (exerciseInfo.minRest == 0 && exerciseInfo.maxRest == 0) {
+    final restSec = exerciseInfo.restSeconds.abs();
+
+    if (restSec == 0) {
       return 'Без отдыха';
     }
-    if (exerciseInfo.minRest != 0 && exerciseInfo.maxRest == 0) {
-      return 'Отдых от ${exerciseInfo.maxRest} мин';
+
+    final minutes = restSec ~/ 60;
+    final seconds = restSec % 60;
+
+    if (minutes > 0 && seconds > 0) {
+      return 'Отдых $minutes мин $seconds сек';
+    } else if (minutes > 0) {
+      return 'Отдых $minutes мин';
+    } else {
+      return 'Отдых $seconds сек';
     }
-    if (exerciseInfo.minRest == 0 && exerciseInfo.maxRest != 0) {
-      return 'Отдых до ${exerciseInfo.maxRest} мин';
-    }
-    if (exerciseInfo.minRest != 0 && exerciseInfo.maxRest != 0) {
-      return 'Отдых ${exerciseInfo.minRest} - ${exerciseInfo.maxRest} мин';
-    }
-    return '';
   }
 
   String getWorkoutString(ExerciseInfo exerciseInfo) {
-    String result = '';
-    if (exerciseInfo.minSets != 0 || exerciseInfo.maxSets != 0) {
-      result += getRangeString(exerciseInfo.minSets, exerciseInfo.maxSets);
-      result += ' по ';
-    }
-    result += getRangeString(exerciseInfo.minRepeats, exerciseInfo.maxRepeats);
-    if (exerciseInfo.lastSetsFull) {
-      result += '\n1 в отказ';
-    }
+    if (exerciseInfo.sets.isEmpty) return '';
 
-    return result;
+    return exerciseInfo.sets
+        .map((set) {
+          final setsCount = set.setsCount?.abs() ?? 0;
+          final from = set.repeatsFrom?.abs();
+          final to = set.repeatsTo?.abs();
+          final isHard = (set.asMuchAsPossible ?? 0) == 1;
+
+          if (setsCount == 0 || ((from ?? 0) == 0 && (to ?? 0) == 0)) {
+            return '';
+          }
+
+          String repeatsText;
+          if (from != null && to != null) {
+            repeatsText = from == to || to == 0 ? '$from' : '$from–$to';
+          } else if (from != null) {
+            repeatsText = '$from';
+          } else if (to != null) {
+            repeatsText = '$to';
+          } else {
+            repeatsText = '-';
+          }
+
+          final hardText = isHard ? '\n1 в отказ' : '';
+
+          return '$setsCount по $repeatsText$hardText';
+        })
+        .where((s) => s.isNotEmpty)
+        .join('\n\n');
   }
 
   String getRangeString(int minValue, int maxValue) {

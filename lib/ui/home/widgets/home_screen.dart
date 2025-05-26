@@ -10,6 +10,7 @@ import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/ui/home/view_model/home_view_model.dart';
 import 'package:level_up/ui/home/widgets/banner_button.dart';
 import 'package:level_up/ui/home/widgets/calendar_widget.dart';
+import 'package:level_up/ui/home/widgets/start_training_banner.dart';
 import 'package:level_up/ui/home/widgets/statistics_tile_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -34,6 +35,7 @@ class HomeScreen extends StatelessWidget {
                 onLogoutClicked: () => provider.logout(context),
               ),
               centerTitle: true,
+              backgroundColor: AppColors.backgroundColor,
             ),
             backgroundColor: AppColors.backgroundColor,
             body: provider.isLoading
@@ -45,17 +47,24 @@ class HomeScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 20),
-                        CalendarWidget(height: 55, days: provider.getWeekDays()),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 14, bottom: 8),
-                          child: Text(provider.trainingName, style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor)),
+                        CalendarWidget(
+                          height: 55,
+                          days: provider.getWeekDays(),
+                          onDaySelected: (CalendarDayInfo day, int index) {
+                            if (!day.isTrainingDay) return;
+                            provider.selectDay(index);
+                          },
+                        ),
+                        SizedBox(
+                          height: 20,
                         ),
                         Expanded(
                           flex: 100,
-                          child: BannerButton(
+                          child: StartTrainingBanner(
                             imagePath: Assets.startTrainingBanner,
-                            text: 'НАЧАТЬ ТРЕНИРОВКУ',
+                            text: provider.selectedTrainingName,
                             onClick: () => provider.onStartWorkoutClicked(context),
+                            isActive: provider.selectedTrainingName.isNotEmpty,
                           ),
                         ),
                         Padding(

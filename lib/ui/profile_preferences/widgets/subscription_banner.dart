@@ -25,7 +25,7 @@ class SubscriptionBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Подписка', style: Style.raleway14w400),
+                  Text('Подписка', style: Style.outfit14w400),
                   SizedBox(height: 4),
                   Text('активна до $validUntilDate', style: Style.ablation15w900),
                 ],

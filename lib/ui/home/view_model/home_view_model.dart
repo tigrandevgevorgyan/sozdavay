@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:level_up/config/dio_client.dart';
+import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
 import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/local_storage.dart';
@@ -62,6 +64,23 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> reloadMainInfo(BuildContext context) async {
+    _isLoading = true;
+    notifyListeners();
+
+    await _loadMainInfo(context);
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  int? _selectedDayIndex;
+
+  void selectDay(int index) {
+    _selectedDayIndex = index;
+    notifyListeners();
+  }
+
   List<CalendarDayInfo> getWeekDays() {
     if (_mainInfo == null) {
       return [];
@@ -72,18 +91,43 @@ class HomeViewModel extends ChangeNotifier {
     for (int i = 0; i < 7; i++) {
       final dayOfWeek = monday.add(Duration(days: i));
       final DayInfo dayInfo = _mainInfo!.schedule[i];
-      result.add(CalendarDayInfo(dayInfo.day, dayOfWeek.day, dayInfo.name != null, dayInfo.isActive));
+      final bool isToday = dayOfWeek.year == today.year &&
+          dayOfWeek.month == today.month &&
+          dayOfWeek.day == today.day;
+      final isSelected = _selectedDayIndex != null
+          ? _selectedDayIndex == i
+          : isToday;
+      final bool isTrainingDay = dayInfo.name?.isNotEmpty ?? false;
+      result.add(CalendarDayInfo(dayInfo.day, dayOfWeek.day,  isTrainingDay, isToday, isSelected));
     }
     return result;
   }
 
+  String get selectedTrainingName {
+    if (_mainInfo == null) return '';
+
+    final schedule = _mainInfo!.schedule;
+    final int todayIndex = DateTime.now().weekday - 1;
+    final index = _selectedDayIndex ?? todayIndex;
+
+    if (index < 0 || index >= schedule.length) return '';
+
+    final dayInfo = schedule[index];
+
+    return dayInfo.name ?? (dayInfo.isActive ? 'НАЧАТЬ ТРЕНИРОВКУ' : '');
+
+  }
+
   void onStartWorkoutClicked(BuildContext context) async {
-    final result = await GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.workoutPath) as bool?;
+    final dayIndex = (_selectedDayIndex ?? DateTime.now().weekday - 1) + 1;
+    final result = await GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.workoutPath, extra: dayIndex) as bool?;
     if ((result ?? false) && context.mounted) {
+      await _loadMainInfo(context);
       final now = DateTime.now();
       String dayName = '${weekDays[now.weekday]} ${DateFormat('dd.MM.yy').format(now)}';
       final params = TextEditingScreenParams(title: dayName, initialText: _profile?.data.measurements ?? "", onTextUpdated: _updateMeasurements);
       GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params);
+      notifyListeners();
     }
   }
 
@@ -105,9 +149,14 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void logout(BuildContext context) async {
-    final result = await localStorage.clearAccessToken();
+    _isLoading = true;
+    notifyListeners();
+    final result = await GetIt.I<IAuthRepository>().logout();
+    _isLoading = false;
+    notifyListeners();
     switch (result) {
       case Ok<void>():
+        GetIt.I<IProfileRepository>().onLogout();
         if (context.mounted) {
           GoRouter.of(context).go(LevelUpRouter.signInPath);
         }

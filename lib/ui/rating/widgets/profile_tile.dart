@@ -36,14 +36,14 @@ class ProfileTile extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Text(name, style: Style.raleway16w400.copyWith(color: AppColors.primaryTextColor)),
+                child: Text(name, style: Style.outfit16w400.copyWith(color: AppColors.primaryTextColor)),
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(score.toString(), style: Style.ablation14w900),
-                Text(tierName, style: Style.raleway11w300.copyWith(color: AppColors.primaryTextColor)),
+                Text(tierName, style: Style.outfit11w300.copyWith(color: AppColors.primaryTextColor)),
               ],
             ),
             SizedBox(width: 10),

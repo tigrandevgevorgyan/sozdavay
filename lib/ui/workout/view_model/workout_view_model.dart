@@ -11,7 +11,9 @@ import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 
 class WorkoutViewModel extends ChangeNotifier {
-  WorkoutViewModel(BuildContext context, this.workoutRepository) {
+  final int dayIndex;
+
+  WorkoutViewModel(BuildContext context, this.workoutRepository, {required this.dayIndex}) {
     _init(context);
   }
 
@@ -26,7 +28,7 @@ class WorkoutViewModel extends ChangeNotifier {
 
   void _init(BuildContext context) async {
     _isLoading = true;
-    final result = await workoutRepository.loadWorkout();
+    final result = await workoutRepository.loadWorkout(dayIndex: dayIndex);
     _isLoading = false;
     switch (result) {
       case Ok<List<WorkoutInfo>>():
@@ -57,6 +59,34 @@ class WorkoutViewModel extends ChangeNotifier {
 
   Future<void> addSetResult(BuildContext context, int exerciseId, int weight, int repeats, int difficult, int time) async {
     final result = await workoutRepository.addSetResult(exerciseId, weight, repeats, difficult, time);
+    switch (result) {
+      case Ok<List<WorkoutInfo>>():
+        _workout = result.value;
+        notifyListeners();
+      case Error<List<WorkoutInfo>>():
+        if (context.mounted) {
+          notifyListeners();
+          ErrorUtils.showError(context, result.error.getErrorMessage());
+        }
+    }
+  }
+
+  Future<void> updateSetResult(BuildContext context, int id, int exerciseId, int weight, int repeats, int difficult, int time) async {
+    final result = await workoutRepository.updateSetResult(id, exerciseId, weight, repeats, difficult, time);
+    switch (result) {
+      case Ok<List<WorkoutInfo>>():
+        _workout = result.value;
+        notifyListeners();
+      case Error<List<WorkoutInfo>>():
+        if (context.mounted) {
+          notifyListeners();
+          ErrorUtils.showError(context, result.error.getErrorMessage());
+        }
+    }
+  }
+
+  Future<void> deleteSetResult(BuildContext context, int id) async {
+    final result = await workoutRepository.deleteSetResult(id);
     switch (result) {
       case Ok<List<WorkoutInfo>>():
         _workout = result.value;

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:level_up/config/assets.dart';
+import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_container.dart';
+import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_text_field.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
@@ -13,38 +15,50 @@ import 'package:level_up/ui/workout/widgets/workout_top_bar.dart';
 import 'package:provider/provider.dart';
 
 class ComplexWorkoutScreen extends StatelessWidget {
-  const ComplexWorkoutScreen({super.key});
+  const ComplexWorkoutScreen({super.key, required this.workoutInfo});
+
+  final WorkoutInfo workoutInfo;
 
   @override
   Widget build(BuildContext context) {
+    final sideHorizontalPadding = 12.0;
+    final minHorizontalPadding = 4.0;
     return ChangeNotifierProvider(
-      create: (context) => ComplexViewModel(),
+      create: (context) => ComplexViewModel(context),
       child: Consumer<ComplexViewModel>(builder: (context, provider, _) {
         return Column(
           children: [
-            WorkoutTopBar(isUpdatingFirstExercise: false, firstExerciseName: 'Комлпекс номер 1', onFirstExerciseRefresh: () {}),
+            WorkoutTopBar(
+                isUpdatingFirstExercise: provider.isUpdatingExercise,
+                firstExerciseName: workoutInfo.items.first.name,
+                onFirstExerciseRefresh: () => provider.changeExercise(context)),
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: EdgeInsets.symmetric(horizontal: sideHorizontalPadding),
                   child: Column(
                     children: [
                       SizedBox(height: 10),
-                      SizedBox(
-                        height: 259,
+                      IntrinsicHeight(
                         child: Row(
                           children: [
-                            Expanded(
-                              flex: 1,
-                              child: VideoPlayerCard(videoUrl: 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'),
+                            AspectRatio(
+                              aspectRatio: 9 / 16,
+                              child: VideoPlayerCard(videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4'),
                             ),
-                            SizedBox(width: 4),
+                            SizedBox(width: minHorizontalPadding),
                             Expanded(
                               flex: 1,
-                              child: GridView.builder(
-                                itemCount: 8,
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 4, mainAxisSpacing: 4, childAspectRatio: 1),
-                                itemBuilder: (context, index) => VideoPreview(),
+                              child: SizedBox(
+                                height: (MediaQuery.of(context).size.width - (sideHorizontalPadding * 2) - minHorizontalPadding) / 2 * 16 / 9,
+                                child: GridView.builder(
+                                  itemCount: 8,
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 4, mainAxisSpacing: 4, childAspectRatio: 9 / 16),
+                                  itemBuilder: (context, index) => VideoPlayerCard(
+                                    videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4',
+                                    isUIVisible: false,
+                                  ),
+                                ),
                               ),
                             )
                           ],
@@ -55,8 +69,8 @@ class ComplexWorkoutScreen extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.all(12),
                           child: Text(
-                            'Символизм продолжает фактографический метод кластерного анализа. Художественный ритуал имитирует непосредственный романтизм, таким образом, второй комплекс движущих сил получил разработку в трудах А.Берталанфи и Ш.Бюлера. Герменевтика, на первый взгляд',
-                            style: Style.raleway16w300.copyWith(color: AppColors.primaryTextColor),
+                            workoutInfo.items.first.description ?? '',
+                            style: Style.outfit16w300.copyWith(color: AppColors.primaryTextColor),
                           ),
                         ),
                       ),
@@ -65,48 +79,30 @@ class ComplexWorkoutScreen extends StatelessWidget {
                         height: 46,
                         child: Row(
                           children: [
-                            LevelUpIconButton(iconAsset: Assets.minusIcon, onClick: () {}),
+                            LevelUpIconButton(iconAsset: Assets.minusIcon, onClick: () => provider.onMinusClicked(context)),
                             SizedBox(width: 4),
                             Expanded(
                               child: LevelUpTextField(
                                 controller: provider.textController,
-                                hintText: 'время',
-                                textSize: 15,
-                                keyboardType: TextInputType.datetime,
-                                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9,/]'))],
-                              ),
-                            ),
-                            SizedBox(width: 4),
-                            LevelUpIconButton(iconAsset: Assets.plusIcon, onClick: () {}),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      SizedBox(
-                        height: 46,
-                        child: Row(
-                          children: [
-                            LevelUpIconButton(iconAsset: Assets.minusIcon, onClick: () {}),
-                            SizedBox(width: 4),
-                            Expanded(
-                              child: LevelUpTextField(
-                                controller: provider.textController,
-                                hintText: 'раунды',
+                                hintText: provider.isTime ? 'время' : 'раунды',
                                 textSize: 15,
                                 keyboardType: TextInputType.number,
-                                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9,/]'))],
+                                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
                               ),
                             ),
                             SizedBox(width: 4),
-                            LevelUpIconButton(iconAsset: Assets.plusIcon, onClick: () {}),
+                            LevelUpIconButton(iconAsset: Assets.plusIcon, onClick: () => provider.onPlusClicked(context)),
                           ],
                         ),
                       ),
                       SizedBox(height: 16),
-                      SixResultsWidget(
-                        results: provider.testResults,
-                        onResultSelected: (id) {},
-                      ),
+                      provider.isUpdatingHistory
+                          ? Center(child: LevelUpLoader())
+                          : SixResultsWidget(
+                              selectedId: provider.selectedId,
+                              results: provider.generateComplexSixDaysResult(workoutInfo.items.first),
+                              onResultSelected: (id) => provider.onResultSelected(context, id),
+                            ),
                       SizedBox(height: 16),
                     ],
                   ),

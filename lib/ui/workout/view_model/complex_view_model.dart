@@ -1,45 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:level_up/ui/workout/view_model/base_view_model.dart';
+import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:level_up/ui/workout/widgets/day_measurements_result.dart';
 import 'package:level_up/ui/workout/widgets/six_results_widget.dart';
+import 'package:provider/provider.dart';
 
-class ComplexViewModel extends ChangeNotifier {
+import '../../../data/services/workout/models/workout_response.dart';
+
+class ComplexViewModel extends BaseViewModel {
   late TextEditingController textController;
 
-  final List<SixResultsDayInfo> testResults = [
-    SixResultsDayInfo('пн 1.04.22', [
-      DayResultInfo(1, '120/35'),
-      DayResultInfo(1, '120/35'),
-      DayResultInfo(1, '120/35'),
-    ]),
-    SixResultsDayInfo('вт 2.04.22', [
-      DayResultInfo(1, '120/35'),
-      DayResultInfo(1, '120/35'),
-      DayResultInfo(1, '120/35'),
-    ]),
-    SixResultsDayInfo('ср 3.04.22', [
-      DayResultInfo(1, '120/35'),
-      DayResultInfo(1, '120/35'),
-      DayResultInfo(1, '120/35'),
-    ]),
-    SixResultsDayInfo('чт 4.04.22', [
-      DayResultInfo(1, '120/35'),
-      DayResultInfo(1, '120/35'),
-      DayResultInfo(1, '120/35'),
-    ]),
-    SixResultsDayInfo('пт 5.04.22', [
-      DayResultInfo(1, '120/35'),
-      DayResultInfo(1, '120/35'),
-      DayResultInfo(1, '120/35'),
-    ]),
-    SixResultsDayInfo('сб 6.04.22', [
-      DayResultInfo(1, '120/35'),
-      DayResultInfo(1, '120/35'),
-      DayResultInfo(1, '120/35'),
-    ]),
-  ];
+  bool _isTime = false;
 
-  ComplexViewModel() {
+  bool get isTime => _isTime;
+
+  ComplexViewModel(BuildContext context) {
     textController = TextEditingController();
+    final currentWorkout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
+    _isTime = currentWorkout.isTime;
+  }
+
+  void onPlusClicked(BuildContext context) {
+    if (textController.text.isEmpty) {
+      return;
+    }
+    final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
+    super.addOrUpdateSetResult(context, workout.items.first.id, !isTime ? int.parse(textController.text) : 0, 0, isTime ? double.parse(textController.text).toInt() : 0);
+    textController.clear();
+    notifyListeners();
+  }
+
+  void onMinusClicked(BuildContext context) {
+    if (super.selectedId == null) {
+      textController.clear();
+    } else {
+      super.deleteSetResult(context);
+      textController.clear();
+    }
+    notifyListeners();
+  }
+
+  List<SixResultsDayInfo> generateComplexSixDaysResult(ExerciseInfo exerciseInfo) {
+    List<SixResultsDayInfo> result = [];
+    for (HistoryInfo history in exerciseInfo.history) {
+      List<DayResultInfo> resultStrings = [];
+      for (ResultValue value in history.values) {
+        resultStrings.add(DayResultInfo(value.id, isTime ? value.time.toString() : value.repeats.toString()));
+      }
+      result.add(SixResultsDayInfo('${history.day} ${history.date}', resultStrings));
+    }
+    return result;
   }
 
   @override

@@ -106,8 +106,12 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
   void onSaveClicked(BuildContext context) async {
     _error = null;
     notifyListeners();
-    if (_trainingWeeklySelection == null || _levelSelection == null || _goalSelection == null || (isPriorityAvailable && _prioritySelection == null)) {
-      _error = 'Не заполнены все поля';
+    if (_categorySelection == null ||
+        _trainingWeeklySelection == null ||
+        _levelSelection == null ||
+        _goalSelection == null ||
+        (isPriorityAvailable && _prioritySelection == null)) {
+      _error = 'Не все поля заполнены';
       notifyListeners();
       return;
     }
@@ -129,7 +133,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
   }
 
   void _loadProfileAndOptions(BuildContext context) async {
-    final profile = await profileRepository.getProfile();
+    final profile = await profileRepository.reloadProfile();
     switch (profile) {
       case Ok<UserProfileExtendedResponse>():
         categoriesDialogContent.setOptions(profile.value.categories);

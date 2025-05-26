@@ -64,8 +64,7 @@ class ProfilePreferencesScreen extends StatelessWidget {
                                 value: provider.goalSelection,
                                 onClick: () => provider.onGoalClicked(context),
                               ),
-                              if (provider.isPriorityAvailable) SizedBox(height: 12),
-                              if (provider.isPriorityAvailable)
+                                SizedBox(height: 12),
                                 OptionsBlocWidget(
                                   title: 'Выберите приоритет',
                                   value: provider.prioritySelection,
@@ -111,7 +110,7 @@ class NameInputField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Как вас зовут?', style: Style.raleway14w400.copyWith(color: AppColors.primaryTextColor)),
+        Text('Как вас зовут?', style: Style.outfit14w400.copyWith(color: AppColors.primaryTextColor)),
         SizedBox(height: 4),
         LevelUpTextField(controller: controller, hintText: 'Имя'),
       ],
@@ -136,7 +135,7 @@ class OptionsBlocWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: Style.raleway14w400.copyWith(color: AppColors.primaryTextColor)),
+        Text(title, style: Style.outfit14w400.copyWith(color: AppColors.primaryTextColor)),
         SizedBox(height: 8),
         OptionsInputField(
           hint: 'Не выбрано',

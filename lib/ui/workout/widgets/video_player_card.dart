@@ -7,9 +7,10 @@ import 'package:level_up/ui/workout/screens/video_player_screen.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerCard extends StatefulWidget {
-  const VideoPlayerCard({super.key, required this.videoUrl});
+  const VideoPlayerCard({super.key, required this.videoUrl, this.isUIVisible = true});
 
   final String videoUrl;
+  final bool isUIVisible;
 
   @override
   State<VideoPlayerCard> createState() => _VideoPlayerCardState();
@@ -52,27 +53,29 @@ class _VideoPlayerCardState extends State<VideoPlayerCard> {
                     ),
                   )
                 : SizedBox.shrink(),
-            Positioned.fill(
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _controller.value.isPlaying ? _controller.pause() : _controller.play();
-                  });
-                },
-                child: Align(
-                  alignment: Alignment.center,
-                  child: SvgPicture.asset(_controller.value.isPlaying ? Assets.pauseIcon : Assets.playIcon),
+            if (widget.isUIVisible)
+              Positioned.fill(
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      _controller.value.isPlaying ? _controller.pause() : _controller.play();
+                    });
+                  },
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: SvgPicture.asset(_controller.value.isPlaying ? Assets.pauseIcon : Assets.playIcon),
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-              top: 4,
-              right: 4,
-              child: GestureDetector(
-                onTap: goToPlayerScreen,
-                child: SvgPicture.asset(Assets.enlargeIcon),
+            if (widget.isUIVisible)
+              Positioned(
+                top: 4,
+                right: 4,
+                child: GestureDetector(
+                  onTap: goToPlayerScreen,
+                  child: SvgPicture.asset(Assets.enlargeIcon),
+                ),
               ),
-            ),
           ],
         ),
       ),

@@ -58,16 +58,16 @@ class ExerciseRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        //  SizedBox(height: 6),
+        SizedBox(width: 6),
+        Expanded(
+          child: Text(title, style: Style.outfit17w700.copyWith(color: AppColors.primaryTextColor)),
+        ),
         GestureDetector(
           onTap: onRefreshClicked,
           child: Padding(
-            padding: const EdgeInsets.only(left: 6, right: 14),
+            padding: const EdgeInsets.only(left: 14, right: 14),
             child: isUpdating ? LevelUpLoader() : SvgPicture.asset(Assets.refreshIcon),
           ),
-        ),
-        Expanded(
-          child: Text(title, style: Style.raleway17w700.copyWith(color: AppColors.primaryTextColor)),
         ),
       ],
     );
