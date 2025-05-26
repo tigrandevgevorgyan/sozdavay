@@ -67,7 +67,7 @@ class CalendarWidget extends StatelessWidget {
   }
 
   Color _getTextColor(CalendarDayInfo day) {
-    if (day.isTrainingDay && !day.isToday) {
+    if (day.isTrainingDay && day.isToday) {
       return AppColors.primaryTextColor;
     }
     return AppColors.tertiaryHintColor;
