@@ -133,7 +133,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
   }
 
   void _loadProfileAndOptions(BuildContext context) async {
-    final profile = await profileRepository.getProfile();
+    final profile = await profileRepository.reloadProfile();
     switch (profile) {
       case Ok<UserProfileExtendedResponse>():
         categoriesDialogContent.setOptions(profile.value.categories);

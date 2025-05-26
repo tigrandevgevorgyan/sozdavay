@@ -41,39 +41,44 @@ class SimpleWorkoutScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                          height: 259,
-                          child: Row(
-                            children: [
-                              Expanded(flex: 1, child: VideoPlayerCard(videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4')),
-                              SizedBox(width: 4),
-                              Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    children: [
-                                      Expanded(
-                                          flex: 1,
-                                          child: LevelUpContainer(
-                                            child:
-                                                Text(provider.getWorkoutString(workoutInfo.items.first), style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
-                                          )),
-                                      SizedBox(height: 4),
-                                      Expanded(
-                                          flex: 1,
-                                          child: LevelUpContainer(
-                                            child: Column(
-                                              children: [
-                                                SquareTimer(
-                                                  title: provider.getRestString(workoutInfo.items.first),
-                                                  secondsDuration: workoutInfo.items.first.restSeconds,
-                                                ),
-                                              ],
-                                            ),
-                                          )),
-                                    ],
-                                  ))
-                            ],
-                          )),
+                      IntrinsicHeight(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: AspectRatio(
+                                aspectRatio: 9 / 16,
+                                child: VideoPlayerCard(videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4'),
+                              ),
+                            ),
+                            SizedBox(width: 4),
+                            Expanded(
+                                flex: 1,
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                        flex: 1,
+                                        child: LevelUpContainer(
+                                          child: Text(provider.getWorkoutString(workoutInfo.items.first), style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
+                                        )),
+                                    SizedBox(height: 4),
+                                    Expanded(
+                                        flex: 1,
+                                        child: LevelUpContainer(
+                                          child: Column(
+                                            children: [
+                                              SquareTimer(
+                                                title: provider.getRestString(workoutInfo.items.first),
+                                                secondsDuration: workoutInfo.items.first.restSeconds,
+                                              ),
+                                            ],
+                                          ),
+                                        )),
+                                  ],
+                                )),
+                          ],
+                        ),
+                      ),
                       SizedBox(height: 10),
                       SizedBox(
                         height: 46,
@@ -87,7 +92,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                               hintText: 'Вес',
                               textSize: 12,
                               keyboardType: TextInputType.number,
-                              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[+0-9]|.'))],
+                              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]|\.'))],
                             ),
                           ),
                           SizedBox(width: 4),
@@ -98,7 +103,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                               hintText: 'Повторы',
                               textSize: 12,
                               keyboardType: TextInputType.number,
-                              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[+0-9]'))],
+                              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
                             ),
                           ),
                           SizedBox(width: 4),

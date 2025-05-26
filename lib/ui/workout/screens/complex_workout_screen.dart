@@ -21,7 +21,7 @@ class ComplexWorkoutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => ComplexViewModel(),
+      create: (context) => ComplexViewModel(context),
       child: Consumer<ComplexViewModel>(builder: (context, provider, _) {
         return Column(
           children: [
@@ -37,9 +37,9 @@ class ComplexWorkoutScreen extends StatelessWidget {
                         height: 259,
                         child: Row(
                           children: [
-                            Expanded(
-                              flex: 1,
-                              child: VideoPlayerCard(videoUrl: 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'),
+                            AspectRatio(
+                              aspectRatio: 9 / 16,
+                              child: VideoPlayerCard(videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4'),
                             ),
                             SizedBox(width: 4),
                             Expanded(
@@ -64,47 +64,47 @@ class ComplexWorkoutScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 8),
-                      SizedBox(
-                        height: 46,
-                        child: Row(
-                          children: [
-                            LevelUpIconButton(iconAsset: Assets.minusIcon, onClick: () {}),
-                            SizedBox(width: 4),
-                            Expanded(
-                              child: LevelUpTextField(
-                                controller: provider.textController,
-                                hintText: 'время',
-                                textSize: 15,
-                                keyboardType: TextInputType.datetime,
-                                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9,/]'))],
+                      provider.isTime
+                          ? SizedBox(
+                              height: 46,
+                              child: Row(
+                                children: [
+                                  LevelUpIconButton(iconAsset: Assets.minusIcon, onClick: () {}),
+                                  SizedBox(width: 4),
+                                  Expanded(
+                                    child: LevelUpTextField(
+                                      controller: provider.textController,
+                                      hintText: 'время',
+                                      textSize: 15,
+                                      keyboardType: TextInputType.datetime,
+                                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
+                                    ),
+                                  ),
+                                  SizedBox(width: 4),
+                                  LevelUpIconButton(iconAsset: Assets.plusIcon, onClick: () {}),
+                                ],
+                              ),
+                            )
+                          : SizedBox(
+                              height: 46,
+                              child: Row(
+                                children: [
+                                  LevelUpIconButton(iconAsset: Assets.minusIcon, onClick: () {}),
+                                  SizedBox(width: 4),
+                                  Expanded(
+                                    child: LevelUpTextField(
+                                      controller: provider.textController,
+                                      hintText: 'раунды',
+                                      textSize: 15,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
+                                    ),
+                                  ),
+                                  SizedBox(width: 4),
+                                  LevelUpIconButton(iconAsset: Assets.plusIcon, onClick: () {}),
+                                ],
                               ),
                             ),
-                            SizedBox(width: 4),
-                            LevelUpIconButton(iconAsset: Assets.plusIcon, onClick: () {}),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      SizedBox(
-                        height: 46,
-                        child: Row(
-                          children: [
-                            LevelUpIconButton(iconAsset: Assets.minusIcon, onClick: () {}),
-                            SizedBox(width: 4),
-                            Expanded(
-                              child: LevelUpTextField(
-                                controller: provider.textController,
-                                hintText: 'раунды',
-                                textSize: 15,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9,/]'))],
-                              ),
-                            ),
-                            SizedBox(width: 4),
-                            LevelUpIconButton(iconAsset: Assets.plusIcon, onClick: () {}),
-                          ],
-                        ),
-                      ),
                       SizedBox(height: 16),
                       SixResultsWidget(
                         results: provider.generateSixDaysResult(workoutInfo.items.first),
