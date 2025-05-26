@@ -20,6 +20,7 @@ class BaseViewModel extends ChangeNotifier {
 
   void onResultSelected(BuildContext context, int id) {
     _selectedId = id;
+    notifyListeners();
   }
 
   void deselectResult() {
@@ -35,18 +36,18 @@ class BaseViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addOrUpdateSetResult(BuildContext context, int exerciseId, int repeats, int weight) async {
+  void addOrUpdateSetResult(BuildContext context, int exerciseId, int repeats, int weight, int time) async {
     FocusManager.instance.primaryFocus?.unfocus();
     if (_selectedId != null) {
       _isUpdatingHistory = true;
       notifyListeners();
-      await Provider.of<WorkoutViewModel>(context, listen: false).updateSetResult(context, selectedId!, exerciseId, weight, repeats, 1, 1);
+      await Provider.of<WorkoutViewModel>(context, listen: false).updateSetResult(context, selectedId!, exerciseId, weight, repeats, 1, time);
       _isUpdatingHistory = false;
       notifyListeners();
     } else {
       _isUpdatingHistory = true;
       notifyListeners();
-      await Provider.of<WorkoutViewModel>(context, listen: false).addSetResult(context, exerciseId, weight, repeats, 1, 1);
+      await Provider.of<WorkoutViewModel>(context, listen: false).addSetResult(context, exerciseId, weight, repeats, 1, time);
       _isUpdatingHistory = false;
       notifyListeners();
     }
@@ -116,33 +117,35 @@ class BaseViewModel extends ChangeNotifier {
   String getWorkoutString(ExerciseInfo exerciseInfo) {
     if (exerciseInfo.sets.isEmpty) return '';
 
-    return exerciseInfo.sets.map((set) {
-      final setsCount = set.setsCount?.abs() ?? 0;
-      final from = set.repeatsFrom?.abs();
-      final to = set.repeatsTo?.abs();
-      final isHard = (set.asMuchAsPossible ?? 0) == 1;
+    return exerciseInfo.sets
+        .map((set) {
+          final setsCount = set.setsCount?.abs() ?? 0;
+          final from = set.repeatsFrom?.abs();
+          final to = set.repeatsTo?.abs();
+          final isHard = (set.asMuchAsPossible ?? 0) == 1;
 
-      if (setsCount == 0 || ((from ?? 0) == 0 && (to ?? 0) == 0)) {
-        return '';
-      }
+          if (setsCount == 0 || ((from ?? 0) == 0 && (to ?? 0) == 0)) {
+            return '';
+          }
 
-      String repeatsText;
-      if (from != null && to != null) {
-        repeatsText = from == to || to == 0 ? '$from' : '$from–$to';
-      } else if (from != null) {
-        repeatsText = '$from';
-      } else if (to != null) {
-        repeatsText = '$to';
-      } else {
-        repeatsText = '-';
-      }
+          String repeatsText;
+          if (from != null && to != null) {
+            repeatsText = from == to || to == 0 ? '$from' : '$from–$to';
+          } else if (from != null) {
+            repeatsText = '$from';
+          } else if (to != null) {
+            repeatsText = '$to';
+          } else {
+            repeatsText = '-';
+          }
 
-      final hardText = isHard ? '\n1 в отказ' : '';
+          final hardText = isHard ? '\n1 в отказ' : '';
 
-      return '$setsCount по $repeatsText$hardText';
-    }).where((s) => s.isNotEmpty).join('\n\n');
+          return '$setsCount по $repeatsText$hardText';
+        })
+        .where((s) => s.isNotEmpty)
+        .join('\n\n');
   }
-
 
   String getRangeString(int minValue, int maxValue) {
     if (minValue != 0 && maxValue != 0) {
