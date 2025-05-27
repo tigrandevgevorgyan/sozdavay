@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:level_up/config/dio_client.dart';
 import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
 import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
@@ -16,7 +15,6 @@ import 'package:level_up/utils/result.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/services/data/models/main_response.dart';
-import '../../../utils/misc_utils.dart';
 
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel(
@@ -119,13 +117,7 @@ class HomeViewModel extends ChangeNotifier {
     final result = await GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.workoutPath, extra: dayIndex) as bool?;
     if ((result ?? false) && context.mounted) {
       await _loadMainInfo(context);
-      final now = DateTime.now();
-      String dayName = '${weekDays[now.weekday]} ${DateFormat('dd.MM.yy').format(now)}';
-      final params = TextEditingScreenParams(title: dayName, initialText: _profile?.data.measurements ?? "", onTextUpdated: _updateMeasurements);
-      if (context.mounted) {
-        GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params);
-        notifyListeners();
-      }
+      notifyListeners();
     }
   }
 

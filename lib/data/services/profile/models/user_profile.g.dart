@@ -9,6 +9,7 @@ part of 'user_profile.dart';
 UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => UserProfile(
       json['records'] as String?,
       json['measurements'] as String?,
+      json['paid_until'] as String?,
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       phone: json['phone'] as String,
@@ -48,4 +49,5 @@ Map<String, dynamic> _$UserProfileToJson(UserProfile instance) =>
       'priority': instance.priority,
       'records': instance.records,
       'measurements': instance.measurements,
+      'paid_until': instance.paidUntil,
     };

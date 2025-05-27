@@ -43,7 +43,7 @@ class ProfilePreferencesScreen extends StatelessWidget {
                         child: SingleChildScrollView(
                           child: Column(
                             children: [
-                              SubscriptionBanner(validUntilDate: "1.11.2025"),
+                              SubscriptionBanner(validUntilDate: provider.validUntilDate),
                               SizedBox(height: 12),
                               NameInputField(controller: provider.nameController),
                               SizedBox(height: 14),
@@ -64,13 +64,14 @@ class ProfilePreferencesScreen extends StatelessWidget {
                                 value: provider.goalSelection,
                                 onClick: () => provider.onGoalClicked(context),
                               ),
-                                SizedBox(height: 12),
+                              SizedBox(height: 12),
+                              if (provider.isPriorityAvailable)
                                 OptionsBlocWidget(
                                   title: 'Выберите приоритет',
                                   value: provider.prioritySelection,
                                   onClick: () => provider.onPriorityClicked(context),
                                 ),
-                              SizedBox(height: 12),
+                              if (provider.isPriorityAvailable) SizedBox(height: 12),
                               OptionsBlocWidget(
                                 title: 'Выберите кол-во тренировок в неделю',
                                 value: provider.trainingWeeklySelection,

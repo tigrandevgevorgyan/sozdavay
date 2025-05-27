@@ -8,6 +8,7 @@ class UserProfile {
   final int id;
   final String name;
   final String phone;
+
   // final String? sex;
   final int? days;
   final IdNamePairWithPriority? category;
@@ -17,17 +18,23 @@ class UserProfile {
   final IdNamePairWithPriority? priority;
   final String? records;
   final String? measurements;
+  @JsonKey(name: 'paid_until')
+  final String? paidUntil;
 
-  UserProfile(this.records, this.measurements,
-      {required this.id,
-      required this.name,
-      required this.phone,
-      required this.category,
-      required this.days,
-      required this.age,
-      required this.experience,
-      required this.goal,
-      required this.priority});
+  UserProfile(
+    this.records,
+    this.measurements,
+    this.paidUntil, {
+    required this.id,
+    required this.name,
+    required this.phone,
+    required this.category,
+    required this.days,
+    required this.age,
+    required this.experience,
+    required this.goal,
+    required this.priority,
+  });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
 

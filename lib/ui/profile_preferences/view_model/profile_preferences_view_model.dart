@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:level_up/config/dio_client.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/profile/models/user_profile_response.dart';
@@ -62,6 +63,9 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
   String? get error => _error;
 
   bool get isPriorityAvailable => priorityDialogContent.hasPriorityById(_prioritySelection);
+  String _validUntilDate = '';
+
+  String get validUntilDate => _validUntilDate;
 
   void onGenderWeightClicked(BuildContext context) async {
     final result = await OptionsDialog.showDialog(context, categorySelection, categoriesDialogContent.title, categoriesDialogContent.optionsValues);
@@ -147,6 +151,12 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
         _prioritySelection = profile.value.data.priority?.id;
         _trainingWeeklySelection = profile.value.data.days;
         _nameController.text = profile.value.data.name;
+        if (profile.value.data.paidUntil != null) {
+          DateTime validDateTime = DateFormat("yyyy-MM-dd").parse(profile.value.data.paidUntil!);
+          _validUntilDate = DateFormat("dd.MM.yyyy").format(validDateTime);
+        } else {
+          _validUntilDate = '';
+        }
       case Error<UserProfileExtendedResponse>():
         if (context.mounted) {
           ErrorUtils.showError(context, profile.error.getErrorMessage());

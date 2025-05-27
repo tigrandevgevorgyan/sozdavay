@@ -127,7 +127,7 @@ class TimerPainter extends CustomPainter {
       canvas.drawLine(Offset(size.width - 2, 0), Offset(size.width - 2, min(size.height, size.height * (value - 0.5) * 4)), defaultPaint);
     }
     if (value >= 0.75) {
-      canvas.drawLine(Offset(size.width - 2, size.height), Offset(max(0, size.width - size.width * (value - 0.75) * 4), size.height), defaultPaint);
+      canvas.drawLine(Offset(size.width - 2, size.height), Offset(max(0, size.width - 2 - size.width * (value - 0.75) * 4), size.height), defaultPaint);
     }
   }
 

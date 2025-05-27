@@ -15,6 +15,7 @@ import 'package:level_up/ui/workout/widgets/horizontal_timer.dart';
 import 'package:level_up/ui/workout/widgets/plus_minus_button.dart';
 import 'package:level_up/ui/workout/widgets/video_player_card.dart';
 import 'package:level_up/ui/workout/widgets/workout_top_bar.dart';
+import 'package:level_up/utils/misc_utils.dart';
 import 'package:provider/provider.dart';
 
 class DoubleWorkoutScreen extends StatelessWidget {
@@ -193,7 +194,7 @@ class DoubleWorkoutScreen extends StatelessWidget {
   List<DayResultInfo> generateSingleDayResult(HistoryInfo historyInfo) {
     List<DayResultInfo> result = [];
     for (ResultValue value in historyInfo.values) {
-      result.add(DayResultInfo(value.id, '${value.weight}/${value.repeats}'));
+      result.add(DayResultInfo(value.id, '${value.weight.formatDouble()}/${value.repeats}'));
     }
     return result;
   }

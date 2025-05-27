@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/profile/models/user_profile_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
@@ -9,6 +10,7 @@ import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:level_up/ui/workout/widgets/day_measurements_result.dart';
 import 'package:level_up/ui/workout/widgets/six_results_widget.dart';
 import 'package:level_up/utils/error_utils.dart';
+import 'package:level_up/utils/misc_utils.dart';
 import 'package:level_up/utils/result.dart';
 import 'package:provider/provider.dart';
 
@@ -84,7 +86,9 @@ class BaseViewModel extends ChangeNotifier {
     final profileResult = await profileRepository.getProfile();
     switch (profileResult) {
       case Ok<UserProfileExtendedResponse>():
-        final params = TextEditingScreenParams(title: 'Рекорды', initialText: profileResult.value.data.measurements ?? "", onTextUpdated: _updateRecords);
+        final now = DateTime.now();
+        String dayName = '${weekDays[now.weekday]} ${DateFormat('dd.MM.yy').format(now)}';
+        final params = TextEditingScreenParams(title: 'ЗАМЕТКА $dayName', initialText: profileResult.value.data.measurements ?? "", onTextUpdated: _updateRecords);
         if (context.mounted) {
           GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params);
         }
@@ -128,7 +132,7 @@ class BaseViewModel extends ChangeNotifier {
     for (HistoryInfo history in exerciseInfo.history) {
       List<DayResultInfo> resultStrings = [];
       for (ResultValue value in history.values) {
-        resultStrings.add(DayResultInfo(value.id, '${value.weight}/${value.repeats}'));
+        resultStrings.add(DayResultInfo(value.id, '${value.weight.formatDouble()}/${value.repeats}'));
       }
       result.add(SixResultsDayInfo('${history.day} ${history.date}', resultStrings));
     }
