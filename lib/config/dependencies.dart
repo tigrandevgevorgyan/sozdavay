@@ -19,6 +19,6 @@ class Dependencies {
     GetIt.I.registerSingleton<IAuthRepository>(AuthRepository(AuthService(dioClient), localStorage));
     GetIt.I.registerSingleton<IProfileRepository>(ProfileRepositoryImpl(profileService: ProfileService(dioClient)));
     GetIt.I.registerSingleton<IDataRepository>(DataRepositoryImpl(dataService: DataService(dioClient)));
-    GetIt.I.registerSingleton<IWorkoutRepository>(WorkoutRepositoryImp(workoutService: WorkoutService(dioClient)));
+    GetIt.I.registerSingleton<IWorkoutRepository>(WorkoutRepositoryImp(workoutService: WorkoutService(dioClient), localStorage));
   }
 }
