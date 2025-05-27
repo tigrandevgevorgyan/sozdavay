@@ -15,22 +15,25 @@ import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../data/repositories/workout_repository/workout_repository.dart';
 import '../../../data/services/data/models/main_response.dart';
 import '../../../utils/misc_utils.dart';
 
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel(
-    BuildContext context, {
+    BuildContext context,{
     required this.dataRepository,
     required this.profileRepository,
     required this.localStorage,
-  }) {
+    required this.workoutRepository,
+      }) {
     _init(context);
   }
 
   final ILocalStorage localStorage;
   final IProfileRepository profileRepository;
   final IDataRepository dataRepository;
+  final IWorkoutRepository workoutRepository;
 
   bool _isLoading = true;
 
@@ -57,6 +60,7 @@ class HomeViewModel extends ChangeNotifier {
       '';
 
   void _init(BuildContext context) async {
+    await workoutRepository.sendOfflineSets();
     final isSuccess = await _loadProfile(context);
     if (isSuccess && context.mounted) {
       await _loadMainInfo(context);
@@ -203,5 +207,11 @@ class HomeViewModel extends ChangeNotifier {
           ErrorUtils.showError(context, mainInfo.error.getErrorMessage());
         }
     }
+  }
+
+  @override
+  void dispose() {
+    workoutRepository.dispose();
+    super.dispose();
   }
 }
