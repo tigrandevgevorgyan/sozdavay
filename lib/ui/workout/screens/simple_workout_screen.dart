@@ -117,6 +117,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                               selectedId: provider.selectedId,
                               results: provider.generateSixDaysResult(workoutInfo.items.first),
                               onResultSelected: (id) => provider.onResultSelected(context, id),
+                              onNotesClicked: () => provider.onNotesClicked(context),
                             ),
                       SizedBox(height: 16),
                     ],

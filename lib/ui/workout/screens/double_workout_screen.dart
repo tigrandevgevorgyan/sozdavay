@@ -31,12 +31,12 @@ class DoubleWorkoutScreen extends StatelessWidget {
           body: Column(
             children: [
               WorkoutTopBar(
-                isUpdatingFirstExercise: provider.isUpdatingFirstExercise,
+                isUpdatingFirstExercise: provider.isUpdatingExercise,
                 isUpdatingSecondExercise: provider.isUpdatingSecondExercise,
                 firstExerciseName: workoutInfo.items.first.name,
                 secondExerciseName: workoutInfo.items.last.name,
-                onFirstExerciseRefresh: () {},
-                onSecondExerciseRefresh: () {},
+                onFirstExerciseRefresh: () => provider.changeExercise(context),
+                onSecondExerciseRefresh: () => provider.onChangeSecondExercise(context),
               ),
               SizedBox(height: 12),
               Expanded(
@@ -55,7 +55,10 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                   flex: 1,
                                   child: Column(
                                     children: [
-                                      VideoPlayerCard(videoUrl: 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'),
+                                      AspectRatio(
+                                        aspectRatio: 9 / 16,
+                                        child: VideoPlayerCard(videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4'),
+                                      ),
                                       SizedBox(height: 4),
                                       LevelUpContainer(
                                         height: 62,
@@ -69,7 +72,10 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                   flex: 1,
                                   child: Column(
                                     children: [
-                                      VideoPlayerCard(videoUrl: 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'),
+                                      AspectRatio(
+                                        aspectRatio: 9 / 16,
+                                        child: VideoPlayerCard(videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4'),
+                                      ),
                                       SizedBox(height: 4),
                                       LevelUpContainer(
                                           height: 62,
@@ -86,7 +92,7 @@ class DoubleWorkoutScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 4),
                             HorizontalTimer(
-                                title: provider.getRestString(workoutInfo.items.last),
+                              title: provider.getRestString(workoutInfo.items.last),
                               secondsToCount: max(
                                 workoutInfo.items.first.restSeconds,
                                 workoutInfo.items.last.restSeconds,
@@ -150,6 +156,7 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                               title: '${firstHistoryItem.day} ${firstHistoryItem.date}',
                                               results: generateSingleDayResult(firstHistoryItem),
                                               onResultSelected: (id) => provider.onFirstIdSelected(context, id),
+                                              onNotesClicked: () => provider.onNotesClicked(context),
                                             )
                                           : SizedBox.shrink(),
                                     ),
@@ -159,6 +166,7 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                               title: '${secondHistoryItem.day} ${secondHistoryItem.date}',
                                               results: generateSingleDayResult(secondHistoryItem),
                                               onResultSelected: (id) => provider.onSecondIdSelected(context, id),
+                                              onNotesClicked: () => provider.onNotesClicked(context),
                                             )
                                           : SizedBox.shrink(),
                                     ),

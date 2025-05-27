@@ -6,12 +6,13 @@ import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 
 class DayMeasurementsResult extends StatelessWidget {
-  const DayMeasurementsResult({super.key, required this.title, required this.results, this.selectedId, required this.onResultSelected});
+  const DayMeasurementsResult({super.key, required this.title, required this.results, this.selectedId, required this.onResultSelected, required this.onNotesClicked});
 
   final String title;
   final int? selectedId;
   final List<DayResultInfo> results;
   final Function(int id) onResultSelected;
+  final Function() onNotesClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,10 @@ class DayMeasurementsResult extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            SvgPicture.asset(Assets.pencilIcon),
+            GestureDetector(
+              onTap: onNotesClicked,
+              child: SvgPicture.asset(Assets.pencilIcon),
+            ),
             SizedBox(width: 4),
             Expanded(
               child: Padding(

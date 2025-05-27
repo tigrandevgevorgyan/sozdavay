@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:get_it/get_it.dart';
+import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/ui/workout/view_model/base_view_model.dart';
 import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:provider/provider.dart';
@@ -7,7 +9,7 @@ class SimpleViewModel extends BaseViewModel {
   late TextEditingController weightController;
   late TextEditingController repeatsController;
 
-  SimpleViewModel() {
+  SimpleViewModel() : super(GetIt.I<IProfileRepository>()) {
     weightController = TextEditingController();
     repeatsController = TextEditingController();
   }

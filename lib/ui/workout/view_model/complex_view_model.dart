@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/ui/workout/view_model/base_view_model.dart';
 import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:level_up/ui/workout/widgets/day_measurements_result.dart';
@@ -14,7 +16,7 @@ class ComplexViewModel extends BaseViewModel {
 
   bool get isTime => _isTime;
 
-  ComplexViewModel(BuildContext context) {
+  ComplexViewModel(BuildContext context) : super(GetIt.I<IProfileRepository>()) {
     textController = TextEditingController();
     final currentWorkout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     _isTime = currentWorkout.isTime;

@@ -1,12 +1,24 @@
 import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
+import 'package:level_up/data/services/profile/models/user_profile_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
+import 'package:level_up/routing/levelup_router.dart';
+import 'package:level_up/ui/text_editing_screen/text_editing_screen.dart';
 import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:level_up/ui/workout/widgets/day_measurements_result.dart';
 import 'package:level_up/ui/workout/widgets/six_results_widget.dart';
+import 'package:level_up/utils/error_utils.dart';
+import 'package:level_up/utils/result.dart';
 import 'package:provider/provider.dart';
 
+import '../../../utils/misc_utils.dart';
+
 class BaseViewModel extends ChangeNotifier {
-  BaseViewModel();
+  BaseViewModel(this.profileRepository);
+
+  final IProfileRepository profileRepository;
 
   bool _isUpdatingHistory = false;
 
@@ -27,13 +39,18 @@ class BaseViewModel extends ChangeNotifier {
     _selectedId = null;
   }
 
-  void changeExercise(BuildContext context) async {
+  Future<void> changeExercise(BuildContext context, {int? exerciseId}) async {
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
-    isUpdatingExercise = true;
-    notifyListeners();
-    await Provider.of<WorkoutViewModel>(context, listen: false).updateExercise(context, workout.items.first.id);
-    isUpdatingExercise = false;
-    notifyListeners();
+    if (exerciseId == null) {
+      // if id is provided, then ui logic is handled somewhere else
+      isUpdatingExercise = true;
+      notifyListeners();
+    }
+    await Provider.of<WorkoutViewModel>(context, listen: false).updateExercise(context, exerciseId ?? workout.items.first.id);
+    if (exerciseId == null) {
+      isUpdatingExercise = false;
+      notifyListeners();
+    }
   }
 
   void addOrUpdateSetResult(BuildContext context, int exerciseId, int repeats, int weight, int time) async {
@@ -64,6 +81,34 @@ class BaseViewModel extends ChangeNotifier {
       notifyListeners();
     }
     deselectResult();
+  }
+
+  void onNotesClicked(BuildContext context) async {
+    final profileResult = await profileRepository.getProfile();
+    switch (profileResult) {
+      case Ok<UserProfileExtendedResponse>():
+        final now = DateTime.now();
+        String dayName = '${weekDays[now.weekday]} ${DateFormat('dd.MM.yy').format(now)}';
+        final params = TextEditingScreenParams(title: dayName, initialText: profileResult.value.data.measurements ?? "", onTextUpdated: _updateRecords);
+        if (context.mounted) {
+          GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params);
+        }
+      case Error<UserProfileExtendedResponse>():
+        if (context.mounted) {
+          ErrorUtils.showError(context, 'Не удаётся загрузить профиль');
+        }
+    }
+  }
+
+  Future<Result<bool>> _updateRecords(String records) async {
+    final result = await profileRepository.updateMeasurements(records);
+    switch (result) {
+      case Ok<UserProfileShortResponse>():
+        await profileRepository.reloadProfile();
+        return Result.ok(true);
+      case Error<UserProfileShortResponse>():
+        return Result.error(result.error);
+    }
   }
 
   ResultValue? findResultById(BuildContext context, int id) {

@@ -16,6 +16,7 @@ import 'package:level_up/utils/result.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/services/data/models/main_response.dart';
+import '../../../utils/misc_utils.dart';
 
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel(
@@ -91,14 +92,10 @@ class HomeViewModel extends ChangeNotifier {
     for (int i = 0; i < 7; i++) {
       final dayOfWeek = monday.add(Duration(days: i));
       final DayInfo dayInfo = _mainInfo!.schedule[i];
-      final bool isToday = dayOfWeek.year == today.year &&
-          dayOfWeek.month == today.month &&
-          dayOfWeek.day == today.day;
-      final isSelected = _selectedDayIndex != null
-          ? _selectedDayIndex == i
-          : isToday;
+      final bool isToday = dayOfWeek.year == today.year && dayOfWeek.month == today.month && dayOfWeek.day == today.day;
+      final isSelected = _selectedDayIndex != null ? _selectedDayIndex == i : isToday;
       final bool isTrainingDay = dayInfo.name?.isNotEmpty ?? false;
-      result.add(CalendarDayInfo(dayInfo.day, dayOfWeek.day,  isTrainingDay, isToday, isSelected));
+      result.add(CalendarDayInfo(dayInfo.day, dayOfWeek.day, isTrainingDay, isToday, isSelected));
     }
     return result;
   }
@@ -115,7 +112,6 @@ class HomeViewModel extends ChangeNotifier {
     final dayInfo = schedule[index];
 
     return dayInfo.name ?? (dayInfo.isActive ? 'НАЧАТЬ ТРЕНИРОВКУ' : '');
-
   }
 
   void onStartWorkoutClicked(BuildContext context) async {
@@ -126,8 +122,10 @@ class HomeViewModel extends ChangeNotifier {
       final now = DateTime.now();
       String dayName = '${weekDays[now.weekday]} ${DateFormat('dd.MM.yy').format(now)}';
       final params = TextEditingScreenParams(title: dayName, initialText: _profile?.data.measurements ?? "", onTextUpdated: _updateMeasurements);
-      GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params);
-      notifyListeners();
+      if (context.mounted) {
+        GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params);
+        notifyListeners();
+      }
     }
   }
 
@@ -206,6 +204,4 @@ class HomeViewModel extends ChangeNotifier {
         }
     }
   }
-
-  final weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
 }

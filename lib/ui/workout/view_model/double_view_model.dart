@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:get_it/get_it.dart';
+import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/ui/workout/view_model/base_view_model.dart';
 import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:provider/provider.dart';
@@ -10,25 +12,15 @@ class DoubleViewModel extends BaseViewModel {
   late TextEditingController weightFirstController;
   late TextEditingController weightSecondController;
 
-  bool _isUpdatingFirstExercise = false;
-
-  bool get isUpdatingFirstExercise => _isUpdatingFirstExercise;
-
   bool _isUpdatingSecondExercise = false;
 
   bool get isUpdatingSecondExercise => _isUpdatingSecondExercise;
 
-  DoubleViewModel(BuildContext context) {
+  DoubleViewModel(BuildContext context) : super(GetIt.I<IProfileRepository>()) {
     repeatsFirstController = TextEditingController();
     repeatsSecondController = TextEditingController();
     weightFirstController = TextEditingController();
     weightSecondController = TextEditingController();
-  }
-
-  void updateFirstExercise() {
-    _isUpdatingFirstExercise = true;
-    notifyListeners();
-    //Provider.of(context, listen: false).
   }
 
   void onFirstIdSelected(BuildContext context, int id) {
@@ -76,6 +68,15 @@ class DoubleViewModel extends BaseViewModel {
       super.deleteSetResult(context);
       _resetText();
     }
+  }
+
+  void onChangeSecondExercise(BuildContext context) async {
+    _isUpdatingSecondExercise = true;
+    notifyListeners();
+    final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
+    await changeExercise(context, exerciseId: workout.items.last.id);
+    _isUpdatingSecondExercise = false;
+    notifyListeners();
   }
 
   void _resetText() {

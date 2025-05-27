@@ -102,6 +102,7 @@ class ComplexWorkoutScreen extends StatelessWidget {
                               selectedId: provider.selectedId,
                               results: provider.generateComplexSixDaysResult(workoutInfo.items.first),
                               onResultSelected: (id) => provider.onResultSelected(context, id),
+                              onNotesClicked: () => provider.onNotesClicked(context),
                             ),
                       SizedBox(height: 16),
                     ],

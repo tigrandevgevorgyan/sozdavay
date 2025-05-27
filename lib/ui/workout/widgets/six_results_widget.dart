@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:level_up/ui/workout/widgets/day_measurements_result.dart';
 
 class SixResultsWidget extends StatelessWidget {
-  const SixResultsWidget({super.key, required this.results, this.selectedId, required this.onResultSelected});
+  const SixResultsWidget({super.key, required this.results, this.selectedId, required this.onResultSelected, required this.onNotesClicked});
 
   final int? selectedId;
   final List<SixResultsDayInfo> results;
   final Function(int id) onResultSelected;
+  final Function() onNotesClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +26,7 @@ class SixResultsWidget extends StatelessWidget {
                   results: results[i].results,
                   selectedId: selectedId,
                   onResultSelected: onResultSelected,
+                  onNotesClicked: onNotesClicked,
                 ),
               ),
           ],
@@ -41,6 +43,7 @@ class SixResultsWidget extends StatelessWidget {
                   results: results[i].results,
                   selectedId: selectedId,
                   onResultSelected: onResultSelected,
+                  onNotesClicked: onNotesClicked,
                 ),
               ),
           ],
