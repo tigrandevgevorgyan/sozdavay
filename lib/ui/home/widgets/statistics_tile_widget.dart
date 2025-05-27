@@ -168,7 +168,7 @@ class RatingPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - 10) / 2;
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius), 0, 2 * pi, false, backgroundArcPaint);
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), -pi / 2, (2 * pi) * percent / 3500, false, foregroundArcPaint);
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), -pi / 2, (2 * pi) * percent, false, foregroundArcPaint);
   }
 
   @override

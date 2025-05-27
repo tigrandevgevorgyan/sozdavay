@@ -43,7 +43,7 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
           appBar: AppBar(backgroundColor: AppColors.backgroundContentColor, toolbarHeight: 0),
           backgroundColor: AppColors.backgroundColor,
           body: SafeArea(
-            child: provider.isLoading
+            child: provider.isLoading || provider.isWorkoutEmpty
                 ? Center(child: LevelUpLoader())
                 : Column(
                     children: [

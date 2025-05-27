@@ -10,6 +10,7 @@ import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/ui/workout/view_model/double_view_model.dart';
 import 'package:level_up/ui/workout/widgets/day_measurements_result.dart';
+import 'package:level_up/ui/workout/widgets/empty_video_placeholder.dart';
 import 'package:level_up/ui/workout/widgets/horizontal_timer.dart';
 import 'package:level_up/ui/workout/widgets/plus_minus_button.dart';
 import 'package:level_up/ui/workout/widgets/video_player_card.dart';
@@ -57,7 +58,9 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                     children: [
                                       AspectRatio(
                                         aspectRatio: 9 / 16,
-                                        child: VideoPlayerCard(videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4'),
+                                        child: workoutInfo.items.first.getFirstVideoLink() != null
+                                            ? VideoPlayerCard(videoUrl: workoutInfo.items.first.getFirstVideoLink()!)
+                                            : EmptyVideoPlaceholder(),
                                       ),
                                       SizedBox(height: 4),
                                       LevelUpContainer(
@@ -74,7 +77,9 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                     children: [
                                       AspectRatio(
                                         aspectRatio: 9 / 16,
-                                        child: VideoPlayerCard(videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4'),
+                                        child: workoutInfo.items.last.getFirstVideoLink() != null
+                                            ? VideoPlayerCard(videoUrl: workoutInfo.items.last.getFirstVideoLink()!)
+                                            : EmptyVideoPlaceholder(),
                                       ),
                                       SizedBox(height: 4),
                                       LevelUpContainer(

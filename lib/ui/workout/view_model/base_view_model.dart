@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/profile/models/user_profile_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
@@ -12,8 +11,6 @@ import 'package:level_up/ui/workout/widgets/six_results_widget.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 import 'package:provider/provider.dart';
-
-import '../../../utils/misc_utils.dart';
 
 class BaseViewModel extends ChangeNotifier {
   BaseViewModel(this.profileRepository);
@@ -53,7 +50,7 @@ class BaseViewModel extends ChangeNotifier {
     }
   }
 
-  void addOrUpdateSetResult(BuildContext context, int exerciseId, int repeats, int weight, int time) async {
+  void addOrUpdateSetResult(BuildContext context, int exerciseId, int itemId, int repeats, int weight, int time) async {
     FocusManager.instance.primaryFocus?.unfocus();
     if (_selectedId != null) {
       _isUpdatingHistory = true;
@@ -64,7 +61,7 @@ class BaseViewModel extends ChangeNotifier {
     } else {
       _isUpdatingHistory = true;
       notifyListeners();
-      await Provider.of<WorkoutViewModel>(context, listen: false).addSetResult(context, exerciseId, weight, repeats, 1, time);
+      await Provider.of<WorkoutViewModel>(context, listen: false).addSetResult(context, exerciseId, itemId, weight, repeats, 1, time);
       _isUpdatingHistory = false;
       notifyListeners();
     }
@@ -87,9 +84,7 @@ class BaseViewModel extends ChangeNotifier {
     final profileResult = await profileRepository.getProfile();
     switch (profileResult) {
       case Ok<UserProfileExtendedResponse>():
-        final now = DateTime.now();
-        String dayName = '${weekDays[now.weekday]} ${DateFormat('dd.MM.yy').format(now)}';
-        final params = TextEditingScreenParams(title: dayName, initialText: profileResult.value.data.measurements ?? "", onTextUpdated: _updateRecords);
+        final params = TextEditingScreenParams(title: 'Рекорды', initialText: profileResult.value.data.measurements ?? "", onTextUpdated: _updateRecords);
         if (context.mounted) {
           GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params);
         }

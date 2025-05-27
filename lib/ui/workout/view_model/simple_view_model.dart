@@ -31,7 +31,7 @@ class SimpleViewModel extends BaseViewModel {
     }
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     try {
-      super.addOrUpdateSetResult(context, workout.items.first.id, int.parse(repeatsController.text), double.parse(weightController.text).toInt(), 0);
+      super.addOrUpdateSetResult(context, workout.items.first.id, workout.items.first.itemId, int.parse(repeatsController.text), double.parse(weightController.text).toInt(), 0);
     } on Exception {}
     _resetText();
   }

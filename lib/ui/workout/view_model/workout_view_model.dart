@@ -26,12 +26,20 @@ class WorkoutViewModel extends ChangeNotifier {
 
   WorkoutInfo get currentWorkout => _workout![index];
 
+  bool get isWorkoutEmpty => _workout != null && _workout!.isEmpty;
+
   void _init(BuildContext context) async {
     _isLoading = true;
     final result = await workoutRepository.loadWorkout(dayIndex: dayIndex);
     _isLoading = false;
     switch (result) {
       case Ok<List<WorkoutInfo>>():
+        if (result.value.isEmpty) {
+          if (context.mounted) {
+            GoRouter.of(context).pop();
+            ErrorUtils.showError(context, 'Отсутсвуют упражнения!');
+          }
+        }
         _workout = result.value;
         notifyListeners();
       case Error<List<WorkoutInfo>>():
@@ -57,8 +65,8 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addSetResult(BuildContext context, int exerciseId, int weight, int repeats, int difficult, int time) async {
-    final result = await workoutRepository.addSetResult(exerciseId, weight, repeats, difficult, time);
+  Future<void> addSetResult(BuildContext context, int exerciseId, int itemId, int weight, int repeats, int difficult, int time) async {
+    final result = await workoutRepository.addSetResult(exerciseId, itemId, weight, repeats, difficult, time);
     switch (result) {
       case Ok<List<WorkoutInfo>>():
         _workout = result.value;

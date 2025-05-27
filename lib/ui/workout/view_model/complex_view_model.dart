@@ -27,7 +27,8 @@ class ComplexViewModel extends BaseViewModel {
       return;
     }
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
-    super.addOrUpdateSetResult(context, workout.items.first.id, !isTime ? int.parse(textController.text) : 0, 0, isTime ? double.parse(textController.text).toInt() : 0);
+    super.addOrUpdateSetResult(
+        context, workout.items.first.id, workout.items.first.itemId, !isTime ? int.parse(textController.text) : 0, 0, isTime ? double.parse(textController.text).toInt() : 0);
     textController.clear();
     notifyListeners();
   }

@@ -8,6 +8,7 @@ import 'package:level_up/ui/core/common_widgets/level_up_text_field.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/ui/workout/view_model/simple_view_model.dart';
+import 'package:level_up/ui/workout/widgets/empty_video_placeholder.dart';
 import 'package:level_up/ui/workout/widgets/level_up_icon_button.dart';
 import 'package:level_up/ui/workout/widgets/six_results_widget.dart';
 import 'package:level_up/ui/workout/widgets/square_timer.dart';
@@ -48,7 +49,9 @@ class SimpleWorkoutScreen extends StatelessWidget {
                               flex: 1,
                               child: AspectRatio(
                                 aspectRatio: 9 / 16,
-                                child: VideoPlayerCard(videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4'),
+                                child: workoutInfo.items.first.getFirstVideoLink() != null
+                                    ? VideoPlayerCard(videoUrl: workoutInfo.items.first.getFirstVideoLink()!)
+                                    : EmptyVideoPlaceholder(),
                               ),
                             ),
                             SizedBox(width: 4),

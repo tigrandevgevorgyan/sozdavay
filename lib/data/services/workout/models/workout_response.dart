@@ -52,15 +52,25 @@ class ExerciseInfo {
   final List<HistoryInfo> history;
 
   ExerciseInfo(
-      this.itemId,
-      this.id,
-      this.name,
-      this.description,
-      this.videos,
-      this.sets,
-      this.restSeconds,
-      this.history,
-      );
+    this.itemId,
+    this.id,
+    this.name,
+    this.description,
+    this.videos,
+    this.sets,
+    this.restSeconds,
+    this.history,
+  );
+
+  String? getFirstVideoLink() {
+    return getVideoLinks().firstOrNull;
+  }
+
+  List<String> getVideoLinks() {
+    List<String> result = [];
+    result.addAll(videos.where((video) => video.type == 'other').map((e) => e.url).toList());
+    return result;
+  }
 
   factory ExerciseInfo.fromJson(Map<String, dynamic> json) => _$ExerciseInfoFromJson(json);
   Map<String, dynamic> toJson() => _$ExerciseInfoToJson(this);

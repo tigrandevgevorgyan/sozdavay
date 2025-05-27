@@ -19,7 +19,14 @@ abstract class WorkoutService {
   Future<WorkoutResponse> changeExercise(@Field() int id, @Field() bool isSecond);
 
   @POST('/workout/set')
-  Future<List<HistoryInfo>> addSetResult(@Field('exercise_id') int exerciseId, @Field() int weight, @Field() int repeats, @Field() int difficult, @Field() int time);
+  Future<List<HistoryInfo>> addSetResult(
+    @Field('exercise_id') int exerciseId,
+    @Field('item_id') int itemId,
+    @Field() int weight,
+    @Field() int repeats,
+    @Field() int difficult,
+    @Field() int time,
+  );
 
   @PUT('/workout/set')
   Future<List<HistoryInfo>> updateSetResult(

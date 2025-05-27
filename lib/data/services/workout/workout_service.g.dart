@@ -101,6 +101,7 @@ class _WorkoutService implements WorkoutService {
   @override
   Future<List<HistoryInfo>> addSetResult(
     int exerciseId,
+    int itemId,
     int weight,
     int repeats,
     int difficult,
@@ -111,6 +112,7 @@ class _WorkoutService implements WorkoutService {
     final _headers = <String, dynamic>{};
     final _data = {
       'exercise_id': exerciseId,
+      'item_id': itemId,
       'weight': weight,
       'repeats': repeats,
       'difficult': difficult,

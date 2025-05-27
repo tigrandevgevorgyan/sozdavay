@@ -48,7 +48,8 @@ class DoubleViewModel extends BaseViewModel {
       return;
     }
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
-    super.addOrUpdateSetResult(context, workout.items.first.id, int.parse(repeatsFirstController.text), double.parse(weightFirstController.text).toInt(), 0);
+    super.addOrUpdateSetResult(
+        context, workout.items.first.id, workout.items.first.itemId, int.parse(repeatsFirstController.text), double.parse(weightFirstController.text).toInt(), 0);
     _resetText();
   }
 
@@ -57,7 +58,8 @@ class DoubleViewModel extends BaseViewModel {
       return;
     }
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
-    super.addOrUpdateSetResult(context, workout.items.last.id, int.parse(repeatsSecondController.text), double.parse(weightSecondController.text).toInt(), 0);
+    super.addOrUpdateSetResult(
+        context, workout.items.last.id, workout.items.last.itemId, int.parse(repeatsSecondController.text), double.parse(weightSecondController.text).toInt(), 0);
     _resetText();
   }
 

@@ -8,7 +8,7 @@ abstract class IWorkoutRepository {
 
   Future<Result<List<WorkoutInfo>>> changeExercise(int id, bool isSecond);
 
-  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int weight, int repeats, int difficult, int time);
+  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, int weight, int repeats, int difficult, int time);
 
   Future<Result<void>> finishWorkout();
 
@@ -69,11 +69,10 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
     return await loadWorkout(dayIndex: _lastDayIndex!);
   }
 
-
   @override
-  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int weight, int repeats, int difficult, int time) async {
+  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, int weight, int repeats, int difficult, int time) async {
     try {
-      final result = await _workoutService.addSetResult(exerciseId, weight, repeats, difficult, time);
+      final result = await _workoutService.addSetResult(exerciseId, itemId, weight, repeats, difficult, time);
       return await _reloadWorkout();
     } on DioException catch (e) {
       return Result.error(e);

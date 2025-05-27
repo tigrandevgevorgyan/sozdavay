@@ -8,16 +8,24 @@ import 'package:level_up/ui/core/common_widgets/level_up_text_field.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/ui/workout/view_model/complex_view_model.dart';
+import 'package:level_up/ui/workout/widgets/empty_video_placeholder.dart';
 import 'package:level_up/ui/workout/widgets/level_up_icon_button.dart';
 import 'package:level_up/ui/workout/widgets/six_results_widget.dart';
 import 'package:level_up/ui/workout/widgets/video_player_card.dart';
 import 'package:level_up/ui/workout/widgets/workout_top_bar.dart';
 import 'package:provider/provider.dart';
 
-class ComplexWorkoutScreen extends StatelessWidget {
+class ComplexWorkoutScreen extends StatefulWidget {
   const ComplexWorkoutScreen({super.key, required this.workoutInfo});
 
   final WorkoutInfo workoutInfo;
+
+  @override
+  State<ComplexWorkoutScreen> createState() => _ComplexWorkoutScreenState();
+}
+
+class _ComplexWorkoutScreenState extends State<ComplexWorkoutScreen> {
+  int _currentVideoIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +38,7 @@ class ComplexWorkoutScreen extends StatelessWidget {
           children: [
             WorkoutTopBar(
                 isUpdatingFirstExercise: provider.isUpdatingExercise,
-                firstExerciseName: workoutInfo.items.first.name,
+                firstExerciseName: widget.workoutInfo.items.first.name,
                 onFirstExerciseRefresh: () => provider.changeExercise(context)),
             Expanded(
               child: SingleChildScrollView(
@@ -44,7 +52,9 @@ class ComplexWorkoutScreen extends StatelessWidget {
                           children: [
                             AspectRatio(
                               aspectRatio: 9 / 16,
-                              child: VideoPlayerCard(videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4'),
+                              child: widget.workoutInfo.items.first.getVideoLinks().isNotEmpty
+                                  ? VideoPlayerCard(videoUrl: widget.workoutInfo.items.first.getVideoLinks()[_currentVideoIndex])
+                                  : EmptyVideoPlaceholder(),
                             ),
                             SizedBox(width: minHorizontalPadding),
                             Expanded(
@@ -52,11 +62,16 @@ class ComplexWorkoutScreen extends StatelessWidget {
                               child: SizedBox(
                                 height: (MediaQuery.of(context).size.width - (sideHorizontalPadding * 2) - minHorizontalPadding) / 2 * 16 / 9,
                                 child: GridView.builder(
-                                  itemCount: 8,
+                                  itemCount: widget.workoutInfo.items.first.getVideoLinks().length,
                                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 4, mainAxisSpacing: 4, childAspectRatio: 9 / 16),
-                                  itemBuilder: (context, index) => VideoPlayerCard(
-                                    videoUrl: 'https://storage.yandexcloud.net/testlevelup/video_2025-04-24_23-19-14.mp4',
-                                    isUIVisible: false,
+                                  itemBuilder: (context, index) => GestureDetector(
+                                    onTap: () => setState(() {
+                                      _currentVideoIndex = index;
+                                    }),
+                                    child: VideoPlayerCard(
+                                      videoUrl: widget.workoutInfo.items.first.getVideoLinks()[index],
+                                      isUIVisible: false,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -69,7 +84,7 @@ class ComplexWorkoutScreen extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.all(12),
                           child: Text(
-                            workoutInfo.items.first.description ?? '',
+                            widget.workoutInfo.items.first.description ?? '',
                             style: Style.outfit16w300.copyWith(color: AppColors.primaryTextColor),
                           ),
                         ),
@@ -100,7 +115,7 @@ class ComplexWorkoutScreen extends StatelessWidget {
                           ? Center(child: LevelUpLoader())
                           : SixResultsWidget(
                               selectedId: provider.selectedId,
-                              results: provider.generateComplexSixDaysResult(workoutInfo.items.first),
+                              results: provider.generateComplexSixDaysResult(widget.workoutInfo.items.first),
                               onResultSelected: (id) => provider.onResultSelected(context, id),
                               onNotesClicked: () => provider.onNotesClicked(context),
                             ),
