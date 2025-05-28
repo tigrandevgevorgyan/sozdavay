@@ -11,26 +11,17 @@ abstract class ILocalStorage {
 
   Future<Result<void>> clearAccessToken();
 
-  Future<Result<void>> saveOfflineSet(WorkoutSets set);
+  Future<Result<void>> saveOfflineOperation(WorkoutSets set);
 
-  Future<Result<List<Map<String, dynamic>>>> getOfflineSets();
+  Future<Result<List<Map<String, dynamic>>>> getOfflineOperations();
 
-  Future<Result<void>> removeOfflineSet(WorkoutSets set);
-
-  Future<Result<void>> saveOfflineDeletedSet(int id);
-
-  Future<Result<List<int>>> getOfflineDeletedSets();
-
-  Future<Result<void>> removeOfflineDeletedSet(int id);
-
-  Future<Result<void>> removeOfflineSetsByItemId(int itemId);
+  Future<Result<void>> removeOfflineOperation(WorkoutSets set);
 
 }
 
 class LocalStorageImpl extends ILocalStorage {
   static const _tokenKey = 'access_token';
-  static const _workoutSetsKey = 'workout_sets_';
-  static const _deletedSetsKey = 'deleted_sets';
+  static const _workoutSetsKey = 'workout_sets';
 
   @override
   Future<Result<String?>> getAccessToken() async {
@@ -65,87 +56,15 @@ class LocalStorageImpl extends ILocalStorage {
   }
 
   @override
-  Future<Result<void>> saveOfflineSet(WorkoutSets set) async {
+  Future<Result<void>> saveOfflineOperation(WorkoutSets set) async {
     try {
       final sp = await SharedPreferences.getInstance();
-      final key = '$_workoutSetsKey${set.itemId}';
+      final key = _workoutSetsKey;
       final list = sp.getStringList(key) ?? [];
       final encoded = jsonEncode(set.toJson());
-
-      if (!list.contains(encoded)) {
-        list.add(encoded);
-        await sp.setStringList(key, list);
-      }
-
-      return Result.ok(null);
-    } on Exception catch (e) {
-      return Result.error(e);
-    }
-  }
-
-  @override
-  Future<Result<List<Map<String, dynamic>>>> getOfflineSets() async {
-    try {
-      final sp = await SharedPreferences.getInstance();
-      final allKeys = sp.getKeys().where((k) => k.startsWith(_workoutSetsKey));
-
-      final result = <Map<String, dynamic>>[];
-
-      for (final key in allKeys) {
-        final list = sp.getStringList(key) ?? [];
-
-        for (final json in list) {
-          try {
-            final map = jsonDecode(json) as Map<String, dynamic>;
-            result.add(map);
-          } catch (e) {
-          }
-        }
-      }
-      return Result.ok(result);
-    } on Exception catch (e) {
-      return Result.error(e);
-    }
-  }
-
-
-  @override
-  Future<Result<void>> removeOfflineSet(WorkoutSets set) async {
-    try {
-      final sp = await SharedPreferences.getInstance();
-      final key = '$_workoutSetsKey${set.itemId}';
-      final list = sp.getStringList(key) ?? [];
-
-      list.removeWhere((entry) {
-        try {
-          final decoded = WorkoutSets.fromJson(jsonDecode(entry));
-          return decoded.id == set.id &&
-              decoded.weight == set.weight &&
-              decoded.repeats == set.repeats &&
-              decoded.time == set.time;
-        } catch (_) {
-          return false;
-        }
-      });
-
-      if (list.isEmpty) {
-        await sp.remove(key);
-      } else {
-        await sp.setStringList(key, list);
-      }
-
-      return Result.ok(null);
-    } on Exception catch (e) {
-      return Result.error(e);
-    }
-  }
-
-  @override
-  Future<Result<void>> removeOfflineSetsByItemId(int itemId) async {
-    try {
-      final sp = await SharedPreferences.getInstance();
-      final key = '$_workoutSetsKey$itemId';
-      await sp.remove(key);
+      list.removeWhere((entry) => entry == encoded);
+      list.add(encoded);
+      await sp.setStringList(key, list);
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
@@ -154,31 +73,11 @@ class LocalStorageImpl extends ILocalStorage {
 
 
   @override
-  Future<Result<void>> saveOfflineDeletedSet(int id) async {
+  Future<Result<List<Map<String, dynamic>>>> getOfflineOperations() async {
     try {
       final sp = await SharedPreferences.getInstance();
-      final key = _deletedSetsKey;
-      final data = sp.getStringList(key) ?? [];
-
-      final idStr = id.toString();
-      if (!data.contains(idStr)) {
-        data.add(idStr);
-        await sp.setStringList(key, data);
-      }
-
-      return Result.ok(null);
-    } on Exception catch (e) {
-      return Result.error(e);
-    }
-  }
-
-
-  @override
-  Future<Result<List<int>>> getOfflineDeletedSets() async {
-    try {
-      final sp = await SharedPreferences.getInstance();
-      final data = sp.getStringList(_deletedSetsKey) ?? [];
-      final result = data.map(int.parse).toList();
+      final list = sp.getStringList(_workoutSetsKey) ?? [];
+      final result = list.map((json) => jsonDecode(json) as Map<String, dynamic>).toList();
       return Result.ok(result);
     } on Exception catch (e) {
       return Result.error(e);
@@ -186,17 +85,16 @@ class LocalStorageImpl extends ILocalStorage {
   }
 
   @override
-  Future<Result<void>> removeOfflineDeletedSet(int id) async {
+  Future<Result<void>> removeOfflineOperation(WorkoutSets set) async {
     try {
       final sp = await SharedPreferences.getInstance();
-      final data = sp.getStringList(_deletedSetsKey) ?? [];
-      data.remove(id.toString());
-      await sp.setStringList(_deletedSetsKey, data);
+      final list = sp.getStringList(_workoutSetsKey) ?? [];
+      list.removeWhere((entry) => entry == jsonEncode(set.toJson()));
+      await sp.setStringList(_workoutSetsKey, list);
       return Result.ok(null);
     } on Exception catch (e) {
       return Result.error(e);
     }
   }
-
 }
 

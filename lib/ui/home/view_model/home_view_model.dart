@@ -58,7 +58,7 @@ class HomeViewModel extends ChangeNotifier {
       '';
 
   void _init(BuildContext context) async {
-    await workoutRepository.sendOfflineSets();
+    await workoutRepository.sendOfflineOperations();
     final isSuccess = await _loadProfile(context);
     if (isSuccess && context.mounted) {
       await _loadMainInfo(context);
