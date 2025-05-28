@@ -31,8 +31,10 @@ class StartTrainingBanner extends StatelessWidget {
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(text, style: Style.ablation15w900.copyWith(color: AppColors.primaryTextColor)),
-                          Spacer(),
+                          Expanded(
+                            child: Text(text, style: Style.ablation15w900.copyWith(color: AppColors.primaryTextColor)),
+                          ),
+                          SizedBox(width: 16),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.activeButtonColor,
