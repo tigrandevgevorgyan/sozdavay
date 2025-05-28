@@ -21,7 +21,7 @@ abstract class IWorkoutRepository {
 
   Future<Result<List<WorkoutInfo>>> deleteSetResult(int id);
 
-  Future<void> sendOfflineSets();
+  Future<void> sendOfflineOperations();
 
   void dispose();
 }
@@ -103,28 +103,15 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
     }
   }
 
-  int _findItemIdByExerciseId(int exerciseId) {
-    for (final w in _workoutResponse?.data ?? []) {
-      for (final item in w.items) {
-        if (item.id == exerciseId) {
-          return item.itemId;
-        }
-      }
-    }
-    throw Exception();
-  }
-
-
   @override
   Future<Result<List<WorkoutInfo>>> addSetResult( int exerciseId, int itemId, int weight, int repeats, int difficult, int time ) async {
-    final offlineSet = WorkoutSets( itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time );
+    final offlineSet = WorkoutSets( itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time, action: OfflineAction.add );
 
     try {
       await _tryWithRetry(
             () => _workoutService.addSetResult(exerciseId, itemId, weight, repeats, difficult, time),
         onRetryError: (_) async {
-          await _localStorage.removeOfflineSetsByItemId(itemId);
-          await _localStorage.saveOfflineSet(offlineSet);
+          await _localStorage.saveOfflineOperation(offlineSet);
         },
       );
       return await _reloadWorkout();
@@ -136,15 +123,13 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
 
   @override
   Future<Result<List<WorkoutInfo>>> updateSetResult( int id, int exerciseId, int weight, int repeats, int difficult, int time ) async {
-    final itemId = _findItemIdByExerciseId(exerciseId);
-    final offlineSet = WorkoutSets( id: id, itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time );
+    final offlineSet = WorkoutSets( id: id, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time, action: OfflineAction.update );
 
     try {
       await _tryWithRetry(
             () => _workoutService.updateSetResult(id, exerciseId, weight, repeats, difficult, time),
         onRetryError: (_) async {
-          await _localStorage.removeOfflineSetsByItemId(itemId);
-          await _localStorage.saveOfflineSet(offlineSet);
+          await _localStorage.saveOfflineOperation(offlineSet);
         },
       );
       return await _reloadWorkout();
@@ -160,84 +145,65 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
       return;
     }
     _retryTimer = Timer(Duration(minutes: 5), () {
-      sendOfflineSets();
+      sendOfflineOperations();
     });
 
   }
 
   @override
-  Future<void> sendOfflineSets() async {
-    try {
-      await _sendOfflineDeletedSets();
+  Future<void> sendOfflineOperations() async {
+    final storedResult = await _localStorage.getOfflineOperations();
 
-      final storedSetsResult = await _localStorage.getOfflineSets();
-      if (storedSetsResult is Ok<List<Map<String, dynamic>>>) {
-        final storedSets = storedSetsResult.value;
-        if (storedSets.isEmpty) {
-          return;
-        }
-
-        for (final setMap in storedSets) {
-          try {
-            final set = WorkoutSets.fromJson(setMap);
-
-            if (set.id != null) {
-              await _tryWithRetry(() => _workoutService.updateSetResult(
-                  set.id!, set.exerciseId, set.weight, set.repeats, set.difficult, set.time
-              ));
-            } else {
-              await _tryWithRetry(() => _workoutService.addSetResult(
-                  set.exerciseId, set.itemId, set.weight, set.repeats, set.difficult, set.time
-              ));
-            }
-
-            await _localStorage.removeOfflineSet(set);
-
-          } catch (e) {
-            _scheduleRetry();
-            return;
-          }
-        }
-
-        _retryTimer?.cancel();
-        _retryTimer = null;
-      }
-    } catch (e) {
+    if (storedResult is! Ok<List<Map<String, dynamic>>>) {
       _scheduleRetry();
-    }
-  }
-
-
-  Future<void> _sendOfflineDeletedSets() async {
-    final deletedResult = await _localStorage.getOfflineDeletedSets();
-
-    if (deletedResult is! Ok<List<int>>) {
       return;
     }
 
-    final deletedIds = deletedResult.value;
-    if (deletedIds.isEmpty) {
-      return;
-    }
+    final operations = storedResult.value;
+    if (operations.isEmpty) return;
 
-    for (final id in deletedIds) {
+    for (final map in operations) {
       try {
-        await _tryWithRetry(() => _workoutService.deleteSetResult(id));
-        await _localStorage.removeOfflineDeletedSet(id);
+        final set = WorkoutSets.fromJson(map);
+
+        switch (set.action) {
+          case OfflineAction.add:
+            await _tryWithRetry(() => _workoutService.addSetResult(set.exerciseId!, set.itemId!, set.weight!, set.repeats!, set.difficult!, set.time!));
+            break;
+
+          case OfflineAction.update:
+            if (set.id == null) throw Exception();
+            await _tryWithRetry(() => _workoutService.updateSetResult(set.id!, set.exerciseId!, set.weight!, set.repeats!, set.difficult!, set.time!));
+            break;
+
+          case OfflineAction.delete:
+            if (set.id == null) throw Exception();
+            await _tryWithRetry(() => _workoutService.deleteSetResult(set.id!));
+            break;
+        }
+
+        await _localStorage.removeOfflineOperation(set);
+
       } catch (e) {
+
         _scheduleRetry();
         return;
       }
     }
+
+    _retryTimer?.cancel();
+    _retryTimer = null;
   }
+
 
 
   @override
   Future<Result<List<WorkoutInfo>>> deleteSetResult(int id) async {
+    final offlineSet = WorkoutSets(id: id, action: OfflineAction.delete);
     try {
       await _tryWithRetry(() => _workoutService.deleteSetResult(id),
         onRetryError: (_) async {
-          await _localStorage.saveOfflineDeletedSet(id);
+          await _localStorage.saveOfflineOperation(offlineSet);
         },
       );
       return await _reloadWorkout();
