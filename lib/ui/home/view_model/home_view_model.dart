@@ -57,6 +57,10 @@ class HomeViewModel extends ChangeNotifier {
           ?.name ??
       '';
 
+  bool get hasWorkoutPlan {
+    return _mainInfo?.schedule.any((day) => day.name?.isNotEmpty ?? false) ?? false;
+  }
+
   void _init(BuildContext context) async {
     await workoutRepository.sendOfflineOperations();
     final isSuccess = await _loadProfile(context);
@@ -139,7 +143,11 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void onProfileClicked(BuildContext context) {
-    GoRouter.of(context).go(LevelUpRouter.homePath + LevelUpRouter.profilePreferencesPath);
+    final hasPlan = hasWorkoutPlan;
+    GoRouter.of(context).push(
+      LevelUpRouter.homePath + LevelUpRouter.profilePreferencesPath,
+      extra: hasPlan,
+    );
   }
 
   void logout(BuildContext context) async {

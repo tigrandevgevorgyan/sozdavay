@@ -70,7 +70,9 @@ class SignInViewModel extends ChangeNotifier {
       case Ok<AccessTokenResponse>():
         final testProfile = await profileRepository.getProfile(); //TODO: remove!!!!!!!!!!!!!!!!!!!!!!!!
         if (context.mounted) {
-          GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath);
+          GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath,
+            extra: false,
+          );
         }
       case Error<AccessTokenResponse>():
         _error = result.error.getErrorMessage();

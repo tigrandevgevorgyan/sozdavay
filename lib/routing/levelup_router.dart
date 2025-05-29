@@ -64,8 +64,11 @@ class LevelUpRouter {
             GoRoute(
               path: profilePreferencesPath,
               pageBuilder: (context, state) {
+                final hasWorkoutPlan = state.extra as bool;
                 return getPage(
-                  child: const ProfilePreferencesScreen(),
+                  child: ProfilePreferencesScreen(
+                    hasWorkoutPlan: hasWorkoutPlan,
+                  ),
                   state: state,
                 );
               },
@@ -84,8 +87,11 @@ class LevelUpRouter {
             GoRoute(
               path: profilePreferencesPath,
               pageBuilder: (context, state) {
+                final hasWorkoutPlan = state.extra as bool;
                 return getPage(
-                  child: const ProfilePreferencesScreen(),
+                  child: ProfilePreferencesScreen(
+                    hasWorkoutPlan: hasWorkoutPlan,
+                  ),
                   state: state,
                 );
               },

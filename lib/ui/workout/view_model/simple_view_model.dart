@@ -19,7 +19,9 @@ class SimpleViewModel extends BaseViewModel {
     super.onResultSelected(context, id);
     final value = findResultById(context, id);
     if (value != null) {
-      weightController.text = value.weight.toString();
+      weightController.text = (value.weight % 1 == 0)
+          ? value.weight.toInt().toString()
+          : value.weight.toString();
       repeatsController.text = value.repeats.toString();
     }
     notifyListeners();

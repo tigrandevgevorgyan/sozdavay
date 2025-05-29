@@ -11,6 +11,7 @@ import 'package:level_up/utils/result.dart';
 
 class ProfilePreferencesViewModel extends ChangeNotifier {
   final IProfileRepository profileRepository;
+  final bool hasWorkoutPlan;
 
   final levelDialogContent = PreferencesOptionsDialogContent('Ваш Уровень подготовки');
 
@@ -21,7 +22,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
   final trainingWeeklyDialogContent = PreferencesOptionsDialogContent('кол-во тренировок в неделю');
   final categoriesDialogContent = PreferencesOptionsDialogContent('Выберите ваш пол и вес');
 
-  ProfilePreferencesViewModel(BuildContext context, {required this.profileRepository}) {
+  ProfilePreferencesViewModel(BuildContext context, {required this.profileRepository, required this.hasWorkoutPlan}) {
     _nameController = TextEditingController();
     _loadProfileAndOptions(context);
   }
