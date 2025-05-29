@@ -71,7 +71,6 @@ class LocalStorageImpl extends ILocalStorage {
     }
   }
 
-
   @override
   Future<Result<List<Map<String, dynamic>>>> getOfflineOperations() async {
     try {

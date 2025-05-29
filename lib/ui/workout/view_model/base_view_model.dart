@@ -54,29 +54,25 @@ class BaseViewModel extends ChangeNotifier {
 
   void addOrUpdateSetResult(BuildContext context, int exerciseId, int itemId, int repeats, int weight, int time) async {
     FocusManager.instance.primaryFocus?.unfocus();
-    if (_selectedId != null) {
-      _isUpdatingHistory = true;
+
+    try {
+      final viewModel = Provider.of<WorkoutViewModel>(context, listen: false);
+
+      if (_selectedId != null) {
+        await viewModel.updateSetResult(context, _selectedId!, exerciseId, weight, repeats, 1, time);
+      } else {
+        await viewModel.addSetResult(context, exerciseId, itemId, weight, repeats, 1, time);
+      }
+    } finally {
       notifyListeners();
-      await Provider.of<WorkoutViewModel>(context, listen: false).updateSetResult(context, selectedId!, exerciseId, weight, repeats, 1, time);
-      _isUpdatingHistory = false;
-      notifyListeners();
-    } else {
-      _isUpdatingHistory = true;
-      notifyListeners();
-      await Provider.of<WorkoutViewModel>(context, listen: false).addSetResult(context, exerciseId, itemId, weight, repeats, 1, time);
-      _isUpdatingHistory = false;
-      notifyListeners();
+      deselectResult();
     }
-    deselectResult();
   }
 
   void deleteSetResult(BuildContext context) async {
     FocusManager.instance.primaryFocus?.unfocus();
     if (_selectedId != null) {
-      _isUpdatingHistory = true;
-      notifyListeners();
       await Provider.of<WorkoutViewModel>(context, listen: false).deleteSetResult(context, selectedId!);
-      _isUpdatingHistory = false;
       notifyListeners();
     }
     deselectResult();

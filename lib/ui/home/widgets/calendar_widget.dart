@@ -31,14 +31,20 @@ class CalendarWidget extends StatelessWidget {
                     children: [
                       Text(
                         day.dayName,
-                        style: Style.ablation13w700.copyWith(
+                        style: day.isToday
+                            ? Style.ablation13w900.copyWith(
+                          color: _getTextColor(day))
+                        : Style.ablation13w700.copyWith(
                           color: _getTextColor(day),
                         ),
                       ),
                       const SizedBox(height: 1),
                       Text(
                         day.dayNumber.toString(),
-                        style: Style.ablation15w900.copyWith(
+                        style: day.isToday
+                          ? Style.ablation15w900.copyWith(
+                          color: _getTextColor(day))
+                        : Style.ablation15w700.copyWith(
                           color: _getTextColor(day),
                         ),
                       ),
@@ -56,9 +62,6 @@ class CalendarWidget extends StatelessWidget {
   Color _getBackgroundColor(CalendarDayInfo day) {
     if (day.isSelectedDay) {
       return AppColors.activeButtonColor;
-    }
-    if (day.isToday) {
-      return AppColors.backgroundColor;
     }
     if (day.isTrainingDay) {
       return AppColors.backgroundContentColor;
