@@ -113,7 +113,7 @@ class HomeViewModel extends ChangeNotifier {
 
     final dayInfo = schedule[index];
 
-    return dayInfo.name ?? (dayInfo.isActive ? 'НАЧАТЬ ТРЕНИРОВКУ' : '');
+    return dayInfo.name ?? '';
   }
 
   void onStartWorkoutClicked(BuildContext context) async {

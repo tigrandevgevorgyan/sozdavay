@@ -94,25 +94,40 @@ class BottomBar extends StatelessWidget {
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: onLeftArrowClicked,
-            child: Padding(
-              padding: const EdgeInsets.all(6.0),
-              child: SvgPicture.asset(Assets.leftArrowIcon),
+            child: SizedBox(
+              width: 60,
+              height: 40,
+              child: Center(
+                child: SvgPicture.asset(
+                  Assets.leftArrowIcon,
+                ),
+              ),
             ),
           ),
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: onHomeClicked,
-            child: Padding(
-              padding: const EdgeInsets.all(6.0),
-              child: SvgPicture.asset(Assets.homeIcon),
+            child: SizedBox(
+              width: 60,
+              height: 40,
+              child: Center(
+                child: SvgPicture.asset(
+                  Assets.homeIcon,
+                ),
+              ),
             ),
           ),
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: onRightArrowClicked,
-            child: Padding(
-              padding: const EdgeInsets.all(6.0),
-              child: SvgPicture.asset(Assets.rightArrowIcon),
+            child: SizedBox(
+              width: 60,
+              height: 40,
+              child: Center(
+                child: SvgPicture.asset(
+                  Assets.rightArrowIcon,
+                ),
+              ),
             ),
           ),
         ],

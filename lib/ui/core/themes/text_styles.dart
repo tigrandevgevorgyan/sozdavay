@@ -15,6 +15,13 @@ class Style {
     color: Colors.white,
   );
 
+  static const TextStyle ablation15w700 = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w700,
+    fontFamily: "Ablation",
+    color: Colors.white,
+  );
+
   static const TextStyle ablation18w900 = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w900,

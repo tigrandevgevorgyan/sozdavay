@@ -9,6 +9,7 @@ import 'package:level_up/ui/core/common_widgets/level_up_button.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
+import '../../../utils/misc_utils.dart';
 
 class WorkoutViewModel extends ChangeNotifier {
   final int dayIndex;
@@ -65,45 +66,106 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addSetResult(BuildContext context, int exerciseId, int itemId, int weight, int repeats, int difficult, int time) async {
-    final result = await workoutRepository.addSetResult(exerciseId, itemId, weight, repeats, difficult, time);
-    switch (result) {
-      case Ok<List<WorkoutInfo>>():
-        _workout = result.value;
-        notifyListeners();
-      case Error<List<WorkoutInfo>>():
-        if (context.mounted) {
-          notifyListeners();
-          ErrorUtils.showError(context, result.error.getErrorMessage());
+
+  Future<void> addSetResult( BuildContext context, int exerciseId, int itemId, int weight, int repeats, int difficult, int time ) async {
+    if (_workout == null) return;
+
+    final newResult = ResultValue( DateTime.now().millisecondsSinceEpoch, weight.toDouble(), repeats, difficult, time );
+
+    final today = getToday();
+    final weekday = getWeekday();
+
+    for (final workout in _workout!) {
+      for (final exercise in workout.items) {
+        if (exercise.id != exerciseId) continue;
+
+        final existing = exercise.history.firstWhere(
+              (h) => h.date == today,
+          orElse: () => HistoryInfo(weekday, today, []),
+        );
+
+        existing.values.insert(0, newResult);
+
+        if (!exercise.history.contains(existing)) {
+          exercise.history.insert(0, existing);
         }
+
+        notifyListeners();
+        break;
+      }
+    }
+
+    final result = await workoutRepository.addSetResult( exerciseId, itemId, weight, repeats, difficult, time );
+
+    if (result case Error()) {
+      if (context.mounted) {
+        ErrorUtils.showError(context, result.error.getErrorMessage());
+      }
     }
   }
 
-  Future<void> updateSetResult(BuildContext context, int id, int exerciseId, int weight, int repeats, int difficult, int time) async {
-    final result = await workoutRepository.updateSetResult(id, exerciseId, weight, repeats, difficult, time);
-    switch (result) {
-      case Ok<List<WorkoutInfo>>():
-        _workout = result.value;
-        notifyListeners();
-      case Error<List<WorkoutInfo>>():
-        if (context.mounted) {
-          notifyListeners();
-          ErrorUtils.showError(context, result.error.getErrorMessage());
+
+
+
+  Future<void> updateSetResult( BuildContext context, int id, int exerciseId, int weight, int repeats, int difficult, int time ) async {
+    if (_workout == null) return;
+
+    for (final workout in _workout!) {
+      for (final exercise in workout.items) {
+        if (exercise.id != exerciseId) continue;
+
+        for (final history in exercise.history) {
+          for (int i = 0; i < history.values.length; i++) {
+            if (history.values[i].id == id) {
+              history.values[i] = history.values[i].copyWith(
+                weight: weight.toDouble(),
+                repeats: repeats,
+              );
+              notifyListeners();
+              break;
+            }
+          }
         }
+
+        break;
+      }
+    }
+
+    final result = await workoutRepository.updateSetResult(id, exerciseId, weight, repeats, difficult, time );
+
+    if (result case Error()) {
+      if (context.mounted) {
+        ErrorUtils.showError(context, result.error.getErrorMessage());
+      }
     }
   }
+
+
+
 
   Future<void> deleteSetResult(BuildContext context, int id) async {
-    final result = await workoutRepository.deleteSetResult(id);
-    switch (result) {
-      case Ok<List<WorkoutInfo>>():
-        _workout = result.value;
-        notifyListeners();
-      case Error<List<WorkoutInfo>>():
-        if (context.mounted) {
-          notifyListeners();
-          ErrorUtils.showError(context, result.error.getErrorMessage());
+    if (_workout == null) return;
+
+    for (final workout in _workout!) {
+      for (final exercise in workout.items) {
+        for (int i = exercise.history.length - 1; i >= 0; i--) {
+          final history = exercise.history[i];
+          history.values.removeWhere((v) => v.id == id);
+          if (history.values.isEmpty) {
+            exercise.history.removeAt(i);
+          }
         }
+      }
+    }
+
+    notifyListeners();
+
+    final result = await workoutRepository.deleteSetResult(id);
+
+    if (result case Error()) {
+      if (context.mounted) {
+        ErrorUtils.showError(context, result.error.getErrorMessage());
+      }
     }
   }
 

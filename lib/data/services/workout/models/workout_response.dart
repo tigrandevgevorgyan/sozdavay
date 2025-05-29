@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-
 import '../../common_models/base_response.dart';
 
 part 'workout_response.g.dart';
@@ -133,3 +132,19 @@ class ResultValue {
   factory ResultValue.fromJson(Map<String, dynamic> json) => _$ResultValueFromJson(json);
   Map<String, dynamic> toJson() => _$ResultValueToJson(this);
 }
+
+extension ResultValueCopyWith on ResultValue {
+  ResultValue copyWith({
+    double? weight,
+    int? repeats,
+  }) {
+    return ResultValue(
+      id,
+      weight ?? this.weight,
+      repeats ?? this.repeats,
+      difficult,
+      time,
+    );
+  }
+}
+
