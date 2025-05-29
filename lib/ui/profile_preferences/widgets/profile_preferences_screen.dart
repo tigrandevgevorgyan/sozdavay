@@ -14,12 +14,13 @@ import 'package:level_up/ui/profile_preferences/widgets/subscription_banner.dart
 import 'package:provider/provider.dart';
 
 class ProfilePreferencesScreen extends StatelessWidget {
-  const ProfilePreferencesScreen({super.key});
+  const ProfilePreferencesScreen({super.key, required this.hasWorkoutPlan});
+  final bool hasWorkoutPlan;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (BuildContext context) => ProfilePreferencesViewModel(context, profileRepository: GetIt.I<IProfileRepository>()),
+      create: (BuildContext context) => ProfilePreferencesViewModel(context, profileRepository: GetIt.I<IProfileRepository>(), hasWorkoutPlan: hasWorkoutPlan),
       child: Consumer<ProfilePreferencesViewModel>(builder: (context, provider, _) {
         return Scaffold(
           appBar: AppBar(
@@ -53,31 +54,36 @@ class ProfilePreferencesScreen extends StatelessWidget {
                                 onClick: () => provider.onGenderWeightClicked(context),
                               ),
                               SizedBox(height: 12),
-                              OptionsBlocWidget(
-                                title: 'Выберите свой уровень подготовки',
-                                value: provider.levelSelection,
-                                onClick: () => provider.onLevelClicked(context),
+                              if (!hasWorkoutPlan)
+                              Column(
+                                children: [
+                                  OptionsBlocWidget(
+                                    title: 'Выберите свой уровень подготовки',
+                                    value: provider.levelSelection,
+                                    onClick: () => provider.onLevelClicked(context),
+                                  ),
+                                  SizedBox(height: 12),
+                                  OptionsBlocWidget(
+                                    title: 'Выберите свою цель',
+                                    value: provider.goalSelection,
+                                    onClick: () => provider.onGoalClicked(context),
+                                  ),
+                                  SizedBox(height: 12),
+                                  if (provider.isPriorityAvailable)
+                                    OptionsBlocWidget(
+                                      title: 'Выберите приоритет',
+                                      value: provider.prioritySelection,
+                                      onClick: () => provider.onPriorityClicked(context),
+                                    ),
+                                  if (provider.isPriorityAvailable) SizedBox(height: 12),
+                                  OptionsBlocWidget(
+                                    title: 'Выберите кол-во тренировок в неделю',
+                                    value: provider.trainingWeeklySelection,
+                                    onClick: () => provider.onTrainingWeeklyClicked(context),
+                                  ),
+                                  SizedBox(height: 12),
+                                ],
                               ),
-                              SizedBox(height: 12),
-                              OptionsBlocWidget(
-                                title: 'Выберите свою цель',
-                                value: provider.goalSelection,
-                                onClick: () => provider.onGoalClicked(context),
-                              ),
-                              SizedBox(height: 12),
-                              if (provider.isPriorityAvailable)
-                                OptionsBlocWidget(
-                                  title: 'Выберите приоритет',
-                                  value: provider.prioritySelection,
-                                  onClick: () => provider.onPriorityClicked(context),
-                                ),
-                              if (provider.isPriorityAvailable) SizedBox(height: 12),
-                              OptionsBlocWidget(
-                                title: 'Выберите кол-во тренировок в неделю',
-                                value: provider.trainingWeeklySelection,
-                                onClick: () => provider.onTrainingWeeklyClicked(context),
-                              ),
-                              SizedBox(height: 12),
                             ],
                           ),
                         ),

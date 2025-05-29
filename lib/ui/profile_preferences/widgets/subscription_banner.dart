@@ -15,7 +15,13 @@ class SubscriptionBanner extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
-            child: Image.asset(Assets.subscriptionBanner),
+            child: Image.asset(
+              Assets.subscriptionBanner,
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+              width: double.infinity,
+            )
+
           ),
           Align(
             alignment: Alignment.bottomLeft,
