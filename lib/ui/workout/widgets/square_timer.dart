@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:level_up/config/assets.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
+import 'package:level_up/utils/alarm_utils.dart';
 
 class SquareTimer extends StatefulWidget {
   const SquareTimer({super.key, required this.title, required this.secondsDuration});
@@ -89,6 +90,9 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       setState(() {
         _isRunning = true;
       });
+      DateTime time = DateTime.now();
+      time.add(Duration(seconds: 7));
+      scheduleSquareNotification(time);
     }
   }
 
