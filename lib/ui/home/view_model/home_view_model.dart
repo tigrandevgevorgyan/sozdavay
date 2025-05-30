@@ -88,10 +88,35 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void initSelectedDayIndex() {
+    _selectedDayIndex = null;
+
+    if (_mainInfo == null) return;
+
+    final activeIndex = _mainInfo!.schedule.indexWhere((d) => d.isActive);
+    if (activeIndex != -1) {
+      _selectedDayIndex = activeIndex;
+    } else {
+      final today = DateTime.now();
+      final monday = today.subtract(Duration(days: today.weekday - 1));
+      for (int i = 0; i < 7; i++) {
+        final dayOfWeek = monday.add(Duration(days: i));
+        if (dayOfWeek.year == today.year &&
+            dayOfWeek.month == today.month &&
+            dayOfWeek.day == today.day) {
+          _selectedDayIndex = i;
+          break;
+        }
+      }
+    }
+    notifyListeners();
+  }
+
   List<CalendarDayInfo> getWeekDays() {
     if (_mainInfo == null) {
       return [];
     }
+
     final List<CalendarDayInfo> result = [];
     final today = DateTime.now();
     final monday = today.subtract(Duration(days: today.weekday - 1));
@@ -99,8 +124,9 @@ class HomeViewModel extends ChangeNotifier {
       final dayOfWeek = monday.add(Duration(days: i));
       final DayInfo dayInfo = _mainInfo!.schedule[i];
       final bool isToday = dayOfWeek.year == today.year && dayOfWeek.month == today.month && dayOfWeek.day == today.day;
-      final isSelected = _selectedDayIndex != null ? _selectedDayIndex == i : isToday;
+      final isSelected = _selectedDayIndex == i;
       final bool isTrainingDay = dayInfo.name?.isNotEmpty ?? false;
+
       result.add(CalendarDayInfo(dayInfo.day, dayOfWeek.day, isTrainingDay, isToday, isSelected));
     }
     return result;
@@ -202,6 +228,7 @@ class HomeViewModel extends ChangeNotifier {
     switch (mainInfo) {
       case Ok<MainResponse>():
         _mainInfo = mainInfo.value.data;
+        initSelectedDayIndex();
       case Error<MainResponse>():
         if (context != null && context.mounted) {
           ErrorUtils.showError(context, mainInfo.error.getErrorMessage());
