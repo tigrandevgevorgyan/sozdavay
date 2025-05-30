@@ -16,6 +16,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/repositories/workout_repository/workout_repository.dart';
 import '../../../data/services/data/models/main_response.dart';
+import '../../../utils/misc_utils.dart';
 
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel(
@@ -228,12 +229,15 @@ class HomeViewModel extends ChangeNotifier {
     switch (mainInfo) {
       case Ok<MainResponse>():
         _mainInfo = mainInfo.value.data;
-        initSelectedDayIndex();
       case Error<MainResponse>():
-        if (context != null && context.mounted) {
-          ErrorUtils.showError(context, mainInfo.error.getErrorMessage());
-        }
+
+        _mainInfo = _emptyMainInfo();
     }
+    notifyListeners();
+  }
+
+  MainInfo _emptyMainInfo() {
+    return MainInfo(WorkoutStats(0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '');
   }
 
   @override

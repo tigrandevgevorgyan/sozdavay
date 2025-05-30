@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:level_up/data/services/data/models/rating_response.dart';
 import 'package:level_up/utils/result.dart';
 
+import '../../../utils/misc_utils.dart';
 import '../../services/data/data_service.dart';
 import '../../services/data/models/main_response.dart';
 
@@ -17,14 +18,20 @@ class DataRepositoryImpl extends IDataRepository {
   final DataService dataService;
 
   DataRepositoryImpl({required this.dataService});
+
   @override
   Future<Result<MainResponse>> getMainInfo() async {
-    try {
-      final result = await dataService.getMainScreenInfo();
-      return Result.ok(result);
-    } on DioException catch (e) {
-      return Result.error(e);
-    }
+  try {
+  final result = await dataService.getMainScreenInfo();
+  return Result.ok(result);
+  } on DioException catch (e) {
+  return Result.error(e);
+  } catch (e) {
+  return Result.error(DioException(
+  requestOptions: RequestOptions(path: ''),
+  error: e,
+  ));
+  }
   }
 
   @override
