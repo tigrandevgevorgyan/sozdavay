@@ -5,6 +5,7 @@ import 'package:level_up/config/assets.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_container.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
+import 'package:level_up/utils/alarm_utils.dart';
 
 class HorizontalTimer extends StatefulWidget {
   const HorizontalTimer({super.key, required this.title, required this.secondsToCount});
@@ -20,6 +21,8 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
   AnimationController? _controller;
 
   bool _isRunning = false;
+
+  late final AppLifecycleListener _lifecycleListener;
 
   @override
   void initState() {
@@ -39,6 +42,18 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
             _isRunning = false;
             audioPlayer.play(AssetSource('sounds/gong.mp3'));
           });
+        }
+      },
+    );
+    _lifecycleListener = AppLifecycleListener(
+      onResume: () async {
+        cancelHorizontalNotification();
+      },
+      onPause: () {
+        if (_isRunning) {
+          DateTime time = DateTime.now();
+          time = time.add(Duration(milliseconds: widget.secondsToCount * 1000 - (widget.secondsToCount * 1000 * (_controller?.value ?? 0.0)).toInt()));
+          scheduleHorizontalNotification(time);
         }
       },
     );
@@ -102,5 +117,6 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
     audioPlayer.dispose();
     _controller?.reset();
     _controller?.dispose();
+    _lifecycleListener.dispose();
   }
 }

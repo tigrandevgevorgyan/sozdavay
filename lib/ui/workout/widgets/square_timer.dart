@@ -23,6 +23,8 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   AnimationController? _controller;
   bool _isRunning = false;
 
+  late final AppLifecycleListener _lifecycleListener;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +48,18 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       },
     );
     _controller?.reset();
+    _lifecycleListener = AppLifecycleListener(
+      onResume: () async {
+        cancelSquareNotification();
+      },
+      onPause: () {
+        if (_isRunning) {
+          DateTime time = DateTime.now();
+          time = time.add(Duration(milliseconds: widget.secondsDuration * 1000 - (widget.secondsDuration * 1000 * (_controller?.value ?? 0.0)).toInt()));
+          scheduleSquareNotification(time);
+        }
+      },
+    );
   }
 
   @override
@@ -102,6 +116,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
     audioPlayer.dispose();
     _controller?.reset();
     _controller?.dispose();
+    _lifecycleListener.dispose();
   }
 }
 

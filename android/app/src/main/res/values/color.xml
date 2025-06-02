@@ -2,5 +2,6 @@
 <resources>
 
     <color name="background_color">#010101</color>
+    <color name="colorAccent">#ff0101</color>
 
 </resources>

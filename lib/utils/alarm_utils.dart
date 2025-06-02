@@ -1,14 +1,13 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:alarm/alarm.dart';
 
 AlarmSettings createNotification(int id, DateTime alarmTime) {
   return AlarmSettings(
-    id: 42,
+    id: id,
     dateTime: alarmTime,
     assetAudioPath: 'assets/sounds/gong.mp3',
-    loopAudio: true,
+    loopAudio: false,
     vibrate: true,
     warningNotificationOnKill: Platform.isIOS,
     androidFullScreenIntent: true,
@@ -18,13 +17,20 @@ AlarmSettings createNotification(int id, DateTime alarmTime) {
       volumeEnforced: true,
     ),
     notificationSettings: const NotificationSettings(
-      title: 'This is the title',
-      body: 'This is the body',
-      stopButton: 'Stop the alarm',
-      icon: 'notification_icon',
-      iconColor: Color(0xff862778),
+      title: '????? ?????!',
+      body: '???? ?????????????!',
+      stopButton: '?????????',
+      //iconColor: Colors.red,
     ),
   );
+}
+
+Future<void> scheduleHorizontalNotification(DateTime alarmTime) async {
+  await Alarm.set(alarmSettings: createNotification(2, alarmTime));
+}
+
+void cancelHorizontalNotification() async {
+  await Alarm.stop(2);
 }
 
 Future<void> scheduleSquareNotification(DateTime alarmTime) async {
