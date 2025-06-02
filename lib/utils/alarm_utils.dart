@@ -6,7 +6,7 @@ AlarmSettings createNotification(int id, DateTime alarmTime) {
   return AlarmSettings(
     id: id,
     dateTime: alarmTime,
-    assetAudioPath: 'assets/sounds/gong.mp3',
+    assetAudioPath: 'assets/sounds/notification_sound.wav',
     loopAudio: false,
     vibrate: true,
     warningNotificationOnKill: Platform.isIOS,
@@ -17,9 +17,8 @@ AlarmSettings createNotification(int id, DateTime alarmTime) {
       volumeEnforced: true,
     ),
     notificationSettings: const NotificationSettings(
-      title: '????? ?????!',
-      body: '???? ?????????????!',
-      stopButton: '?????????',
+      title: 'Время отдыха вышло',
+      body: 'Продолжить тренировку',
       //iconColor: Colors.red,
     ),
   );

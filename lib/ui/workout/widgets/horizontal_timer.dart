@@ -6,6 +6,7 @@ import 'package:level_up/ui/core/common_widgets/level_up_container.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/utils/alarm_utils.dart';
+import '../../../utils/timer_state_storage.dart';
 
 class HorizontalTimer extends StatefulWidget {
   const HorizontalTimer({super.key, required this.title, required this.secondsToCount});
@@ -36,12 +37,16 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
         }
       });
     _controller!.addStatusListener(
-      (status) {
+          (status) async {
         if (status.isCompleted) {
           setState(() {
             _isRunning = false;
-            audioPlayer.play(AssetSource('sounds/gong.mp3'));
           });
+          final wasOnBackground = await TimerStateStorage.wasTriggered(2);
+          if (!wasOnBackground) {
+            audioPlayer.play(AssetSource('sounds/notification_sound.wav'));
+          }
+          await TimerStateStorage.clear(2);
         }
       },
     );
@@ -53,6 +58,7 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
         if (_isRunning) {
           DateTime time = DateTime.now();
           time = time.add(Duration(milliseconds: widget.secondsToCount * 1000 - (widget.secondsToCount * 1000 * (_controller?.value ?? 0.0)).toInt()));
+          TimerStateStorage.save(2, time);
           scheduleHorizontalNotification(time);
         }
       },

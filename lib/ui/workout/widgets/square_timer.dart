@@ -7,6 +7,7 @@ import 'package:level_up/config/assets.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/utils/alarm_utils.dart';
+import 'package:level_up/utils/timer_state_storage.dart';
 
 class SquareTimer extends StatefulWidget {
   const SquareTimer({super.key, required this.title, required this.secondsDuration});
@@ -32,18 +33,21 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       vsync: this,
       duration: Duration(seconds: widget.secondsDuration),
     )..addListener(() {
-        print('timer test!');
-        if (context.mounted) {
-          setState(() {});
-        }
-      });
+      if (context.mounted) {
+        setState(() {});
+      }
+    });
     _controller!.addStatusListener(
-      (status) {
+          (status) async {
         if (status.isCompleted) {
           setState(() {
             _isRunning = false;
-            audioPlayer.play(AssetSource('sounds/gong.mp3'));
           });
+          final wasOnBackground = await TimerStateStorage.wasTriggered(1);
+          if (!wasOnBackground) {
+            audioPlayer.play(AssetSource('sounds/notification_sound.wav'));
+          }
+          await TimerStateStorage.clear(1);
         }
       },
     );
@@ -56,6 +60,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
         if (_isRunning) {
           DateTime time = DateTime.now();
           time = time.add(Duration(milliseconds: widget.secondsDuration * 1000 - (widget.secondsDuration * 1000 * (_controller?.value ?? 0.0)).toInt()));
+          TimerStateStorage.save(1, time);
           scheduleSquareNotification(time);
         }
       },
@@ -104,9 +109,6 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       setState(() {
         _isRunning = true;
       });
-      DateTime time = DateTime.now();
-      time.add(Duration(seconds: 7));
-      scheduleSquareNotification(time);
     }
   }
 
