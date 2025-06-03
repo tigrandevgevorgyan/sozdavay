@@ -233,6 +233,7 @@ class HomeViewModel extends ChangeNotifier {
 
         _mainInfo = _emptyMainInfo();
     }
+    initSelectedDayIndex();
     notifyListeners();
   }
 
