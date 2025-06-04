@@ -8,6 +8,7 @@ import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/utils/alarm_utils.dart';
 import 'package:level_up/utils/timer_state_storage.dart';
+import '../../../utils/notifications.dart';
 
 class SquareTimer extends StatefulWidget {
   const SquareTimer({super.key, required this.title, required this.secondsDuration});
@@ -58,10 +59,12 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       },
       onPause: () {
         if (_isRunning) {
-          DateTime time = DateTime.now();
-          time = time.add(Duration(milliseconds: widget.secondsDuration * 1000 - (widget.secondsDuration * 1000 * (_controller?.value ?? 0.0)).toInt()));
-          TimerStateStorage.save(1, time);
-          scheduleSquareNotification(time);
+          final remainingTime = widget.secondsDuration * 1000 - ( widget.secondsDuration * 1000 * (_controller?.value ?? 0.0)).toInt();
+          final time = Duration(milliseconds: remainingTime);
+          final triggerTime = DateTime.now().add(time);
+          TimerStateStorage.save(1, triggerTime);
+          scheduleSquareNotification(triggerTime);
+          showCountdownNotification(time, 1);
         }
       },
     );

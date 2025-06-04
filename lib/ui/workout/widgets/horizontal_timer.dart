@@ -6,6 +6,7 @@ import 'package:level_up/ui/core/common_widgets/level_up_container.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/utils/alarm_utils.dart';
+import '../../../utils/notifications.dart';
 import '../../../utils/timer_state_storage.dart';
 
 class HorizontalTimer extends StatefulWidget {
@@ -56,10 +57,12 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
       },
       onPause: () {
         if (_isRunning) {
-          DateTime time = DateTime.now();
-          time = time.add(Duration(milliseconds: widget.secondsToCount * 1000 - (widget.secondsToCount * 1000 * (_controller?.value ?? 0.0)).toInt()));
-          TimerStateStorage.save(2, time);
-          scheduleHorizontalNotification(time);
+          final remainingTime = widget.secondsToCount * 1000 - (widget.secondsToCount * 1000 * (_controller?.value ?? 0.0)).toInt();
+          final time = Duration(milliseconds: remainingTime);
+          final triggerTime = DateTime.now().add(time);
+          TimerStateStorage.save(2, triggerTime);
+          scheduleHorizontalNotification(triggerTime);
+          showCountdownNotification(time, 2);
         }
       },
     );
