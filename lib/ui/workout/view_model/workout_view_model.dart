@@ -51,8 +51,8 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateExercise(BuildContext context, int id) async {
-    final result = await workoutRepository.changeExercise(id, _isSecondWorkout(id));
+  Future<void> updateExercise(BuildContext context, int index) async {
+    final result = await workoutRepository.changeExercise(index, _isSecondWorkout(index));
     _isLoading = false;
     switch (result) {
       case Ok<List<WorkoutInfo>>():

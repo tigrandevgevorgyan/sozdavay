@@ -72,11 +72,11 @@ class _WorkoutService implements WorkoutService {
   }
 
   @override
-  Future<WorkoutResponse> changeExercise(int id, bool isSecond) async {
+  Future<WorkoutResponse> changeExercise(int index, bool second) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = {'id': id, 'isSecond': isSecond};
+    final _data = {'index': index, 'second': second};
     final _options = _setStreamType<WorkoutResponse>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
