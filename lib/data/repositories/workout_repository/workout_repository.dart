@@ -11,7 +11,7 @@ import '../../services/workout/models/workout_sets.dart';
 abstract class IWorkoutRepository {
   Future<Result<List<WorkoutInfo>>> loadWorkout({required int dayIndex});
 
-  Future<Result<List<WorkoutInfo>>> changeExercise(int id, bool isSecond);
+  Future<Result<List<WorkoutInfo>>> changeExercise(int index, bool second);
 
   Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, int weight, int repeats, int difficult, int time);
 
@@ -63,9 +63,9 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   }
 
   @override
-  Future<Result<List<WorkoutInfo>>> changeExercise(int id, bool isSecond) async {
+  Future<Result<List<WorkoutInfo>>> changeExercise(int index, bool second) async {
     try {
-      final result = await _workoutService.changeExercise(id, isSecond);
+      final result = await _workoutService.changeExercise(index, second);
       _workoutResponse = result;
       return Result.ok(result.data);
     } on DioException catch (e) {

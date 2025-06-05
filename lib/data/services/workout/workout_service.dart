@@ -16,7 +16,7 @@ abstract class WorkoutService {
   Future<WorkoutFinishResponse> finishWorkout();
 
   @POST('/workout/change')
-  Future<WorkoutResponse> changeExercise(@Field() int id, @Field() bool isSecond);
+  Future<WorkoutResponse> changeExercise(@Field() int index, @Field() bool second);
 
   @POST('/workout/set')
   Future<List<HistoryInfo>> addSetResult(
