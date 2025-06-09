@@ -8,7 +8,7 @@ import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/ui/text_editing_screen/text_editing_screen.dart';
 import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:level_up/ui/workout/widgets/day_measurements_result.dart';
-import 'package:level_up/ui/workout/widgets/six_results_widget.dart';
+import 'package:level_up/ui/workout/widgets/simple_results_widget.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/misc_utils.dart';
 import 'package:level_up/utils/result.dart';
@@ -52,7 +52,7 @@ class BaseViewModel extends ChangeNotifier {
     }
   }
 
-  void addOrUpdateSetResult(BuildContext context, int exerciseId, int itemId, int repeats, int weight, int time) async {
+  void addOrUpdateSetResult(BuildContext context, int exerciseId, int itemId, int repeats, int weight, int time, String date) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
     try {
@@ -61,7 +61,7 @@ class BaseViewModel extends ChangeNotifier {
       if (_selectedId != null) {
         await viewModel.updateSetResult(context, _selectedId!, exerciseId, weight, repeats, 1, time);
       } else {
-        await viewModel.addSetResult(context, exerciseId, itemId, weight, repeats, 1, time);
+        await viewModel.addSetResult(context, exerciseId, itemId, weight, repeats, 1, time, date);
       }
     } finally {
       notifyListeners();
@@ -127,10 +127,12 @@ class BaseViewModel extends ChangeNotifier {
     List<SixResultsDayInfo> result = [];
     for (HistoryInfo history in exerciseInfo.history) {
       List<DayResultInfo> resultStrings = [];
+      String? title;
       for (ResultValue value in history.values) {
+        title = value.date.toWeekdayWithDate();
         resultStrings.add(DayResultInfo(value.id, '${value.weight.formatDouble()}/${value.repeats}'));
       }
-      result.add(SixResultsDayInfo('${history.day} ${history.date}', resultStrings));
+      result.add(SixResultsDayInfo(title ?? '${history.day} ${history.date}', resultStrings));
     }
     return result;
   }

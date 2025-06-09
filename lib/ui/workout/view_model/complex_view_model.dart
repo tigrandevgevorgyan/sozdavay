@@ -4,7 +4,8 @@ import 'package:level_up/data/repositories/profile_service/profile_repository.da
 import 'package:level_up/ui/workout/view_model/base_view_model.dart';
 import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:level_up/ui/workout/widgets/day_measurements_result.dart';
-import 'package:level_up/ui/workout/widgets/six_results_widget.dart';
+import 'package:level_up/ui/workout/widgets/simple_results_widget.dart';
+import 'package:level_up/utils/misc_utils.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/services/workout/models/workout_response.dart';
@@ -27,8 +28,9 @@ class ComplexViewModel extends BaseViewModel {
       return;
     }
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
+    final now = DateTime.now().toIso8601String();
     super.addOrUpdateSetResult(
-        context, workout.items.first.id, workout.items.first.itemId, !isTime ? int.parse(textController.text) : 0, 0, isTime ? double.parse(textController.text).toInt() : 0);
+        context, workout.items.first.id, workout.items.first.itemId, !isTime ? int.parse(textController.text) : 0, 0, isTime ? double.parse(textController.text).toInt() : 0, now);
     textController.clear();
     notifyListeners();
   }
@@ -45,12 +47,14 @@ class ComplexViewModel extends BaseViewModel {
 
   List<SixResultsDayInfo> generateComplexSixDaysResult(ExerciseInfo exerciseInfo) {
     List<SixResultsDayInfo> result = [];
+    String? title;
     for (HistoryInfo history in exerciseInfo.history) {
       List<DayResultInfo> resultStrings = [];
       for (ResultValue value in history.values) {
         resultStrings.add(DayResultInfo(value.id, isTime ? value.time.toString() : value.repeats.toString()));
+        title = value.date.toWeekdayWithDate();
       }
-      result.add(SixResultsDayInfo('${history.day} ${history.date}', resultStrings));
+      result.add(SixResultsDayInfo(title ?? '${history.day} ${history.date}', resultStrings));
     }
     return result;
   }

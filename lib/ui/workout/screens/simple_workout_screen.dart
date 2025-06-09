@@ -10,7 +10,7 @@ import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/ui/workout/view_model/simple_view_model.dart';
 import 'package:level_up/ui/workout/widgets/empty_video_placeholder.dart';
 import 'package:level_up/ui/workout/widgets/level_up_icon_button.dart';
-import 'package:level_up/ui/workout/widgets/six_results_widget.dart';
+import 'package:level_up/ui/workout/widgets/simple_results_widget.dart';
 import 'package:level_up/ui/workout/widgets/square_timer.dart';
 import 'package:level_up/ui/workout/widgets/video_player_card.dart';
 import 'package:level_up/ui/workout/widgets/workout_top_bar.dart';
@@ -116,7 +116,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                       SizedBox(height: 16),
                       provider.isUpdatingHistory
                           ? Center(child: LevelUpLoader())
-                          : SixResultsWidget(
+                          : SimpleResultsWidget(
                               selectedId: provider.selectedId,
                               results: provider.generateSixDaysResult(workoutInfo.items.first),
                               onResultSelected: (id) => provider.onResultSelected(context, id),

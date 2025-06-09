@@ -26,6 +26,7 @@ abstract class WorkoutService {
     @Field() int repeats,
     @Field() int difficult,
     @Field() int time,
+    @Field() String date,
   );
 
   @PUT('/workout/set')

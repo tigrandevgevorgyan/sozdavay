@@ -67,10 +67,10 @@ class WorkoutViewModel extends ChangeNotifier {
   }
 
 
-  Future<void> addSetResult( BuildContext context, int exerciseId, int itemId, int weight, int repeats, int difficult, int time ) async {
+  Future<void> addSetResult( BuildContext context, int exerciseId, int itemId, int weight, int repeats, int difficult, int time, String date ) async {
     if (_workout == null) return;
 
-    final newResult = ResultValue( DateTime.now().millisecondsSinceEpoch, weight.toDouble(), repeats, difficult, time );
+    final newResult = ResultValue( DateTime.now().millisecondsSinceEpoch, weight.toDouble(), repeats, difficult, time, date);
 
     final today = getToday();
     final weekday = getWeekday();
@@ -95,7 +95,7 @@ class WorkoutViewModel extends ChangeNotifier {
       }
     }
 
-    final result = await workoutRepository.addSetResult( exerciseId, itemId, weight, repeats, difficult, time );
+    final result = await workoutRepository.addSetResult( exerciseId, itemId, weight, repeats, difficult, time, date );
 
     if (result case Error()) {
       if (context.mounted) {
@@ -131,7 +131,7 @@ class WorkoutViewModel extends ChangeNotifier {
       }
     }
 
-    final result = await workoutRepository.updateSetResult(id, exerciseId, weight, repeats, difficult, time );
+    final result = await workoutRepository.updateSetResult(id, exerciseId, weight, repeats, difficult, time);
 
     if (result case Error()) {
       if (context.mounted) {

@@ -106,6 +106,7 @@ class _WorkoutService implements WorkoutService {
     int repeats,
     int difficult,
     int time,
+    String date,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -117,6 +118,7 @@ class _WorkoutService implements WorkoutService {
       'repeats': repeats,
       'difficult': difficult,
       'time': time,
+      'date': date,
     };
     final _options = _setStreamType<List<HistoryInfo>>(
       Options(method: 'POST', headers: _headers, extra: _extra)

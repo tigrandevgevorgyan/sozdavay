@@ -20,6 +20,8 @@ class UserProfile {
   final String? measurements;
   @JsonKey(name: 'paid_until')
   final String? paidUntil;
+  @JsonKey(name: 'plan_type')
+  final int planType;
 
   UserProfile(
     this.records,
@@ -34,6 +36,7 @@ class UserProfile {
     required this.experience,
     required this.goal,
     required this.priority,
+    required this.planType,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
