@@ -39,25 +39,28 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
     return ChangeNotifierProvider<WorkoutViewModel>(
       create: (BuildContext context) => WorkoutViewModel(context, GetIt.I<IWorkoutRepository>(), dayIndex: dayIndex),
       child: Consumer<WorkoutViewModel>(builder: (context, provider, __) {
-        return Scaffold(
-          appBar: AppBar(backgroundColor: AppColors.backgroundContentColor, toolbarHeight: 0),
-          backgroundColor: AppColors.backgroundColor,
-          body: SafeArea(
-            child: provider.isLoading || provider.isWorkoutEmpty
-                ? Center(child: LevelUpLoader())
-                : Column(
-                    children: [
-                      Expanded(
-                        child: _getScreenByWorkout(provider.currentWorkout),
-                      ),
-                      BottomBar(
-                        onLeftArrowClicked: provider.onPreviousClicked,
-                        onRightArrowClicked: () => provider.onNextClicked(context),
-                        onHomeClicked: () => GoRouter.of(context).pop(),
-                      ),
-                      SizedBox(height: 10),
-                    ],
-                  ),
+        return PopScope(
+          onPopInvokedWithResult: (didPop, result) => provider.deleteWorkout(),
+          child: Scaffold(
+            appBar: AppBar(backgroundColor: AppColors.backgroundContentColor, toolbarHeight: 0),
+            backgroundColor: AppColors.backgroundColor,
+            body: SafeArea(
+              child: provider.isLoading || provider.isWorkoutEmpty
+                  ? Center(child: LevelUpLoader())
+                  : Column(
+                      children: [
+                        Expanded(
+                          child: _getScreenByWorkout(provider.currentWorkout),
+                        ),
+                        BottomBar(
+                          onLeftArrowClicked: provider.onPreviousClicked,
+                          onRightArrowClicked: () => provider.onNextClicked(context),
+                          onHomeClicked: () => GoRouter.of(context).pop(),
+                        ),
+                        SizedBox(height: 10),
+                      ],
+                    ),
+            ),
           ),
         );
       }),

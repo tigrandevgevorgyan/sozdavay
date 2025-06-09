@@ -9,6 +9,8 @@ class IsCompletedResponse extends BaseResponse {
 
   IsCompletedResponse(super.message, this.success);
 
+  bool get isSuccess => success ?? false;
+
   factory IsCompletedResponse.fromJson(Map<String, dynamic> json) => _$IsCompletedResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$IsCompletedResponseToJson(this);

@@ -12,11 +12,13 @@ WorkoutResponse _$WorkoutResponseFromJson(Map<String, dynamic> json) =>
       (json['data'] as List<dynamic>)
           .map((e) => WorkoutInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
+      (json['workout_id'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$WorkoutResponseToJson(WorkoutResponse instance) =>
     <String, dynamic>{
       'message': instance.message,
+      'workout_id': instance.workoutId,
       'data': instance.data,
     };
 
