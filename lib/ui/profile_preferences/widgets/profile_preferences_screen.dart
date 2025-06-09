@@ -58,7 +58,7 @@ class ProfilePreferencesScreen extends StatelessWidget {
                               Column(
                                 children: [
                                   OptionsBlocWidget(
-                                    title: 'Выберите свой уровень подготовки',
+                                    title: 'Выберите сложность',
                                     value: provider.levelSelection,
                                     onClick: () => provider.onLevelClicked(context),
                                   ),

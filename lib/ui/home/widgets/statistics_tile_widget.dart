@@ -124,7 +124,7 @@ class RatingTile extends StatelessWidget {
                   alignment: Alignment.center,
                   children: [
                     CustomPaint(
-                      size: Size(90, 90),
+                      size: Size(120, 120),
                       painter: RatingPainter(
                           arcBackgroundColor: AppColors.secondaryDefaultColor, arcForegroundColor: AppColors.activeButtonColor, strokeWidth: 10, percent: ratingPercent),
                     ),

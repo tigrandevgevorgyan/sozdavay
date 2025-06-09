@@ -71,6 +71,7 @@ class PodiumPositionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayName = name?.replaceAll('\u00A0', ' ').split(' ').join('\n');
     return Column(
       children: [
         Padding(
@@ -78,8 +79,12 @@ class PodiumPositionWidget extends StatelessWidget {
           child: Image.asset(imagePath),
         ),
         SizedBox(height: 4),
-        if (name != null && score != null) ...[
-          Text(name!, style: Style.outfit16w400.copyWith(color: AppColors.primaryTextColor), textAlign: TextAlign.center),
+        if (displayName != null && score != null) ...[
+          Text( displayName,
+            style: Style.outfit14w400.copyWith(color: AppColors.primaryTextColor),
+              textAlign: TextAlign.center,
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,),
           SizedBox(height: 4),
           Text(score.toString(), style: Style.ablation14w900.copyWith(color: AppColors.activeButtonColor)),
         ]
