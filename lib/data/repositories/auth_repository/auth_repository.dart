@@ -14,6 +14,10 @@ abstract class IAuthRepository {
   Future<Result<void>> logout();
 
   Future<Result<void>> deauthorize();
+
+  Future<Result<bool>> isFirstLogin();
+
+  Future<Result<void>> markFirstLoginShown();
 }
 
 class AuthRepository extends IAuthRepository {
@@ -73,5 +77,15 @@ class AuthRepository extends IAuthRepository {
     } on DioException catch (e) {
       return Result.error(e);
     }
+  }
+
+  @override
+  Future<Result<bool>> isFirstLogin() {
+    return _localStorage.isFirstLogin();
+  }
+
+  @override
+  Future<Result<void>> markFirstLoginShown() {
+    return _localStorage.setFirstLoginShown();
   }
 }
