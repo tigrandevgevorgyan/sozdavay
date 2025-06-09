@@ -11,6 +11,7 @@ import 'package:level_up/ui/workout/screens/complex_workout_screen.dart';
 import 'package:level_up/ui/workout/screens/double_workout_screen.dart';
 import 'package:level_up/ui/workout/screens/simple_workout_screen.dart';
 import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
+import 'package:level_up/ui/workout/widgets/error_placeholder.dart';
 import 'package:provider/provider.dart';
 
 class WorkoutBaseScreen extends StatefulWidget {
@@ -47,6 +48,12 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
             body: SafeArea(
               child: provider.isLoading || provider.isWorkoutEmpty
                   ? Center(child: LevelUpLoader())
+                  : provider.hasError
+                ? ErrorPlaceholder(
+                  onTap: (){
+                    provider.init(context);
+                  },
+              )
                   : Column(
                       children: [
                         Expanded(

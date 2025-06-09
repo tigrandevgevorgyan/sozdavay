@@ -17,7 +17,7 @@ class WorkoutViewModel extends ChangeNotifier {
   final int dayIndex;
 
   WorkoutViewModel(BuildContext context, this.workoutRepository, {required this.dayIndex}) {
-    _init(context);
+    init(context);
   }
 
   final IWorkoutRepository workoutRepository;
@@ -25,6 +25,7 @@ class WorkoutViewModel extends ChangeNotifier {
   List<WorkoutInfo>? _workout;
   int _workoutId = -1;
   bool _isLoading = true;
+  bool hasError = false;
 
   bool get isLoading => _isLoading;
 
@@ -32,8 +33,10 @@ class WorkoutViewModel extends ChangeNotifier {
 
   bool get isWorkoutEmpty => _workout != null && _workout!.isEmpty;
 
-  void _init(BuildContext context) async {
+  void init(BuildContext context) async {
     _isLoading = true;
+    hasError = false;
+    notifyListeners();
     final result = await workoutRepository.loadWorkout(dayIndex: dayIndex);
     _isLoading = false;
     switch (result) {
@@ -49,10 +52,11 @@ class WorkoutViewModel extends ChangeNotifier {
         notifyListeners();
       case Error<WorkoutResponse>():
         if (context.mounted) {
-          notifyListeners();
+          hasError = true;
           ErrorUtils.showError(context, result.error.getErrorMessage());
         }
     }
+    notifyListeners();
   }
 
   Future<void> updateExercise(BuildContext context, int index) async {
