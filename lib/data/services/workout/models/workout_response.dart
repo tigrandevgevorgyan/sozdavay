@@ -126,8 +126,9 @@ class ResultValue {
   final int repeats;
   final int difficult;
   final int time;
+  final String date;
 
-  ResultValue(this.id, this.weight, this.repeats, this.difficult, this.time);
+  ResultValue(this.id, this.weight, this.repeats, this.difficult, this.time, this.date);
 
   factory ResultValue.fromJson(Map<String, dynamic> json) => _$ResultValueFromJson(json);
   Map<String, dynamic> toJson() => _$ResultValueToJson(this);
@@ -144,6 +145,7 @@ extension ResultValueCopyWith on ResultValue {
       repeats ?? this.repeats,
       difficult,
       time,
+      date
     );
   }
 }

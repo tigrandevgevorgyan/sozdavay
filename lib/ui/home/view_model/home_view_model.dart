@@ -41,6 +41,9 @@ class HomeViewModel extends ChangeNotifier {
   UserProfileExtendedResponse? _profile;
   MainInfo? _mainInfo;
 
+  late int _planType;
+  int get planType => _planType;
+
   String get level => _mainInfo?.label ?? '';
 
   int get rating => _mainInfo?.rating ?? 0;
@@ -59,7 +62,7 @@ class HomeViewModel extends ChangeNotifier {
       '';
 
   bool get hasWorkoutPlan {
-    return _mainInfo?.schedule.any((day) => day.name?.isNotEmpty ?? false) ?? false;
+    return _planType == 2;
   }
 
   void _init(BuildContext context) async {
@@ -214,6 +217,7 @@ class HomeViewModel extends ChangeNotifier {
     switch (profile) {
       case Ok<UserProfileExtendedResponse>():
         _profile = profile.value;
+        _planType = _profile!.data.planType;
         return true;
       case Error<UserProfileExtendedResponse>():
         if (context != null && context.mounted) {

@@ -151,6 +151,11 @@ class DoubleWorkoutScreen extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final firstHistoryItem = workoutInfo.items.first.history.elementAtOrNull(index);
                               final secondHistoryItem = workoutInfo.items.last.history.elementAtOrNull(index);
+                              final firstDate = firstHistoryItem?.values.firstOrNull?.date;
+                              final secondDate = secondHistoryItem?.values.firstOrNull?.date;
+                              final titleFirst = firstDate?.toWeekdayWithDate();
+                              final titleSecond = secondDate?.toWeekdayWithDate();
+
                               return Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 14),
                                 child: Row(
@@ -159,7 +164,7 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                     Expanded(
                                       child: firstHistoryItem != null
                                           ? DayMeasurementsResult(
-                                              title: '${firstHistoryItem.day} ${firstHistoryItem.date}',
+                                              title: titleFirst ?? '${firstHistoryItem.day} ${firstHistoryItem.date}',
                                               results: generateSingleDayResult(firstHistoryItem),
                                               onResultSelected: (id) => provider.onFirstIdSelected(context, id),
                                               onNotesClicked: () => provider.onNotesClicked(context),
@@ -169,7 +174,7 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                     Expanded(
                                       child: secondHistoryItem != null
                                           ? DayMeasurementsResult(
-                                              title: '${secondHistoryItem.day} ${secondHistoryItem.date}',
+                                              title: titleSecond ?? '${secondHistoryItem.day} ${secondHistoryItem.date}',
                                               results: generateSingleDayResult(secondHistoryItem),
                                               onResultSelected: (id) => provider.onSecondIdSelected(context, id),
                                               onNotesClicked: () => provider.onNotesClicked(context),

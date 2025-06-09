@@ -13,7 +13,7 @@ abstract class IWorkoutRepository {
 
   Future<Result<List<WorkoutInfo>>> changeExercise(int index, bool second);
 
-  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, int weight, int repeats, int difficult, int time);
+  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, int weight, int repeats, int difficult, int time, String date);
 
   Future<Result<void>> finishWorkout();
 
@@ -95,12 +95,12 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   }
 
   @override
-  Future<Result<List<WorkoutInfo>>> addSetResult( int exerciseId, int itemId, int weight, int repeats, int difficult, int time ) async {
-    final offlineSet = WorkoutSets.add( itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time );
+  Future<Result<List<WorkoutInfo>>> addSetResult( int exerciseId, int itemId, int weight, int repeats, int difficult, int time, String date ) async {
+    final offlineSet = WorkoutSets.add( itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time, date: date );
 
     try {
       await _tryWithRetry(
-            () => _workoutService.addSetResult(exerciseId, itemId, weight, repeats, difficult, time),
+            () => _workoutService.addSetResult(exerciseId, itemId, weight, repeats, difficult, time, date),
         onRetryError: (_) async {
           await _localStorage.saveOfflineOperation(offlineSet);
         },
@@ -159,7 +159,7 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
 
         switch (set.action) {
           case OfflineAction.add:
-            await _tryWithRetry(() => _workoutService.addSetResult(set.exerciseId!, set.itemId!, set.weight!, set.repeats!, set.difficult!, set.time!));
+            await _tryWithRetry(() => _workoutService.addSetResult(set.exerciseId!, set.itemId!, set.weight!, set.repeats!, set.difficult!, set.time!, set.date!));
             break;
 
           case OfflineAction.update:
