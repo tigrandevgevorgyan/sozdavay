@@ -25,6 +25,9 @@ class StartTrainingBanner extends StatelessWidget {
             fit: StackFit.passthrough,
             children: [
               Image.asset(imagePath, fit: BoxFit.cover),
+              Container(
+                color: Colors.black.withOpacity(0.6),
+              ),
               Padding(
                 padding: const EdgeInsets.all(14.0),
                 child: isActive

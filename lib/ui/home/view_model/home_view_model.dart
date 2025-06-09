@@ -14,6 +14,7 @@ import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../config/home_banners_assets.dart';
 import '../../../data/repositories/workout_repository/workout_repository.dart';
 import '../../../data/services/data/models/main_response.dart';
 import '../../../utils/misc_utils.dart';
@@ -43,6 +44,13 @@ class HomeViewModel extends ChangeNotifier {
 
   late int _planType;
   int get planType => _planType;
+
+  late final String trainingImage = HomeBannersAssets.getRandomTrainingImage();
+
+  late final String measurementsImage = HomeBannersAssets.getRandomMeasurementsImage();
+
+  late final String chatImage = HomeBannersAssets.getRandomChatImage();
+
 
   String get level => _mainInfo?.label ?? '';
 

@@ -64,7 +64,7 @@ class HomeScreen extends StatelessWidget {
                         Expanded(
                           flex: 100,
                           child: StartTrainingBanner(
-                            imagePath: Assets.startTrainingBanner,
+                            imagePath: provider.trainingImage,
                             text: provider.selectedTrainingName,
                             onClick: () => provider.onStartWorkoutClicked(context),
                             isActive: provider.selectedTrainingName.isNotEmpty,
@@ -97,7 +97,7 @@ class HomeScreen extends StatelessWidget {
                         Expanded(
                           flex: 100,
                           child: BannerButton(
-                            imagePath: Assets.measurementsBanner,
+                            imagePath: provider.measurementsImage,
                             text: 'Замеры',
                             onClick: () => provider.onMeasurementsClicked(context),
                           ),
@@ -106,7 +106,7 @@ class HomeScreen extends StatelessWidget {
                         Expanded(
                           flex: 100,
                           child: BannerButton(
-                            imagePath: Assets.chatBanner,
+                            imagePath: provider.chatImage,
                             text: 'Чат с тренером',
                             onClick: provider.onChatClicked,
                           ),
