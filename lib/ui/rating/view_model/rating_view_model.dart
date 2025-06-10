@@ -78,8 +78,14 @@ class RatingViewModel extends ChangeNotifier {
     switch (result) {
       case Ok<RatingResponse>():
         _ratingInfo = result.value;
-        _categoryDialogContent.setOptions(result.value.categories);
-        _periodDialogContent.setOptions(result.value.periods.map((period) => period.toIdNamePair()).toList());
+
+        final categories = result.value.categories;
+        _categoryDialogContent.setOptions(categories);
+        _categoryDialogContent.prependAllOption(name: 'Все категории', id: 0);
+
+        _periodDialogContent.setOptions(
+          result.value.periods.map((period) => period.toIdNamePair()).toList(),
+        );
         _generateLocalRating();
       case Error<RatingResponse>():
         if (context.mounted) {

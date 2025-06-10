@@ -1,8 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:level_up/data/services/data/models/rating_response.dart';
 import 'package:level_up/utils/result.dart';
-
-import '../../../utils/misc_utils.dart';
 import '../../services/data/data_service.dart';
 import '../../services/data/models/main_response.dart';
 
@@ -21,23 +19,31 @@ class DataRepositoryImpl extends IDataRepository {
 
   @override
   Future<Result<MainResponse>> getMainInfo() async {
-  try {
-  final result = await dataService.getMainScreenInfo();
-  return Result.ok(result);
-  } on DioException catch (e) {
-  return Result.error(e);
-  } catch (e) {
-  return Result.error(DioException(
-  requestOptions: RequestOptions(path: ''),
-  error: e,
-  ));
-  }
+    try {
+      final result = await dataService.getMainScreenInfo();
+      return Result.ok(result);
+    } on DioException catch (e) {
+      return Result.error(e);
+    } catch (e) {
+      return Result.error(DioException(
+        requestOptions: RequestOptions(path: ''),
+        error: e,
+      ));
+    }
   }
 
   @override
-  Future<Result<RatingResponse>> getRatingInfoFiltered(int category, int periods) async {
+  Future<Result<RatingResponse>> getRatingInfoFiltered(
+      int category, int periods) async {
     try {
-      final result = await dataService.getRatingFiltered(category, periods);
+      String jsonWithTrailingComma = '''
+{
+  "customer": 0,
+  "category": $category,
+  "period": $periods,
+}''';
+
+      final result = await dataService.getRatingFiltered(jsonWithTrailingComma);
       return Result.ok(result);
     } on DioException catch (e) {
       return Result.error(e);
