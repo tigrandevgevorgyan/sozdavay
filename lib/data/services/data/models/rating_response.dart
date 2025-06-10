@@ -51,6 +51,6 @@ class IdLabelPairWithPriority {
   Map<String, dynamic> toJson() => _$IdLabelPairWithPriorityToJson(this);
 
   IdNamePairWithPriority toIdNamePair() {
-    return IdNamePairWithPriority(false, id, label);
+    return IdNamePairWithPriority(id, label);
   }
 }

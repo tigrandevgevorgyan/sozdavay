@@ -63,10 +63,14 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   String? get error => _error;
 
-  bool get isPriorityAvailable => priorityDialogContent.hasPriorityById(_prioritySelection);
   String _validUntilDate = '';
 
   String get validUntilDate => _validUntilDate;
+
+  bool get isPriorityAvailable {
+    final goal = goalDialogContent.getById(_goalSelection);
+    return goal?.isPriorityAvailable == true;
+  }
 
   void onGenderWeightClicked(BuildContext context) async {
     final result = await OptionsDialog.showDialog(context, categorySelection, categoriesDialogContent.title, categoriesDialogContent.optionsValues);
@@ -183,7 +187,7 @@ class PreferencesOptionsDialogContent {
   List<String> get optionsValues => _options.map((option) => option.name).toList();
 
   bool hasPriorityById(int? id) {
-    return _options.firstWhere((option) => option.id == id, orElse: () => IdNamePairWithPriority(false, -1, "")).isPriorityAvailable ?? false;
+    return _options.firstWhere((option) => option.id == id, orElse: () => IdNamePairWithPriority(-1, "")).isPriorityAvailable ?? false;
   }
 
   void setOptions(List<IdNamePairWithPriority> options) {
@@ -194,10 +198,18 @@ class PreferencesOptionsDialogContent {
     if (id == null) {
       return null;
     }
-    return _options.firstWhere((option) => option.id == id, orElse: () => IdNamePairWithPriority(false, -1, "")).name;
+    return _options.firstWhere((option) => option.id == id, orElse: () => IdNamePairWithPriority(-1, "")).name;
   }
 
   int? getIdByValue(String value) {
-    return _options.firstWhere((option) => option.name == value, orElse: () => IdNamePairWithPriority(false, -1, "")).id;
+    return _options.firstWhere((option) => option.name == value, orElse: () => IdNamePairWithPriority(-1, "")).id;
+  }
+
+  IdNamePairWithPriority? getById(int? id) {
+    if (id == null) return null;
+    return _options.firstWhere(
+          (option) => option.id == id,
+      orElse: () => IdNamePairWithPriority(-1, "", isPriorityAvailable: false),
+    );
   }
 }
