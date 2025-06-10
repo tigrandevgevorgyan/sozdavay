@@ -72,11 +72,11 @@ class _DataService implements DataService {
   }
 
   @override
-  Future<RatingResponse> getRatingFiltered(int category, int periods) async {
+  Future<RatingResponse> getRatingFiltered(String rawJson) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = {'category': category, 'periods': periods};
+    final _data = rawJson;
     final _options = _setStreamType<RatingResponse>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(

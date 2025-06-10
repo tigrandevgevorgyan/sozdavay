@@ -190,6 +190,10 @@ class PreferencesOptionsDialogContent {
     return _options.firstWhere((option) => option.id == id, orElse: () => IdNamePairWithPriority(-1, "")).isPriorityAvailable ?? false;
   }
 
+  void prependAllOption({required String name, int id = -1}) {
+    _options.insert(0, IdNamePairWithPriority(id, name));
+  }
+
   void setOptions(List<IdNamePairWithPriority> options) {
     _options = options;
   }
