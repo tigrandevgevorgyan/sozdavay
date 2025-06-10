@@ -13,9 +13,11 @@ class WorkoutTopBar extends StatelessWidget {
     required this.onFirstExerciseRefresh,
     this.onSecondExerciseRefresh,
     required this.isUpdatingFirstExercise,
+    required this.isRefreshVisible,
     this.isUpdatingSecondExercise,
   });
 
+  final bool isRefreshVisible;
   final bool isUpdatingFirstExercise;
   final bool? isUpdatingSecondExercise;
   final String firstExerciseName;
@@ -36,9 +38,9 @@ class WorkoutTopBar extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: 20),
-            ExerciseRow(isUpdating: isUpdatingFirstExercise, title: firstExerciseName, onRefreshClicked: onFirstExerciseRefresh),
+            ExerciseRow(isRefreshVisible: isRefreshVisible, isUpdating: isUpdatingFirstExercise, title: firstExerciseName, onRefreshClicked: onFirstExerciseRefresh),
             if (secondExerciseName != null) Divider(color: Color(0x80242425)),
-            if (secondExerciseName != null) ExerciseRow(isUpdating: isUpdatingSecondExercise!, title: secondExerciseName!, onRefreshClicked: onSecondExerciseRefresh!),
+            if (secondExerciseName != null) ExerciseRow(isRefreshVisible: isRefreshVisible, isUpdating: isUpdatingSecondExercise!, title: secondExerciseName!, onRefreshClicked: onSecondExerciseRefresh!),
             SizedBox(height: 14),
           ],
         ),
@@ -48,9 +50,10 @@ class WorkoutTopBar extends StatelessWidget {
 }
 
 class ExerciseRow extends StatelessWidget {
-  const ExerciseRow({super.key, required this.title, required this.onRefreshClicked, required this.isUpdating});
+  const ExerciseRow({super.key, required this.isRefreshVisible, required this.title, required this.onRefreshClicked, required this.isUpdating});
 
   final bool isUpdating;
+  final bool isRefreshVisible;
   final String title;
   final Function() onRefreshClicked;
 
@@ -62,13 +65,13 @@ class ExerciseRow extends StatelessWidget {
         Expanded(
           child: Text(title, style: Style.outfit17w700.copyWith(color: AppColors.primaryTextColor)),
         ),
-        GestureDetector(
+        isRefreshVisible? GestureDetector(
           onTap: onRefreshClicked,
           child: Padding(
             padding: const EdgeInsets.only(left: 14, right: 14),
             child: isUpdating ? LevelUpLoader() : SvgPicture.asset(Assets.refreshIcon),
           ),
-        ),
+        ): SizedBox.shrink(),
       ],
     );
   }
