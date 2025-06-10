@@ -42,6 +42,7 @@ UserProfileExtendedResponse _$UserProfileExtendedResponseFromJson(
           .map(
               (e) => IdNamePairWithPriority.fromJson(e as Map<String, dynamic>))
           .toList(),
+      json['available_priority'] as bool?,
     );
 
 Map<String, dynamic> _$UserProfileExtendedResponseToJson(
@@ -52,6 +53,7 @@ Map<String, dynamic> _$UserProfileExtendedResponseToJson(
       'experiences': instance.experiences,
       'goals': instance.goals,
       'days': const DaysConverter().toJson(instance.days),
+      'available_priority': instance.availablePriority,
       'priorites': instance.priorities,
       'categories': instance.categories,
     };
@@ -59,9 +61,9 @@ Map<String, dynamic> _$UserProfileExtendedResponseToJson(
 IdNamePairWithPriority _$IdNamePairWithPriorityFromJson(
         Map<String, dynamic> json) =>
     IdNamePairWithPriority(
-      json['available_priority'] as bool?,
       (json['id'] as num).toInt(),
       json['name'] as String,
+      isPriorityAvailable: json['available_priority'] as bool?,
     );
 
 Map<String, dynamic> _$IdNamePairWithPriorityToJson(

@@ -1,15 +1,19 @@
 import 'package:json_annotation/json_annotation.dart';
+
 import '../../common_models/base_response.dart';
 
 part 'workout_response.g.dart';
 
 @JsonSerializable()
 class WorkoutResponse extends BaseResponse {
-  WorkoutResponse(super.message, this.data);
+  WorkoutResponse(super.message, this.data, this.workoutId);
 
+  @JsonKey(name: 'workout_id')
+  final int? workoutId;
   final List<WorkoutInfo> data;
 
   factory WorkoutResponse.fromJson(Map<String, dynamic> json) => _$WorkoutResponseFromJson(json);
+
   Map<String, dynamic> toJson() => _$WorkoutResponseToJson(this);
 }
 
@@ -31,6 +35,7 @@ class WorkoutInfo {
   WorkoutInfo(this.index, this.isDouble, this.isComplex, this.isTime, this.items);
 
   factory WorkoutInfo.fromJson(Map<String, dynamic> json) => _$WorkoutInfoFromJson(json);
+
   Map<String, dynamic> toJson() => _$WorkoutInfoToJson(this);
 }
 
@@ -72,6 +77,7 @@ class ExerciseInfo {
   }
 
   factory ExerciseInfo.fromJson(Map<String, dynamic> json) => _$ExerciseInfoFromJson(json);
+
   Map<String, dynamic> toJson() => _$ExerciseInfoToJson(this);
 }
 
@@ -92,6 +98,7 @@ class SetInfo {
   SetInfo(this.setsCount, this.repeatsFrom, this.repeatsTo, this.asMuchAsPossible);
 
   factory SetInfo.fromJson(Map<String, dynamic> json) => _$SetInfoFromJson(json);
+
   Map<String, dynamic> toJson() => _$SetInfoToJson(this);
 }
 
@@ -104,6 +111,7 @@ class VideoInfo {
   VideoInfo(this.url, this.type, this.title);
 
   factory VideoInfo.fromJson(Map<String, dynamic> json) => _$VideoInfoFromJson(json);
+
   Map<String, dynamic> toJson() => _$VideoInfoToJson(this);
 }
 
@@ -116,6 +124,7 @@ class HistoryInfo {
   HistoryInfo(this.day, this.date, this.values);
 
   factory HistoryInfo.fromJson(Map<String, dynamic> json) => _$HistoryInfoFromJson(json);
+
   Map<String, dynamic> toJson() => _$HistoryInfoToJson(this);
 }
 
@@ -126,10 +135,12 @@ class ResultValue {
   final int repeats;
   final int difficult;
   final int time;
+  final String date;
 
-  ResultValue(this.id, this.weight, this.repeats, this.difficult, this.time);
+  ResultValue(this.id, this.weight, this.repeats, this.difficult, this.time, this.date);
 
   factory ResultValue.fromJson(Map<String, dynamic> json) => _$ResultValueFromJson(json);
+
   Map<String, dynamic> toJson() => _$ResultValueToJson(this);
 }
 
@@ -138,13 +149,6 @@ extension ResultValueCopyWith on ResultValue {
     double? weight,
     int? repeats,
   }) {
-    return ResultValue(
-      id,
-      weight ?? this.weight,
-      repeats ?? this.repeats,
-      difficult,
-      time,
-    );
+    return ResultValue(id, weight ?? this.weight, repeats ?? this.repeats, difficult, time, date);
   }
 }
-

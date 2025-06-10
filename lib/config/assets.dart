@@ -11,6 +11,19 @@ class Assets {
   static String ratingFirstIcon = "${_baseUrl}rating_1st_icon.png";
   static String ratingSecondIcon = "${_baseUrl}rating_2nd_icon.png";
   static String ratingThirdIcon = "${_baseUrl}rating_3rd_icon.png";
+  static String training1 = "${_baseUrl}training_1.jpg";
+  static String training2 = "${_baseUrl}training_2.jpg";
+  static String training3 = "${_baseUrl}training_3.jpg";
+  static String training4 = "${_baseUrl}training_4.jpg";
+  static String measurements1 = "${_baseUrl}measurements_1.jpg";
+  static String measurements2 = "${_baseUrl}measurements_2.jpg";
+  static String measurements3 = "${_baseUrl}measurements_3.jpg";
+  static String chat1 = "${_baseUrl}chat_1.jpg";
+  static String chat2 = "${_baseUrl}chat_2.jpg";
+  static String chat3 = "${_baseUrl}chat_3.jpg";
+
+
+
   //workout stuff
   static String _workoutBasePath = "${_baseUrl}workout/";
 

@@ -17,11 +17,16 @@ abstract class ILocalStorage {
 
   Future<Result<void>> removeOfflineOperation(WorkoutSets set);
 
+  Future<Result<bool>> isFirstLogin();
+
+  Future<Result<void>> setFirstLoginShown();
+
 }
 
 class LocalStorageImpl extends ILocalStorage {
   static const _tokenKey = 'access_token';
   static const _workoutSetsKey = 'workout_sets';
+  static const _firstLoginKey = 'first_login_shown';
 
   @override
   Future<Result<String?>> getAccessToken() async {
@@ -92,6 +97,27 @@ class LocalStorageImpl extends ILocalStorage {
       await sp.setStringList(_workoutSetsKey, list);
       return Result.ok(null);
     } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<bool>> isFirstLogin() async {
+    try {
+      final sp = await SharedPreferences.getInstance();
+      return Result.ok(!(sp.getBool(_firstLoginKey) ?? false));
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<void>> setFirstLoginShown() async{
+    try {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setBool(_firstLoginKey, true);
+      return Result.ok(null);
+    }  on Exception catch (e) {
       return Result.error(e);
     }
   }

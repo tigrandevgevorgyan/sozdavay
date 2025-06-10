@@ -68,11 +68,22 @@ class SignInViewModel extends ChangeNotifier {
     final result = await authRepository.signIn(_phoneNumber, code);
     switch (result) {
       case Ok<AccessTokenResponse>():
-        final testProfile = await profileRepository.getProfile(); //TODO: remove!!!!!!!!!!!!!!!!!!!!!!!!
-        if (context.mounted) {
-          GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath,
-            extra: false,
-          );
+        final firstLoginResult = await authRepository.isFirstLogin();
+        bool isFirst = false;
+
+        if (firstLoginResult is Ok<bool>) {
+          isFirst = firstLoginResult.value;
+        }
+        // final testProfile = await profileRepository.getProfile(); //TODO: remove!!!!!!!!!!!!!!!!!!!!!!!!
+        if (isFirst) {
+          await authRepository.markFirstLoginShown();
+          if (context.mounted) {
+            GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath, extra: false);
+          }
+        } else {
+          if (context.mounted) {
+            GoRouter.of(context).go(LevelUpRouter.homePath);
+          }
         }
       case Error<AccessTokenResponse>():
         _error = result.error.getErrorMessage();

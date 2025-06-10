@@ -45,6 +45,33 @@ class _WorkoutService implements WorkoutService {
   }
 
   @override
+  Future<IsCompletedResponse> deleteWorkout(int workoutId) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<IsCompletedResponse>(
+      Options(method: 'DELETE', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/workout/${workoutId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late IsCompletedResponse _value;
+    try {
+      _value = IsCompletedResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<WorkoutFinishResponse> finishWorkout() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -106,6 +133,7 @@ class _WorkoutService implements WorkoutService {
     int repeats,
     int difficult,
     int time,
+    String date,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -117,6 +145,7 @@ class _WorkoutService implements WorkoutService {
       'repeats': repeats,
       'difficult': difficult,
       'time': time,
+      'date': date,
     };
     final _options = _setStreamType<List<HistoryInfo>>(
       Options(method: 'POST', headers: _headers, extra: _extra)

@@ -34,6 +34,7 @@ UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => UserProfile(
           ? null
           : IdNamePairWithPriority.fromJson(
               json['priority'] as Map<String, dynamic>),
+      planType: (json['plan_type'] as num).toInt(),
     );
 
 Map<String, dynamic> _$UserProfileToJson(UserProfile instance) =>
@@ -50,4 +51,5 @@ Map<String, dynamic> _$UserProfileToJson(UserProfile instance) =>
       'records': instance.records,
       'measurements': instance.measurements,
       'paid_until': instance.paidUntil,
+      'plan_type': instance.planType,
     };

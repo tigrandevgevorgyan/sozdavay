@@ -11,6 +11,7 @@ import 'package:level_up/ui/workout/screens/complex_workout_screen.dart';
 import 'package:level_up/ui/workout/screens/double_workout_screen.dart';
 import 'package:level_up/ui/workout/screens/simple_workout_screen.dart';
 import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
+import 'package:level_up/ui/workout/widgets/error_placeholder.dart';
 import 'package:provider/provider.dart';
 
 class WorkoutBaseScreen extends StatefulWidget {
@@ -39,27 +40,36 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
     return ChangeNotifierProvider<WorkoutViewModel>(
       create: (BuildContext context) => WorkoutViewModel(context, GetIt.I<IWorkoutRepository>(), dayIndex: dayIndex),
       child: Consumer<WorkoutViewModel>(builder: (context, provider, __) {
-        return Scaffold(
-          appBar: AppBar(backgroundColor: AppColors.backgroundContentColor, toolbarHeight: 0),
-          backgroundColor: AppColors.backgroundColor,
-          body: SafeArea(
-            child: provider.isLoading || provider.isWorkoutEmpty
-                ? Center(child: LevelUpLoader())
-                : Column(
-                    children: [
-                      Expanded(
-                        child: _getScreenByWorkout(provider.currentWorkout),
-                      ),
-                      BottomBar(
-                        onLeftArrowClicked: provider.onPreviousClicked,
-                        onRightArrowClicked: () => provider.onNextClicked(context),
-                        onHomeClicked: () => GoRouter.of(context).pop(),
-                      ),
-                      SizedBox(height: 10),
-                    ],
-                  ),
-          ),
-        );
+          return Scaffold(
+            appBar: AppBar(backgroundColor: AppColors.backgroundContentColor, toolbarHeight: 0),
+            backgroundColor: AppColors.backgroundColor,
+            body: SafeArea(
+              child: provider.isLoading || provider.isWorkoutEmpty
+                  ? Center(child: LevelUpLoader())
+                  : provider.hasError
+                ? ErrorPlaceholder(
+                  onTap: (){
+                    provider.init(context);
+                  },
+              )
+                  : Column(
+                      children: [
+                        Expanded(
+                          child: _getScreenByWorkout(provider.currentWorkout),
+                        ),
+                        BottomBar(
+                          onLeftArrowClicked: provider.onPreviousClicked,
+                          onRightArrowClicked: () => provider.onNextClicked(context),
+                          onHomeClicked: () {
+                            provider.deleteWorkout();
+                            GoRouter.of(context).pop();
+                          },
+                        ),
+                        SizedBox(height: 10),
+                      ],
+                    ),
+            ),
+          );
       }),
     );
   }

@@ -12,11 +12,13 @@ WorkoutResponse _$WorkoutResponseFromJson(Map<String, dynamic> json) =>
       (json['data'] as List<dynamic>)
           .map((e) => WorkoutInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
+      (json['workout_id'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$WorkoutResponseToJson(WorkoutResponse instance) =>
     <String, dynamic>{
       'message': instance.message,
+      'workout_id': instance.workoutId,
       'data': instance.data,
     };
 
@@ -115,6 +117,7 @@ ResultValue _$ResultValueFromJson(Map<String, dynamic> json) => ResultValue(
       (json['repeats'] as num).toInt(),
       (json['difficult'] as num).toInt(),
       (json['time'] as num).toInt(),
+      json['date'] as String,
     );
 
 Map<String, dynamic> _$ResultValueToJson(ResultValue instance) =>
@@ -124,4 +127,5 @@ Map<String, dynamic> _$ResultValueToJson(ResultValue instance) =>
       'repeats': instance.repeats,
       'difficult': instance.difficult,
       'time': instance.time,
+      'date': instance.date,
     };

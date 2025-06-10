@@ -21,6 +21,9 @@ class BannerButton extends StatelessWidget {
             fit: StackFit.passthrough,
             children: [
               Image.asset(imagePath, fit: BoxFit.cover),
+              Container(
+                color: Colors.black.withOpacity(0.6),
+              ),
               Positioned(
                 bottom: 12,
                 left: 16,

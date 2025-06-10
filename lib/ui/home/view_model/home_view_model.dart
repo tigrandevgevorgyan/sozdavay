@@ -14,6 +14,7 @@ import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../config/home_banners_assets.dart';
 import '../../../data/repositories/workout_repository/workout_repository.dart';
 import '../../../data/services/data/models/main_response.dart';
 import '../../../utils/misc_utils.dart';
@@ -24,7 +25,6 @@ class HomeViewModel extends ChangeNotifier {
     required this.dataRepository,
     required this.profileRepository,
     required this.localStorage,
-    required this.workoutRepository,
       }) {
     _init(context);
   }
@@ -32,7 +32,6 @@ class HomeViewModel extends ChangeNotifier {
   final ILocalStorage localStorage;
   final IProfileRepository profileRepository;
   final IDataRepository dataRepository;
-  final IWorkoutRepository workoutRepository;
 
   bool _isLoading = true;
 
@@ -40,6 +39,16 @@ class HomeViewModel extends ChangeNotifier {
 
   UserProfileExtendedResponse? _profile;
   MainInfo? _mainInfo;
+
+  late int _planType;
+  int get planType => _planType;
+
+  late final String trainingImage = HomeBannersAssets.getRandomTrainingImage();
+
+  late final String measurementsImage = HomeBannersAssets.getRandomMeasurementsImage();
+
+  late final String chatImage = HomeBannersAssets.getRandomChatImage();
+
 
   String get level => _mainInfo?.label ?? '';
 
@@ -59,11 +68,10 @@ class HomeViewModel extends ChangeNotifier {
       '';
 
   bool get hasWorkoutPlan {
-    return _mainInfo?.schedule.any((day) => day.name?.isNotEmpty ?? false) ?? false;
+    return _planType == 2;
   }
 
   void _init(BuildContext context) async {
-    await workoutRepository.sendOfflineOperations();
     final isSuccess = await _loadProfile(context);
     if (isSuccess && context.mounted) {
       await _loadMainInfo(context);
@@ -214,6 +222,7 @@ class HomeViewModel extends ChangeNotifier {
     switch (profile) {
       case Ok<UserProfileExtendedResponse>():
         _profile = profile.value;
+        _planType = _profile!.data.planType;
         return true;
       case Error<UserProfileExtendedResponse>():
         if (context != null && context.mounted) {
@@ -239,11 +248,5 @@ class HomeViewModel extends ChangeNotifier {
 
   MainInfo _emptyMainInfo() {
     return MainInfo(WorkoutStats(0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '');
-  }
-
-  @override
-  void dispose() {
-    workoutRepository.dispose();
-    super.dispose();
   }
 }

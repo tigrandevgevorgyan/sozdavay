@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:level_up/data/services/common_models/is_completed_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:level_up/data/services/workout/workout_service.dart';
 import 'package:level_up/utils/result.dart';
@@ -9,27 +10,26 @@ import '../../services/local_storage.dart';
 import '../../services/workout/models/workout_sets.dart';
 
 abstract class IWorkoutRepository {
-  Future<Result<List<WorkoutInfo>>> loadWorkout({required int dayIndex});
+  Future<Result<WorkoutResponse>> loadWorkout({required int dayIndex});
 
   Future<Result<List<WorkoutInfo>>> changeExercise(int index, bool second);
 
-  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, int weight, int repeats, int difficult, int time);
+  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, int weight, int repeats, int difficult, int time, String date);
 
   Future<Result<void>> finishWorkout();
+
+  Future<Result<IsCompletedResponse>> deleteWorkout(int workoutId);
 
   Future<Result<List<WorkoutInfo>>> updateSetResult(int id, int exerciseId, int weight, int repeats, int difficult, int time);
 
   Future<Result<List<WorkoutInfo>>> deleteSetResult(int id);
 
   Future<void> sendOfflineOperations();
-
-  void dispose();
 }
 
 class WorkoutRepositoryImp extends IWorkoutRepository {
   final WorkoutService _workoutService;
   final ILocalStorage _localStorage;
-  Timer? _retryTimer;
 
   WorkoutResponse? _workoutResponse;
   int? _lastDayIndex;
@@ -37,12 +37,26 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   WorkoutRepositoryImp(this._localStorage, {required workoutService}) : _workoutService = workoutService;
 
   @override
-  Future<Result<List<WorkoutInfo>>> loadWorkout({required int dayIndex}) async {
+  Future<Result<WorkoutResponse>> loadWorkout({required int dayIndex}) async {
     try {
       final result = await _workoutService.startWorkout(dayIndex);
       _workoutResponse = result;
       _lastDayIndex = dayIndex;
-      return Result.ok(result.data);
+      return Result.ok(result);
+    } on DioException catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<IsCompletedResponse>> deleteWorkout(int workoutId) async {
+    try {
+      final result = await _workoutService.deleteWorkout(workoutId);
+      if (result.isSuccess) {
+        return Result.ok(result);
+      } else {
+        return Result.error(Exception('Не удалось завершить тренировку'));
+      }
     } on DioException catch (e) {
       return Result.error(e);
     }
@@ -74,16 +88,15 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   }
 
   Future<void> _tryWithRetry(
-      Future<void> Function() operation, {
-        int maxTryCount = 3,
-        void Function(Object error)? onRetryError,
-      }) async {
+    Future<void> Function() operation, {
+    int maxTryCount = 3,
+    void Function(Object error)? onRetryError,
+  }) async {
     for (int tryCount = 1; tryCount <= maxTryCount; tryCount++) {
       try {
         await operation();
         return;
       } catch (e) {
-
         if (tryCount == 1 && onRetryError != null) {
           onRetryError(e);
         }
@@ -95,12 +108,12 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   }
 
   @override
-  Future<Result<List<WorkoutInfo>>> addSetResult( int exerciseId, int itemId, int weight, int repeats, int difficult, int time ) async {
-    final offlineSet = WorkoutSets.add( itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time );
+  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, int weight, int repeats, int difficult, int time, String date) async {
+    final offlineSet = WorkoutSets.add(itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time, date: date);
 
     try {
       await _tryWithRetry(
-            () => _workoutService.addSetResult(exerciseId, itemId, weight, repeats, difficult, time),
+        () => _workoutService.addSetResult(exerciseId, itemId, weight, repeats, difficult, time, date),
         onRetryError: (_) async {
           await _localStorage.saveOfflineOperation(offlineSet);
         },
@@ -111,14 +124,13 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
     }
   }
 
-
   @override
-  Future<Result<List<WorkoutInfo>>> updateSetResult( int id, int exerciseId, int weight, int repeats, int difficult, int time ) async {
-    final offlineSet = WorkoutSets.update( id: id, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time );
+  Future<Result<List<WorkoutInfo>>> updateSetResult(int id, int exerciseId, int weight, int repeats, int difficult, int time) async {
+    final offlineSet = WorkoutSets.update(id: id, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time);
 
     try {
       await _tryWithRetry(
-            () => _workoutService.updateSetResult(id, exerciseId, weight, repeats, difficult, time),
+        () => _workoutService.updateSetResult(id, exerciseId, weight, repeats, difficult, time),
         onRetryError: (e) async {
           await _localStorage.saveOfflineOperation(offlineSet);
         },
@@ -129,24 +141,11 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
     }
   }
 
-
-
-  void _scheduleRetry() {
-    if (_retryTimer?.isActive ?? false) {
-      return;
-    }
-    _retryTimer = Timer(Duration(minutes: 5), () {
-      sendOfflineOperations();
-    });
-
-  }
-
   @override
   Future<void> sendOfflineOperations() async {
     final storedResult = await _localStorage.getOfflineOperations();
 
     if (storedResult is! Ok<List<Map<String, dynamic>>>) {
-      _scheduleRetry();
       return;
     }
 
@@ -159,7 +158,7 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
 
         switch (set.action) {
           case OfflineAction.add:
-            await _tryWithRetry(() => _workoutService.addSetResult(set.exerciseId!, set.itemId!, set.weight!, set.repeats!, set.difficult!, set.time!));
+            await _tryWithRetry(() => _workoutService.addSetResult(set.exerciseId!, set.itemId!, set.weight!, set.repeats!, set.difficult!, set.time!, set.date!));
             break;
 
           case OfflineAction.update:
@@ -174,23 +173,18 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
         }
 
         await _localStorage.removeOfflineOperation(set);
-
       } catch (e) {
-        _scheduleRetry();
         return;
       }
     }
-
-    _retryTimer?.cancel();
-    _retryTimer = null;
   }
-
 
   @override
   Future<Result<List<WorkoutInfo>>> deleteSetResult(int id) async {
     final offlineSet = WorkoutSets.delete(id: id);
     try {
-      await _tryWithRetry(() => _workoutService.deleteSetResult(id),
+      await _tryWithRetry(
+        () => _workoutService.deleteSetResult(id),
         onRetryError: (_) async {
           await _localStorage.saveOfflineOperation(offlineSet);
         },
@@ -201,10 +195,4 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
     }
   }
 
-
-  @override
-  void dispose() {
-    _retryTimer?.cancel();
-    _retryTimer = null;
-  }
 }

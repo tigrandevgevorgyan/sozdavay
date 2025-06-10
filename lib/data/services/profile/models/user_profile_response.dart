@@ -17,13 +17,15 @@ class UserProfileShortResponse extends BaseResponse {
 
 @JsonSerializable()
 class UserProfileExtendedResponse extends BaseResponse {
-  UserProfileExtendedResponse(super.message, this.data, this.experiences, this.goals, this.days, this.priorities, this.categories);
+  UserProfileExtendedResponse(super.message, this.data, this.experiences, this.goals, this.days, this.priorities, this.categories, this.availablePriority);
 
   UserProfile data;
   final List<IdNamePairWithPriority> experiences;
   final List<IdNamePairWithPriority> goals;
   @DaysConverter()
   final List<IdNamePairWithPriority> days;
+  @JsonKey(name: 'available_priority')
+  final bool? availablePriority;
   @JsonKey(name: 'priorites')
   final List<IdNamePairWithPriority> priorities;
   final List<IdNamePairWithPriority> categories;
@@ -40,11 +42,8 @@ class IdNamePairWithPriority {
   @JsonKey(name: 'available_priority')
   final bool? isPriorityAvailable;
 
-  IdNamePairWithPriority(
-    this.isPriorityAvailable,
-    this.id,
-    this.name,
-  );
+  IdNamePairWithPriority(this.id, this.name, {this.isPriorityAvailable});
+
 
   factory IdNamePairWithPriority.fromJson(Map<String, dynamic> json) => _$IdNamePairWithPriorityFromJson(json);
 
@@ -55,7 +54,7 @@ class DaysConverter implements JsonConverter<List<IdNamePairWithPriority>, List<
   const DaysConverter();
 
   @override
-  List<IdNamePairWithPriority> fromJson(List<dynamic> json) => json.map((day) => IdNamePairWithPriority(false, day, '$day тренировки')).toList();
+  List<IdNamePairWithPriority> fromJson(List<dynamic> json) => json.map((day) => IdNamePairWithPriority(day, '$day тренировки')).toList();
 
   @override
   List<int> toJson(List<IdNamePairWithPriority> object) => object.map((o) => o.id).toList();

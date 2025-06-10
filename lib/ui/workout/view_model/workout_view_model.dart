@@ -4,24 +4,28 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/config/dio_client.dart';
 import 'package:level_up/data/repositories/workout_repository/workout_repository.dart';
+import 'package:level_up/data/services/common_models/is_completed_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_button.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
+
 import '../../../utils/misc_utils.dart';
 
 class WorkoutViewModel extends ChangeNotifier {
   final int dayIndex;
 
   WorkoutViewModel(BuildContext context, this.workoutRepository, {required this.dayIndex}) {
-    _init(context);
+    init(context);
   }
 
   final IWorkoutRepository workoutRepository;
   int index = 0;
   List<WorkoutInfo>? _workout;
+  int _workoutId = -1;
   bool _isLoading = true;
+  bool hasError = false;
 
   bool get isLoading => _isLoading;
 
@@ -29,26 +33,30 @@ class WorkoutViewModel extends ChangeNotifier {
 
   bool get isWorkoutEmpty => _workout != null && _workout!.isEmpty;
 
-  void _init(BuildContext context) async {
+  void init(BuildContext context) async {
     _isLoading = true;
+    hasError = false;
+    notifyListeners();
     final result = await workoutRepository.loadWorkout(dayIndex: dayIndex);
     _isLoading = false;
     switch (result) {
-      case Ok<List<WorkoutInfo>>():
-        if (result.value.isEmpty) {
+      case Ok<WorkoutResponse>():
+        _workoutId = result.value.workoutId ?? -1;
+        if (result.value.data.isEmpty) {
           if (context.mounted) {
             GoRouter.of(context).pop();
-            ErrorUtils.showError(context, 'Отсутсвуют упражнения!');
+            ErrorUtils.showError(context, 'Отсутствуют упражнения!');
           }
         }
-        _workout = result.value;
+        _workout = result.value.data;
         notifyListeners();
-      case Error<List<WorkoutInfo>>():
+      case Error<WorkoutResponse>():
         if (context.mounted) {
-          notifyListeners();
+          hasError = true;
           ErrorUtils.showError(context, result.error.getErrorMessage());
         }
     }
+    notifyListeners();
   }
 
   Future<void> updateExercise(BuildContext context, int index) async {
@@ -66,11 +74,21 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
+  void deleteWorkout() async {
+    final result = await workoutRepository.deleteWorkout(_workoutId);
+    _isLoading = false;
+    switch (result) {
+      case Ok<IsCompletedResponse>():
+        debugPrint('workout record deleted'); // this is a silent request, so any response is ignored
+      case Error<IsCompletedResponse>():
+        debugPrint('error in delete request');
+    }
+  }
 
-  Future<void> addSetResult( BuildContext context, int exerciseId, int itemId, int weight, int repeats, int difficult, int time ) async {
+  Future<void> addSetResult(BuildContext context, int exerciseId, int itemId, int weight, int repeats, int difficult, int time, String date) async {
     if (_workout == null) return;
 
-    final newResult = ResultValue( DateTime.now().millisecondsSinceEpoch, weight.toDouble(), repeats, difficult, time );
+    final newResult = ResultValue(DateTime.now().millisecondsSinceEpoch, weight.toDouble(), repeats, difficult, time, date);
 
     final today = getToday();
     final weekday = getWeekday();
@@ -80,7 +98,7 @@ class WorkoutViewModel extends ChangeNotifier {
         if (exercise.id != exerciseId) continue;
 
         final existing = exercise.history.firstWhere(
-              (h) => h.date == today,
+          (h) => h.date == today,
           orElse: () => HistoryInfo(weekday, today, []),
         );
 
@@ -95,7 +113,7 @@ class WorkoutViewModel extends ChangeNotifier {
       }
     }
 
-    final result = await workoutRepository.addSetResult( exerciseId, itemId, weight, repeats, difficult, time );
+    final result = await workoutRepository.addSetResult(exerciseId, itemId, weight, repeats, difficult, time, date);
 
     if (result case Error()) {
       if (context.mounted) {
@@ -104,10 +122,7 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
-
-
-
-  Future<void> updateSetResult( BuildContext context, int id, int exerciseId, int weight, int repeats, int difficult, int time ) async {
+  Future<void> updateSetResult(BuildContext context, int id, int exerciseId, int weight, int repeats, int difficult, int time) async {
     if (_workout == null) return;
 
     for (final workout in _workout!) {
@@ -131,7 +146,7 @@ class WorkoutViewModel extends ChangeNotifier {
       }
     }
 
-    final result = await workoutRepository.updateSetResult(id, exerciseId, weight, repeats, difficult, time );
+    final result = await workoutRepository.updateSetResult(id, exerciseId, weight, repeats, difficult, time);
 
     if (result case Error()) {
       if (context.mounted) {
@@ -139,9 +154,6 @@ class WorkoutViewModel extends ChangeNotifier {
       }
     }
   }
-
-
-
 
   Future<void> deleteSetResult(BuildContext context, int id) async {
     if (_workout == null) return;
@@ -189,6 +201,7 @@ class WorkoutViewModel extends ChangeNotifier {
   void _finishWorkout(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
+    await workoutRepository.sendOfflineOperations();
     final result = await workoutRepository.finishWorkout();
     _isLoading = false;
     notifyListeners();

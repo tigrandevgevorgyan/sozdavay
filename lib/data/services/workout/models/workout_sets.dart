@@ -14,6 +14,7 @@ class WorkoutSets {
   final int? difficult;
   final int? time;
   final OfflineAction action;
+  final String? date;
 
   WorkoutSets({
     this.id,
@@ -23,6 +24,7 @@ class WorkoutSets {
     this.repeats,
     this.difficult,
     this.time,
+    this.date,
     required this.action,
   });
 
@@ -34,6 +36,7 @@ class WorkoutSets {
     this.repeats,
     this.difficult,
     this.time,
+    this.date,
     required this.action,
   });
 
@@ -44,6 +47,7 @@ class WorkoutSets {
     required int repeats,
     required int difficult,
     required int time,
+    required String date,
   }) {
     return WorkoutSets._(
       itemId: itemId,
@@ -52,6 +56,7 @@ class WorkoutSets {
       repeats: repeats,
       difficult: difficult,
       time: time,
+      date: date,
       action: OfflineAction.add,
     );
   }

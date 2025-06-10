@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:level_up/data/services/common_models/is_completed_response.dart';
 import 'package:level_up/data/services/workout/models/workout_finish_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:retrofit/retrofit.dart';
@@ -11,6 +12,9 @@ abstract class WorkoutService {
 
   @GET('/workout/start')
   Future<WorkoutResponse> startWorkout(@Query('day') int dayIndex);
+
+  @DELETE('/workout/{id}')
+  Future<IsCompletedResponse> deleteWorkout(@Path("id") int workoutId);
 
   @POST('/workout/finish')
   Future<WorkoutFinishResponse> finishWorkout();
@@ -26,6 +30,7 @@ abstract class WorkoutService {
     @Field() int repeats,
     @Field() int difficult,
     @Field() int time,
+    @Field() String date,
   );
 
   @PUT('/workout/set')
