@@ -40,9 +40,7 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
     return ChangeNotifierProvider<WorkoutViewModel>(
       create: (BuildContext context) => WorkoutViewModel(context, GetIt.I<IWorkoutRepository>(), dayIndex: dayIndex),
       child: Consumer<WorkoutViewModel>(builder: (context, provider, __) {
-        return PopScope(
-          onPopInvokedWithResult: (didPop, result) => provider.deleteWorkout(),
-          child: Scaffold(
+          return Scaffold(
             appBar: AppBar(backgroundColor: AppColors.backgroundContentColor, toolbarHeight: 0),
             backgroundColor: AppColors.backgroundColor,
             body: SafeArea(
@@ -62,14 +60,16 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
                         BottomBar(
                           onLeftArrowClicked: provider.onPreviousClicked,
                           onRightArrowClicked: () => provider.onNextClicked(context),
-                          onHomeClicked: () => GoRouter.of(context).pop(),
+                          onHomeClicked: () {
+                            provider.deleteWorkout();
+                            GoRouter.of(context).pop();
+                          },
                         ),
                         SizedBox(height: 10),
                       ],
                     ),
             ),
-          ),
-        );
+          );
       }),
     );
   }
