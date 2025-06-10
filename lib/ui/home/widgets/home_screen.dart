@@ -27,7 +27,6 @@ class HomeScreen extends StatelessWidget {
         dataRepository: GetIt.I<IDataRepository>(),
         profileRepository: GetIt.I<IProfileRepository>(),
         localStorage: GetIt.I<ILocalStorage>(),
-        workoutRepository: GetIt.I<IWorkoutRepository>()
       ),
       child: Consumer<HomeViewModel>(
         builder: (context, provider, _) {

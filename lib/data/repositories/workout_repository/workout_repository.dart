@@ -25,14 +25,11 @@ abstract class IWorkoutRepository {
   Future<Result<List<WorkoutInfo>>> deleteSetResult(int id);
 
   Future<void> sendOfflineOperations();
-
-  void dispose();
 }
 
 class WorkoutRepositoryImp extends IWorkoutRepository {
   final WorkoutService _workoutService;
   final ILocalStorage _localStorage;
-  Timer? _retryTimer;
 
   WorkoutResponse? _workoutResponse;
   int? _lastDayIndex;
@@ -144,21 +141,11 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
     }
   }
 
-  void _scheduleRetry() {
-    if (_retryTimer?.isActive ?? false) {
-      return;
-    }
-    _retryTimer = Timer(Duration(minutes: 5), () {
-      sendOfflineOperations();
-    });
-  }
-
   @override
   Future<void> sendOfflineOperations() async {
     final storedResult = await _localStorage.getOfflineOperations();
 
     if (storedResult is! Ok<List<Map<String, dynamic>>>) {
-      _scheduleRetry();
       return;
     }
 
@@ -187,13 +174,9 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
 
         await _localStorage.removeOfflineOperation(set);
       } catch (e) {
-        _scheduleRetry();
         return;
       }
     }
-
-    _retryTimer?.cancel();
-    _retryTimer = null;
   }
 
   @override
@@ -212,9 +195,4 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
     }
   }
 
-  @override
-  void dispose() {
-    _retryTimer?.cancel();
-    _retryTimer = null;
-  }
 }

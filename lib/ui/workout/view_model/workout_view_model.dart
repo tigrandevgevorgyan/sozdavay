@@ -201,6 +201,7 @@ class WorkoutViewModel extends ChangeNotifier {
   void _finishWorkout(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
+    await workoutRepository.sendOfflineOperations();
     final result = await workoutRepository.finishWorkout();
     _isLoading = false;
     notifyListeners();

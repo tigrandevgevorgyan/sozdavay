@@ -25,7 +25,6 @@ class HomeViewModel extends ChangeNotifier {
     required this.dataRepository,
     required this.profileRepository,
     required this.localStorage,
-    required this.workoutRepository,
       }) {
     _init(context);
   }
@@ -33,7 +32,6 @@ class HomeViewModel extends ChangeNotifier {
   final ILocalStorage localStorage;
   final IProfileRepository profileRepository;
   final IDataRepository dataRepository;
-  final IWorkoutRepository workoutRepository;
 
   bool _isLoading = true;
 
@@ -74,7 +72,6 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void _init(BuildContext context) async {
-    await workoutRepository.sendOfflineOperations();
     final isSuccess = await _loadProfile(context);
     if (isSuccess && context.mounted) {
       await _loadMainInfo(context);
@@ -251,11 +248,5 @@ class HomeViewModel extends ChangeNotifier {
 
   MainInfo _emptyMainInfo() {
     return MainInfo(WorkoutStats(0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '');
-  }
-
-  @override
-  void dispose() {
-    workoutRepository.dispose();
-    super.dispose();
   }
 }
