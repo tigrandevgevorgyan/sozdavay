@@ -18,19 +18,38 @@ class VideoPlayerCard extends StatefulWidget {
 
 class _VideoPlayerCardState extends State<VideoPlayerCard> {
   late VideoPlayerController _controller;
+  String currentVideoUrl = '';
 
   @override
   void initState() {
     super.initState();
+    _initController();
+
+  }
+
+  void _initController(){
     _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
       ..initialize().then((_) {
         setState(() {});
       });
     _controller.addListener(
-      () {
+          () {
         setState(() {});
       },
     );
+    currentVideoUrl = widget.videoUrl;
+  }
+
+
+
+  @override
+  void didUpdateWidget(VideoPlayerCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (currentVideoUrl != widget.videoUrl) {
+      _controller.dispose();
+      _initController();
+    }
+
   }
 
   @override
