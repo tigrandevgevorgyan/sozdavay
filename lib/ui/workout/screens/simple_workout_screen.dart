@@ -29,7 +29,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
         return Column(
           children: [
             WorkoutTopBar(
-              isRefreshVisible: workoutInfo.items.length > 1,
+              isRefreshVisible: true,
               isUpdatingFirstExercise: provider.isUpdatingExercise,
               firstExerciseName: workoutInfo.items.first.name,
               onFirstExerciseRefresh: () => provider.changeExercise(context),

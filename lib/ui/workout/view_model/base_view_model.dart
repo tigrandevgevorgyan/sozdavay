@@ -45,7 +45,7 @@ class BaseViewModel extends ChangeNotifier {
       isUpdatingExercise = true;
       notifyListeners();
     }
-    await Provider.of<WorkoutViewModel>(context, listen: false).updateExercise(context, exerciseIndex ?? workout.items.first.id);
+    await Provider.of<WorkoutViewModel>(context, listen: false).updateExercise(context, exerciseIndex ?? workout.index);
     if (exerciseIndex == null) {
       isUpdatingExercise = false;
       notifyListeners();

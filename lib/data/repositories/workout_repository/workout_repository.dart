@@ -79,7 +79,8 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   @override
   Future<Result<List<WorkoutInfo>>> changeExercise(int index, bool second) async {
     try {
-      final result = await _workoutService.changeExercise(index, second);
+      final dayIndex = _lastDayIndex ?? 0;
+      final result = await _workoutService.changeExercise(dayIndex, index, second);
       _workoutResponse = result;
       return Result.ok(result.data);
     } on DioException catch (e) {

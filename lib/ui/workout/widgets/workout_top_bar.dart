@@ -15,9 +15,11 @@ class WorkoutTopBar extends StatelessWidget {
     required this.isUpdatingFirstExercise,
     required this.isRefreshVisible,
     this.isUpdatingSecondExercise,
+    this.isSecondRefreshVisible,
   });
 
   final bool isRefreshVisible;
+  final bool? isSecondRefreshVisible;
   final bool isUpdatingFirstExercise;
   final bool? isUpdatingSecondExercise;
   final String firstExerciseName;
@@ -40,7 +42,7 @@ class WorkoutTopBar extends StatelessWidget {
             SizedBox(height: 20),
             ExerciseRow(isRefreshVisible: isRefreshVisible, isUpdating: isUpdatingFirstExercise, title: firstExerciseName, onRefreshClicked: onFirstExerciseRefresh),
             if (secondExerciseName != null) Divider(color: Color(0x80242425)),
-            if (secondExerciseName != null) ExerciseRow(isRefreshVisible: isRefreshVisible, isUpdating: isUpdatingSecondExercise!, title: secondExerciseName!, onRefreshClicked: onSecondExerciseRefresh!),
+            if (secondExerciseName != null) ExerciseRow(isRefreshVisible: isSecondRefreshVisible ?? false, isUpdating: isUpdatingSecondExercise ?? false, title: secondExerciseName!, onRefreshClicked: onSecondExerciseRefresh ?? () {}),
             SizedBox(height: 14),
           ],
         ),

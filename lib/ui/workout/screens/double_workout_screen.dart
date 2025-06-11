@@ -33,13 +33,11 @@ class DoubleWorkoutScreen extends StatelessWidget {
           body: Column(
             children: [
               WorkoutTopBar(
-                isRefreshVisible: workoutInfo.items.length > 1,
+                isRefreshVisible: true,
                 isUpdatingFirstExercise: provider.isUpdatingExercise,
-                isUpdatingSecondExercise: provider.isUpdatingSecondExercise,
                 firstExerciseName: workoutInfo.items.first.name,
                 secondExerciseName: workoutInfo.items.last.name,
                 onFirstExerciseRefresh: () => provider.changeExercise(context),
-                onSecondExerciseRefresh: () => provider.onChangeSecondExercise(context),
               ),
               SizedBox(height: 12),
               Expanded(
