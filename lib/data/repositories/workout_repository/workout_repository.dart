@@ -80,7 +80,7 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   Future<Result<List<WorkoutInfo>>> changeExercise(int index, bool second) async {
     try {
       final dayIndex = _lastDayIndex ?? 0;
-      final result = await _workoutService.changeExercise(dayIndex, index, second);
+      final result = await _workoutService.changeExercise(index, second, dayIndex);
       _workoutResponse = result;
       return Result.ok(result.data);
     } on DioException catch (e) {

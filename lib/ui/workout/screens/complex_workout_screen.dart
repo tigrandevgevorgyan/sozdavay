@@ -37,10 +37,10 @@ class _ComplexWorkoutScreenState extends State<ComplexWorkoutScreen> {
         return Column(
           children: [
             WorkoutTopBar(
-                isRefreshVisible: true,
+                isRefreshVisible: widget.workoutInfo.items.first.exerciseCount > 1,
                 isUpdatingFirstExercise: provider.isUpdatingExercise,
                 firstExerciseName: widget.workoutInfo.items.first.name,
-                onFirstExerciseRefresh: () => provider.changeExercise(context)),
+                onFirstExerciseRefresh: () => provider.changeExercise(context, second: false)),
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(

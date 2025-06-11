@@ -45,6 +45,7 @@ ExerciseInfo _$ExerciseInfoFromJson(Map<String, dynamic> json) => ExerciseInfo(
       (json['item_id'] as num).toInt(),
       (json['id'] as num).toInt(),
       json['name'] as String,
+      (json['exercise_count'] as num).toInt(),
       json['description'] as String?,
       (json['videos'] as List<dynamic>)
           .map((e) => VideoInfo.fromJson(e as Map<String, dynamic>))
@@ -63,6 +64,7 @@ Map<String, dynamic> _$ExerciseInfoToJson(ExerciseInfo instance) =>
       'item_id': instance.itemId,
       'id': instance.id,
       'name': instance.name,
+      'exercise_count': instance.exerciseCount,
       'description': instance.description,
       'videos': instance.videos,
       'sets': instance.sets,

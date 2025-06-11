@@ -38,14 +38,14 @@ class BaseViewModel extends ChangeNotifier {
     _selectedId = null;
   }
 
-  Future<void> changeExercise(BuildContext context, {int? exerciseIndex}) async {
+  Future<void> changeExercise(BuildContext context, {int? exerciseIndex, required bool second}) async {
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     if (exerciseIndex == null) {
       // if id is provided, then ui logic is handled somewhere else
       isUpdatingExercise = true;
       notifyListeners();
     }
-    await Provider.of<WorkoutViewModel>(context, listen: false).updateExercise(context, exerciseIndex ?? workout.index);
+    await Provider.of<WorkoutViewModel>(context, listen: false).updateExercise(context, second, exerciseIndex ?? workout.index);
     if (exerciseIndex == null) {
       isUpdatingExercise = false;
       notifyListeners();

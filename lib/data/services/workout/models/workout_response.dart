@@ -46,6 +46,10 @@ class ExerciseInfo {
 
   final int id;
   final String name;
+
+  @JsonKey(name: 'exercise_count')
+  final int exerciseCount;
+
   final String? description;
   final List<VideoInfo> videos;
   final List<SetInfo> sets;
@@ -59,6 +63,7 @@ class ExerciseInfo {
     this.itemId,
     this.id,
     this.name,
+    this.exerciseCount,
     this.description,
     this.videos,
     this.sets,

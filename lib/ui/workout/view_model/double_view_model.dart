@@ -78,7 +78,7 @@ class DoubleViewModel extends BaseViewModel {
     _isUpdatingSecondExercise = true;
     notifyListeners();
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
-    await changeExercise(context, exerciseIndex: workout.index);
+    await changeExercise(context, exerciseIndex: workout.index, second: true);
     _isUpdatingSecondExercise = false;
     notifyListeners();
   }

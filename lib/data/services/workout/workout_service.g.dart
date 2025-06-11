@@ -100,14 +100,14 @@ class _WorkoutService implements WorkoutService {
 
   @override
   Future<WorkoutResponse> changeExercise(
-    int day,
     int index,
     bool second,
+    int day,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = {'day': day, 'index': index, 'second': second};
+    final _data = {'index': index, 'second': second, 'day': day};
     final _options = _setStreamType<WorkoutResponse>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(

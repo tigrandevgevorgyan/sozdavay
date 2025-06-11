@@ -20,7 +20,7 @@ abstract class WorkoutService {
   Future<WorkoutFinishResponse> finishWorkout();
 
   @POST('/workout/change')
-  Future<WorkoutResponse> changeExercise(@Field() int day, @Field() int index, @Field() bool second);
+  Future<WorkoutResponse> changeExercise(@Field() int index, @Field() bool second, @Field() int day);
 
   @POST('/workout/set')
   Future<List<HistoryInfo>> addSetResult(
