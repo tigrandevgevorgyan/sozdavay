@@ -30,6 +30,9 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   @override
   void initState() {
     super.initState();
+    cancelSquareNotification();
+    cancelCountdownNotification(1);
+    TimerStateStorage.clear(1);
     _controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: widget.secondsDuration),
@@ -56,6 +59,10 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
     _lifecycleListener = AppLifecycleListener(
       onResume: () async {
         cancelSquareNotification();
+        await cancelCountdownNotification(1);
+        if (_isRunning) {
+          await TimerStateStorage.clear(1);
+        }
       },
       onPause: () {
         if (_isRunning) {
@@ -106,7 +113,13 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       setState(() {
         _isRunning = false;
       });
+      cancelSquareNotification();
+      cancelCountdownNotification(1);
+      TimerStateStorage.clear(1);
     } else {
+      cancelSquareNotification();
+      cancelCountdownNotification(1);
+      TimerStateStorage.clear(1);
       _controller?.reset();
       _controller?.forward();
       setState(() {

@@ -29,6 +29,9 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
   @override
   void initState() {
     super.initState();
+    cancelSquareNotification();
+    cancelCountdownNotification(2);
+    TimerStateStorage.clear(2);
     _controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: widget.secondsToCount),
@@ -54,6 +57,10 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
     _lifecycleListener = AppLifecycleListener(
       onResume: () async {
         cancelHorizontalNotification();
+        await cancelCountdownNotification(2);
+        if (_isRunning) {
+          await TimerStateStorage.clear(2);
+        }
       },
       onPause: () {
         if (_isRunning) {
@@ -111,7 +118,13 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
       setState(() {
         _isRunning = false;
       });
+      cancelSquareNotification();
+      cancelCountdownNotification(2);
+      TimerStateStorage.clear(2);
     } else {
+      cancelSquareNotification();
+      cancelCountdownNotification(2);
+      TimerStateStorage.clear(2);
       _controller?.reset();
       _controller?.forward();
       setState(() {
