@@ -29,6 +29,12 @@ class BaseViewModel extends ChangeNotifier {
 
   int? get selectedId => _selectedId;
 
+  set selectedId(int? value) {
+    _selectedId = value;
+    notifyListeners();
+  }
+
+
   void onResultSelected(BuildContext context, int id) {
     _selectedId = id;
     notifyListeners();

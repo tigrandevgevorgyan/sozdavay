@@ -17,10 +17,19 @@ class ComplexViewModel extends BaseViewModel {
 
   bool get isTime => _isTime;
 
-  ComplexViewModel(BuildContext context) : super(GetIt.I<IProfileRepository>()) {
+  final BuildContext _context;
+
+  ComplexViewModel(BuildContext context)
+      : _context = context,
+        super(GetIt.I<IProfileRepository>()) {
     textController = TextEditingController();
-    final currentWorkout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
+    final currentWorkout = Provider.of<WorkoutViewModel>(_context, listen: false).currentWorkout;
     _isTime = currentWorkout.isTime;
+  }
+
+  ExerciseInfo get currentExercise {
+    final workout = Provider.of<WorkoutViewModel>(_context, listen: false).currentWorkout;
+    return workout.items.first;
   }
 
   void onPlusClicked(BuildContext context) {
@@ -45,13 +54,29 @@ class ComplexViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  List<SixResultsDayInfo> generateComplexSixDaysResult(ExerciseInfo exerciseInfo) {
+  @override
+  void onResultSelected(BuildContext context, int id) {
+    super.onResultSelected(context, id);
+
+    final result = findResultById(context, id);
+    if (result != null) {
+      textController.text = isTime ? result.time.toString() : result.repeats.toString();
+      notifyListeners();
+    }
+  }
+
+  List<SixResultsDayInfo> generateComplexSixDaysResult() {
+    final exerciseInfo = currentExercise;
+
     List<SixResultsDayInfo> result = [];
     String? title;
     for (HistoryInfo history in exerciseInfo.history) {
       List<DayResultInfo> resultStrings = [];
       for (ResultValue value in history.values) {
-        resultStrings.add(DayResultInfo(value.id, isTime ? value.time.toString() : value.repeats.toString()));
+        resultStrings.add(DayResultInfo(
+          value.id,
+          isTime ? value.time.toString() : value.repeats.toString(),
+        ));
         title = value.date.toWeekdayWithDate();
       }
       result.add(SixResultsDayInfo(title ?? '${history.day} ${history.date}', resultStrings));

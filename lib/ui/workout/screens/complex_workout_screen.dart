@@ -116,7 +116,7 @@ class _ComplexWorkoutScreenState extends State<ComplexWorkoutScreen> {
                           ? Center(child: LevelUpLoader())
                           : SimpleResultsWidget(
                               selectedId: provider.selectedId,
-                              results: provider.generateComplexSixDaysResult(widget.workoutInfo.items.first),
+                              results: provider.generateComplexSixDaysResult(),
                               onResultSelected: (id) => provider.onResultSelected(context, id),
                               onNotesClicked: () => provider.onNotesClicked(context),
                             ),

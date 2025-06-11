@@ -153,7 +153,23 @@ extension ResultValueCopyWith on ResultValue {
   ResultValue copyWith({
     double? weight,
     int? repeats,
+    int? time,
   }) {
-    return ResultValue(id, weight ?? this.weight, repeats ?? this.repeats, difficult, time, date);
+    return ResultValue(id, weight ?? this.weight, repeats ?? this.repeats, difficult, time ?? this.time, date);
   }
 }
+
+extension HistoryInfoCopyWith on HistoryInfo {
+  HistoryInfo copyWith({
+    String? day,
+    String? date,
+    List<ResultValue>? values,
+  }) {
+    return HistoryInfo(
+      day ?? this.day,
+      date ?? this.date,
+      values ?? this.values,
+    );
+  }
+}
+

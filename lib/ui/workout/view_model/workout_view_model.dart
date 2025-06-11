@@ -129,23 +129,30 @@ class WorkoutViewModel extends ChangeNotifier {
       for (final exercise in workout.items) {
         if (exercise.id != exerciseId) continue;
 
-        for (final history in exercise.history) {
-          for (int i = 0; i < history.values.length; i++) {
-            if (history.values[i].id == id) {
-              history.values[i] = history.values[i].copyWith(
-                weight: weight.toDouble(),
-                repeats: repeats,
-              );
-              notifyListeners();
-              break;
-            }
-          }
-        }
+        for (int h = 0; h < exercise.history.length; h++) {
+          final history = exercise.history[h];
 
-        break;
+          final i = history.values.indexWhere((v) => v.id == id);
+          if (i == -1) continue;
+
+          final updatedValue = history.values[i].copyWith(
+            weight: weight.toDouble(),
+            repeats: repeats,
+            time: time,
+          );
+
+          final updatedValues = [
+            ...history.values.sublist(0, i),
+            updatedValue,
+            ...history.values.sublist(i + 1),
+          ];
+
+          exercise.history[h] = history.copyWith(values: updatedValues);
+
+          notifyListeners();
+        }
       }
     }
-
     final result = await workoutRepository.updateSetResult(id, exerciseId, weight, repeats, difficult, time);
 
     if (result case Error()) {
