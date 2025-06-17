@@ -133,7 +133,7 @@ class _WorkoutService implements WorkoutService {
   Future<List<HistoryInfo>> addSetResult(
     int exerciseId,
     int itemId,
-    int weight,
+    double weight,
     int repeats,
     int difficult,
     int time,
@@ -180,7 +180,7 @@ class _WorkoutService implements WorkoutService {
   Future<List<HistoryInfo>> updateSetResult(
     int id,
     int exerciseId,
-    int weight,
+    double weight,
     int repeats,
     int difficult,
     int time,

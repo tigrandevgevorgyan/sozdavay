@@ -85,7 +85,7 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addSetResult(BuildContext context, int exerciseId, int itemId, int weight, int repeats, int difficult, int time, String date) async {
+  Future<void> addSetResult(BuildContext context, int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date) async {
     if (_workout == null) return;
 
     final newResult = ResultValue(DateTime.now().millisecondsSinceEpoch, weight.toDouble(), repeats, difficult, time, date);
@@ -122,7 +122,7 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateSetResult(BuildContext context, int id, int exerciseId, int weight, int repeats, int difficult, int time) async {
+  Future<void> updateSetResult(BuildContext context, int id, int exerciseId, double weight, int repeats, int difficult, int time) async {
     if (_workout == null) return;
 
     for (final workout in _workout!) {
@@ -269,18 +269,5 @@ class WorkoutViewModel extends ChangeNotifier {
         );
       },
     );
-  }
-
-  bool _isSecondWorkout(int id) {
-    if (_workout == null) {
-      return false;
-    }
-    for (WorkoutInfo workout in _workout!) {
-      if (!workout.isDouble) {
-        continue;
-      }
-      return workout.items.last.id == id;
-    }
-    return false;
   }
 }

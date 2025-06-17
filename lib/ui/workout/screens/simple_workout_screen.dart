@@ -15,6 +15,7 @@ import 'package:level_up/ui/workout/widgets/square_timer.dart';
 import 'package:level_up/ui/workout/widgets/video_player_card.dart';
 import 'package:level_up/ui/workout/widgets/workout_top_bar.dart';
 import 'package:provider/provider.dart';
+import '../../../utils/weight_formatters.dart';
 
 class SimpleWorkoutScreen extends StatelessWidget {
   const SimpleWorkoutScreen({super.key, required this.workoutInfo});
@@ -73,7 +74,8 @@ class SimpleWorkoutScreen extends StatelessWidget {
                                             children: [
                                               SquareTimer(
                                                 title: provider.getRestString(workoutInfo.items.first),
-                                                secondsDuration: workoutInfo.items.first.restSeconds,
+                                                secondsDuration: workoutInfo.items.first.restSeconds ?? 0,
+                                                haveRest: (workoutInfo.items.first.restSeconds ?? 0) > 0,
                                               ),
                                             ],
                                           ),
@@ -96,7 +98,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                               hintText: 'Вес',
                               textSize: 12,
                               keyboardType: TextInputType.number,
-                              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]|\.'))],
+                              inputFormatters: [WeightTextInputFormatter()],
                             ),
                           ),
                           SizedBox(width: 4),
@@ -119,7 +121,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                           ? Center(child: LevelUpLoader())
                           : SimpleResultsWidget(
                               selectedId: provider.selectedId,
-                              results: provider.generateSixDaysResult(workoutInfo.items.first),
+                              results: provider.generateSimpleDaysResult(workoutInfo.items.first),
                               onResultSelected: (id) => provider.onResultSelected(context, id),
                               onNotesClicked: () => provider.onNotesClicked(context),
                             ),

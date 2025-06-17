@@ -13,9 +13,7 @@ import 'package:level_up/ui/text_editing_screen/text_editing_screen.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../../config/home_banners_assets.dart';
-import '../../../data/repositories/workout_repository/workout_repository.dart';
 import '../../../data/services/data/models/main_response.dart';
 import '../../../utils/misc_utils.dart';
 
@@ -52,7 +50,7 @@ class HomeViewModel extends ChangeNotifier {
 
   String get level => _mainInfo?.label ?? '';
 
-  int get rating => _mainInfo?.rating ?? 0;
+  int get rating => _mainInfo?.levelRating ?? 0;
 
   int get perMonth => _mainInfo?.workout.month ?? 0;
 
@@ -247,6 +245,6 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   MainInfo _emptyMainInfo() {
-    return MainInfo(WorkoutStats(0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '');
+    return MainInfo(WorkoutStats(0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '', 0);
   }
 }

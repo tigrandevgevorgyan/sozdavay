@@ -30,8 +30,7 @@ UserProfileExtendedResponse _$UserProfileExtendedResponseFromJson(
               (e) => IdNamePairWithPriority.fromJson(e as Map<String, dynamic>))
           .toList(),
       (json['goals'] as List<dynamic>)
-          .map(
-              (e) => IdNamePairWithPriority.fromJson(e as Map<String, dynamic>))
+          .map((e) => GoalWithPriorities.fromJson(e as Map<String, dynamic>))
           .toList(),
       const DaysConverter().fromJson(json['days'] as List),
       (json['priorites'] as List<dynamic>)
@@ -56,6 +55,24 @@ Map<String, dynamic> _$UserProfileExtendedResponseToJson(
       'available_priority': instance.availablePriority,
       'priorites': instance.priorities,
       'categories': instance.categories,
+    };
+
+GoalWithPriorities _$GoalWithPrioritiesFromJson(Map<String, dynamic> json) =>
+    GoalWithPriorities(
+      (json['id'] as num).toInt(),
+      json['name'] as String,
+      json['available_priority'] as bool?,
+      (json['priorities'] as List<dynamic>)
+          .map((e) => (e as num).toInt())
+          .toList(),
+    );
+
+Map<String, dynamic> _$GoalWithPrioritiesToJson(GoalWithPriorities instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'available_priority': instance.isPriorityAvailable,
+      'priorities': instance.priorities,
     };
 
 IdNamePairWithPriority _$IdNamePairWithPriorityFromJson(

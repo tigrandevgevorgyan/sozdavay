@@ -53,7 +53,7 @@ ExerciseInfo _$ExerciseInfoFromJson(Map<String, dynamic> json) => ExerciseInfo(
       (json['sets'] as List<dynamic>)
           .map((e) => SetInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
-      (json['rest_seconds'] as num).toInt(),
+      (json['rest_seconds'] as num?)?.toInt(),
       (json['history'] as List<dynamic>)
           .map((e) => HistoryInfo.fromJson(e as Map<String, dynamic>))
           .toList(),

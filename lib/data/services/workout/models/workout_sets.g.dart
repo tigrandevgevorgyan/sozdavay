@@ -10,7 +10,7 @@ WorkoutSets _$WorkoutSetsFromJson(Map<String, dynamic> json) => WorkoutSets(
       id: (json['id'] as num?)?.toInt(),
       itemId: (json['itemId'] as num?)?.toInt(),
       exerciseId: (json['exerciseId'] as num?)?.toInt(),
-      weight: (json['weight'] as num?)?.toInt(),
+      weight: (json['weight'] as num?)?.toDouble(),
       repeats: (json['repeats'] as num?)?.toInt(),
       difficult: (json['difficult'] as num?)?.toInt(),
       time: (json['time'] as num?)?.toInt(),

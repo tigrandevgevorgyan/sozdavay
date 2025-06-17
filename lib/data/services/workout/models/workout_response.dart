@@ -55,7 +55,7 @@ class ExerciseInfo {
   final List<SetInfo> sets;
 
   @JsonKey(name: 'rest_seconds')
-  final int restSeconds;
+  final int? restSeconds;
 
   final List<HistoryInfo> history;
 

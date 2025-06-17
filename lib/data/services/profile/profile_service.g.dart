@@ -102,6 +102,7 @@ class _ProfileService implements ProfileService {
 
   @override
   Future<UserProfileShortResponse> updateProfile(
+    String name,
     int category,
     int days,
     int experience,
@@ -113,6 +114,7 @@ class _ProfileService implements ProfileService {
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = {
+      'name': name,
       'category': category,
       'days': days,
       'experience': experience,
