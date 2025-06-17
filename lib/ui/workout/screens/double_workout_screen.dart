@@ -17,6 +17,7 @@ import 'package:level_up/ui/workout/widgets/video_player_card.dart';
 import 'package:level_up/ui/workout/widgets/workout_top_bar.dart';
 import 'package:level_up/utils/misc_utils.dart';
 import 'package:provider/provider.dart';
+import '../../../utils/weight_formatters.dart';
 
 class DoubleWorkoutScreen extends StatelessWidget {
   const DoubleWorkoutScreen({super.key, required this.workoutInfo});
@@ -102,8 +103,8 @@ class DoubleWorkoutScreen extends StatelessWidget {
                             HorizontalTimer(
                               title: provider.getRestString(workoutInfo.items.last),
                               secondsToCount: max(
-                                workoutInfo.items.first.restSeconds,
-                                workoutInfo.items.last.restSeconds,
+                                workoutInfo.items.first.restSeconds ?? 0,
+                                workoutInfo.items.last.restSeconds ?? 0,
                               ),
                             ),
                             SizedBox(height: 8),
@@ -201,7 +202,7 @@ class DoubleWorkoutScreen extends StatelessWidget {
   List<DayResultInfo> generateSingleDayResult(HistoryInfo historyInfo) {
     List<DayResultInfo> result = [];
     for (ResultValue value in historyInfo.values) {
-      result.add(DayResultInfo(value.id, '${value.weight.formatDouble()}/${value.repeats}'));
+      result.add(DayResultInfo(value.id, '${DoubleFormatter(value.weight).formatDouble()}/${value.repeats}'));
     }
     return result;
   }
@@ -230,7 +231,7 @@ class DoubleResultsRecording extends StatelessWidget {
                 textSize: 12,
                 height: TextFieldHeight.medium,
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[+0-9]'))],
+                inputFormatters: [WeightTextInputFormatter()],
               ),
               SizedBox(height: 4),
               LevelUpTextField(

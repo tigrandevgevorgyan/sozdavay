@@ -9,7 +9,7 @@ class WorkoutSets {
   final int? id;
   final int? itemId;
   final int? exerciseId;
-  final int? weight;
+  final double? weight;
   final int? repeats;
   final int? difficult;
   final int? time;
@@ -43,7 +43,7 @@ class WorkoutSets {
   factory WorkoutSets.add({
     required int itemId,
     required int exerciseId,
-    required int weight,
+    required double weight,
     required int repeats,
     required int difficult,
     required int time,
@@ -64,7 +64,7 @@ class WorkoutSets {
   factory WorkoutSets.update({
     required int id,
     required int exerciseId,
-    required int weight,
+    required double weight,
     required int repeats,
     required int difficult,
     required int time,

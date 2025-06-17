@@ -12,6 +12,7 @@ import 'package:level_up/ui/workout/widgets/simple_results_widget.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/misc_utils.dart';
 import 'package:level_up/utils/result.dart';
+import 'package:level_up/utils/weight_formatters.dart';
 import 'package:provider/provider.dart';
 
 class BaseViewModel extends ChangeNotifier {
@@ -58,7 +59,7 @@ class BaseViewModel extends ChangeNotifier {
     }
   }
 
-  void addOrUpdateSetResult(BuildContext context, int exerciseId, int itemId, int repeats, int weight, int time, String date) async {
+  void addOrUpdateSetResult(BuildContext context, int exerciseId, int itemId, int repeats, double weight, int time, String date) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
     try {
@@ -129,14 +130,14 @@ class BaseViewModel extends ChangeNotifier {
     return null;
   }
 
-  List<SixResultsDayInfo> generateSixDaysResult(ExerciseInfo exerciseInfo) {
+  List<SixResultsDayInfo> generateSimpleDaysResult(ExerciseInfo exerciseInfo) {
     List<SixResultsDayInfo> result = [];
     for (HistoryInfo history in exerciseInfo.history) {
       List<DayResultInfo> resultStrings = [];
       String? title;
       for (ResultValue value in history.values) {
         title = value.date.toWeekdayWithDate();
-        resultStrings.add(DayResultInfo(value.id, '${value.weight.formatDouble()}/${value.repeats}'));
+        resultStrings.add(DayResultInfo(value.id, '${DoubleFormatter(value.weight).formatDouble()}/${value.repeats}'));
       }
       result.add(SixResultsDayInfo(title ?? '${history.day} ${history.date}', resultStrings));
     }
@@ -144,9 +145,9 @@ class BaseViewModel extends ChangeNotifier {
   }
 
   String getRestString(ExerciseInfo exerciseInfo) {
-    final restSec = exerciseInfo.restSeconds.abs();
+    final restSec = exerciseInfo.restSeconds?.abs();
 
-    if (restSec == 0) {
+    if (restSec == null) {
       return 'Без отдыха';
     }
 

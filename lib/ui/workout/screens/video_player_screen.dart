@@ -49,8 +49,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           child: Stack(
             children: [
               _controller.value.isInitialized
-                  ? SizedBox.expand(
-                child: VideoPlayer(_controller),
+                  ? Center(
+                child: AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: VideoPlayer(_controller),
+                ),
               )
                   : SizedBox.shrink(),
               if (_isControlsVisible)

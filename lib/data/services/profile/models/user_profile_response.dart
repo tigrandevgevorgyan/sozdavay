@@ -21,7 +21,7 @@ class UserProfileExtendedResponse extends BaseResponse {
 
   UserProfile data;
   final List<IdNamePairWithPriority> experiences;
-  final List<IdNamePairWithPriority> goals;
+  final List<GoalWithPriorities> goals;
   @DaysConverter()
   final List<IdNamePairWithPriority> days;
   @JsonKey(name: 'available_priority')
@@ -33,6 +33,22 @@ class UserProfileExtendedResponse extends BaseResponse {
   factory UserProfileExtendedResponse.fromJson(Map<String, dynamic> json) => _$UserProfileExtendedResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserProfileExtendedResponseToJson(this);
+}
+
+@JsonSerializable()
+class GoalWithPriorities {
+  final int id;
+  final String name;
+
+  @JsonKey(name: 'available_priority')
+  final bool? isPriorityAvailable;
+
+  final List<int> priorities;
+
+  GoalWithPriorities(this.id, this.name, this.isPriorityAvailable, this.priorities);
+
+  factory GoalWithPriorities.fromJson(Map<String, dynamic> json) => _$GoalWithPrioritiesFromJson(json);
+  Map<String, dynamic> toJson() => _$GoalWithPrioritiesToJson(this);
 }
 
 @JsonSerializable()

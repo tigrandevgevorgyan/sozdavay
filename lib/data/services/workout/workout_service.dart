@@ -26,7 +26,7 @@ abstract class WorkoutService {
   Future<List<HistoryInfo>> addSetResult(
     @Field('exercise_id') int exerciseId,
     @Field('item_id') int itemId,
-    @Field() int weight,
+    @Field() double weight,
     @Field() int repeats,
     @Field() int difficult,
     @Field() int time,
@@ -37,7 +37,7 @@ abstract class WorkoutService {
   Future<List<HistoryInfo>> updateSetResult(
     @Query('id') int id,
     @Query('exercise_id') int exerciseId,
-    @Query('weight') int weight,
+    @Query('weight') double weight,
     @Query('repeats') int repeats,
     @Query('difficult') int difficult,
     @Query('time') int time,

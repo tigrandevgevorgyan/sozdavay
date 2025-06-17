@@ -14,8 +14,6 @@ import 'package:level_up/ui/home/widgets/start_training_banner.dart';
 import 'package:level_up/ui/home/widgets/statistics_tile_widget.dart';
 import 'package:provider/provider.dart';
 
-import '../../../data/repositories/workout_repository/workout_repository.dart';
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -110,6 +108,7 @@ class HomeScreen extends StatelessWidget {
                             onClick: provider.onChatClicked,
                           ),
                         ),
+                        SizedBox(height: 4),
                       ],
                     ),
                   ),

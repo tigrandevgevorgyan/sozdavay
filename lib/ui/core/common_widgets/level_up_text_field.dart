@@ -15,7 +15,9 @@ class LevelUpTextField extends StatefulWidget {
       this.prefix,
       this.focusedHintText,
       this.textSize = 15,
-      this.height = TextFieldHeight.tall});
+      this.height = TextFieldHeight.tall,
+      this.focusNode,
+      });
 
   final TextEditingController controller;
   final String hintText;
@@ -27,20 +29,24 @@ class LevelUpTextField extends StatefulWidget {
   final Widget? prefix;
   final double textSize;
   final TextFieldHeight height;
+  final FocusNode? focusNode;
 
   @override
   State<LevelUpTextField> createState() => _LevelUpTextFieldState();
 }
 
 class _LevelUpTextFieldState extends State<LevelUpTextField> {
-  FocusNode? _focus = FocusNode();
+  late FocusNode _focus;
+  bool _isExternalFocus = false;
 
   late String _hintText = widget.hintText;
 
   @override
   void initState() {
     super.initState();
-    _focus?.addListener(_onFocusChange);
+    _isExternalFocus = widget.focusNode != null;
+    _focus = widget.focusNode ?? FocusNode();
+    _focus.addListener(_onFocusChange);
   }
 
   void _onFocusChange() {
@@ -89,9 +95,10 @@ class _LevelUpTextFieldState extends State<LevelUpTextField> {
   @override
   void dispose() {
     super.dispose();
-    _focus?.removeListener(_onFocusChange);
-    _focus?.dispose();
-    _focus = null;
+    _focus.removeListener(_onFocusChange);
+    if (!_isExternalFocus) {
+      _focus.dispose();
+    }
   }
 }
 

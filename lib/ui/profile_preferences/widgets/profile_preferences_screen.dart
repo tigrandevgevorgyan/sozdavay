@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:level_up/config/assets.dart';
+import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/ui/core/common_widgets/error_text_widget.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_button.dart';
@@ -20,7 +21,7 @@ class ProfilePreferencesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (BuildContext context) => ProfilePreferencesViewModel(context, profileRepository: GetIt.I<IProfileRepository>(), hasWorkoutPlan: hasWorkoutPlan),
+      create: (BuildContext context) => ProfilePreferencesViewModel(context, dataRepository: GetIt.I<IDataRepository>(), profileRepository: GetIt.I<IProfileRepository>(), hasWorkoutPlan: hasWorkoutPlan),
       child: Consumer<ProfilePreferencesViewModel>(builder: (context, provider, _) {
         return Scaffold(
           appBar: AppBar(
@@ -32,75 +33,95 @@ class ProfilePreferencesScreen extends StatelessWidget {
             centerTitle: true,
           ),
           backgroundColor: AppColors.backgroundColor,
-          body: provider.isLoading
-              ? Center(
-                  child: LevelUpLoader(),
-                )
-              : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              SubscriptionBanner(validUntilDate: provider.validUntilDate),
-                              SizedBox(height: 12),
-                              NameInputField(controller: provider.nameController),
-                              SizedBox(height: 14),
-                              OptionsBlocWidget(
-                                title: 'Выберите ваш пол и вес',
-                                value: provider.categorySelection,
-                                onClick: () => provider.onGenderWeightClicked(context),
-                              ),
-                              SizedBox(height: 12),
-                              if (!hasWorkoutPlan)
-                              Column(
-                                children: [
-                                  OptionsBlocWidget(
-                                    title: 'Выберите сложность',
-                                    value: provider.levelSelection,
-                                    onClick: () => provider.onLevelClicked(context),
-                                  ),
-                                  SizedBox(height: 12),
-                                  OptionsBlocWidget(
-                                    title: 'Выберите свою цель',
-                                    value: provider.goalSelection,
-                                    onClick: () => provider.onGoalClicked(context),
-                                  ),
-                                  SizedBox(height: 12),
-                                  if (provider.isPriorityAvailable)
+          body: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: provider.isLoading
+                ? Center(
+                    child: LevelUpLoader(),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                SubscriptionBanner(validUntilDate: provider.validUntilDate),
+                                SizedBox(height: 12),
+                                Consumer<ProfilePreferencesViewModel>(
+                                  builder: (context, provider, _) {
+                                    return Focus(
+                                      onFocusChange: (hasFocus) {
+                                        if (hasFocus && provider.shouldBlockFocus) {
+                                          FocusScope.of(context).unfocus();
+                                        }
+                                      },
+                                      child: LevelUpTextField(
+                                        controller: provider.nameController,
+                                        focusNode: provider.nameFocusNode,
+                                        hintText: 'Имя',
+                                      ),
+                                    );
+                                  },
+                                ),
+                                SizedBox(height: 14),
+                                OptionsBlocWidget(
+                                  title: 'Выберите ваш пол и вес',
+                                  value: provider.categorySelection,
+                                  onClick: () => provider.onGenderWeightClicked(context),
+                                ),
+                                SizedBox(height: 12),
+                                if (!hasWorkoutPlan)
+                                Column(
+                                  children: [
                                     OptionsBlocWidget(
-                                      title: 'Выберите приоритет',
-                                      value: provider.prioritySelection,
-                                      onClick: () => provider.onPriorityClicked(context),
+                                      title: 'Выберите сложность',
+                                      value: provider.levelSelection,
+                                      onClick: () => provider.onLevelClicked(context),
                                     ),
-                                  if (provider.isPriorityAvailable) SizedBox(height: 12),
-                                  OptionsBlocWidget(
-                                    title: 'Выберите кол-во тренировок в неделю',
-                                    value: provider.trainingWeeklySelection,
-                                    onClick: () => provider.onTrainingWeeklyClicked(context),
-                                  ),
-                                  SizedBox(height: 12),
-                                ],
-                              ),
-                            ],
+                                    SizedBox(height: 12),
+                                    OptionsBlocWidget(
+                                      title: 'Выберите свою цель',
+                                      value: provider.goalSelection,
+                                      onClick: () => provider.onGoalClicked(context),
+                                    ),
+                                    SizedBox(height: 12),
+                                    if (provider.isPriorityAvailable)
+                                      OptionsBlocWidget(
+                                        title: 'Выберите приоритет',
+                                        value: provider.prioritySelection,
+                                        onClick: () => provider.onPriorityClicked(context),
+                                      ),
+                                    if (provider.isPriorityAvailable) SizedBox(height: 12),
+                                    OptionsBlocWidget(
+                                      title: 'Выберите кол-во тренировок в неделю',
+                                      value: provider.trainingWeeklySelection,
+                                      onClick: () => provider.onTrainingWeeklyClicked(context),
+                                    ),
+                                    SizedBox(height: 12),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 12),
-                      if (provider.error != null) ErrorTextWidget(error: provider.error),
-                      provider.isUpdating
-                          ? LevelUpLoader()
-                          : LevelUpButton(
-                              text: 'Сохранить и продолжить',
-                              buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.tall),
-                              onClick: () => provider.onSaveClicked(context),
-                            ),
-                      SizedBox(height: 16),
-                    ],
+                        SizedBox(height: 12),
+                        if (provider.error != null) ErrorTextWidget(error: provider.error),
+                        provider.isUpdating
+                            ? LevelUpLoader()
+                            : LevelUpButton(
+                                text: 'Сохранить и продолжить',
+                                buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.tall),
+                          onClick: () => provider.onSaveClicked(context),
+                              ),
+                        SizedBox(height: 16),
+                      ],
+                    ),
                   ),
-                ),
+          ),
         );
       }),
     );
@@ -108,9 +129,10 @@ class ProfilePreferencesScreen extends StatelessWidget {
 }
 
 class NameInputField extends StatelessWidget {
-  const NameInputField({super.key, required this.controller});
+  const NameInputField({super.key, required this.controller, required this.focusNode});
 
   final TextEditingController controller;
+  final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +141,10 @@ class NameInputField extends StatelessWidget {
       children: [
         Text('Как вас зовут?', style: Style.outfit14w400.copyWith(color: AppColors.primaryTextColor)),
         SizedBox(height: 4),
-        LevelUpTextField(controller: controller, hintText: 'Имя'),
+        LevelUpTextField(
+            controller: controller,
+            focusNode: focusNode,
+            hintText: 'Имя'),
       ],
     );
   }

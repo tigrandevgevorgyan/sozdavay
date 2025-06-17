@@ -11,10 +11,11 @@ import 'package:level_up/utils/timer_state_storage.dart';
 import '../../../utils/notifications.dart';
 
 class SquareTimer extends StatefulWidget {
-  const SquareTimer({super.key, required this.title, required this.secondsDuration});
+  const SquareTimer({super.key, required this.title, required this.secondsDuration, required this.haveRest});
 
   final String title;
   final int secondsDuration;
+  final bool haveRest;
 
   @override
   State<SquareTimer> createState() => _SquareTimerState();
@@ -95,7 +96,12 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  GestureDetector(onTap: _onPlayTap, child: SvgPicture.asset(_isRunning ? Assets.stopIcon : Assets.playIcon)),
+                  GestureDetector(
+                      onTap: _onPlayTap,
+                      child: widget.haveRest
+                              ? SvgPicture.asset(_isRunning ? Assets.stopIcon : Assets.playIcon)
+                              : SizedBox.shrink()
+                      ),
                   SizedBox(height: 18),
                   Text(widget.title, style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
                 ],

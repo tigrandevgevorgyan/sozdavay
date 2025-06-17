@@ -36,14 +36,14 @@ class DataRepositoryImpl extends IDataRepository {
   Future<Result<RatingResponse>> getRatingInfoFiltered(
       int category, int periods) async {
     try {
-      String jsonWithTrailingComma = '''
-{
-  "customer": 0,
-  "category": $category,
-  "period": $periods,
-}''';
+      String json = '''
+       {
+         "customer": 0,
+         "category": $category,
+         "period": $periods
+       }''';
 
-      final result = await dataService.getRatingFiltered(jsonWithTrailingComma);
+      final result = await dataService.getRatingFiltered(json);
       return Result.ok(result);
     } on DioException catch (e) {
       return Result.error(e);

@@ -14,13 +14,13 @@ abstract class IWorkoutRepository {
 
   Future<Result<List<WorkoutInfo>>> changeExercise(int index, bool second);
 
-  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, int weight, int repeats, int difficult, int time, String date);
+  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date);
 
   Future<Result<void>> finishWorkout();
 
   Future<Result<IsCompletedResponse>> deleteWorkout(int workoutId);
 
-  Future<Result<List<WorkoutInfo>>> updateSetResult(int id, int exerciseId, int weight, int repeats, int difficult, int time);
+  Future<Result<List<WorkoutInfo>>> updateSetResult(int id, int exerciseId, double weight, int repeats, int difficult, int time);
 
   Future<Result<List<WorkoutInfo>>> deleteSetResult(int id);
 
@@ -109,7 +109,7 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   }
 
   @override
-  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, int weight, int repeats, int difficult, int time, String date) async {
+  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date) async {
     final offlineSet = WorkoutSets.add(itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time, date: date);
 
     try {
@@ -126,7 +126,7 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   }
 
   @override
-  Future<Result<List<WorkoutInfo>>> updateSetResult(int id, int exerciseId, int weight, int repeats, int difficult, int time) async {
+  Future<Result<List<WorkoutInfo>>> updateSetResult(int id, int exerciseId, double weight, int repeats, int difficult, int time) async {
     final offlineSet = WorkoutSets.update(id: id, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time);
 
     try {
