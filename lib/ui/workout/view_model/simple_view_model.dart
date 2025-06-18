@@ -4,12 +4,13 @@ import 'package:level_up/data/repositories/profile_service/profile_repository.da
 import 'package:level_up/ui/workout/view_model/base_view_model.dart';
 import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:provider/provider.dart';
+import '../../../data/repositories/workout_repository/workout_repository.dart';
 
 class SimpleViewModel extends BaseViewModel {
   late TextEditingController weightController;
   late TextEditingController repeatsController;
 
-  SimpleViewModel() : super(GetIt.I<IProfileRepository>()) {
+  SimpleViewModel() : super(GetIt.I<IProfileRepository>(), GetIt.I<IWorkoutRepository>()) {
     weightController = TextEditingController();
     repeatsController = TextEditingController();
   }

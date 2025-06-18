@@ -8,6 +8,7 @@ import 'package:level_up/ui/workout/widgets/simple_results_widget.dart';
 import 'package:level_up/utils/misc_utils.dart';
 import 'package:provider/provider.dart';
 
+import '../../../data/repositories/workout_repository/workout_repository.dart';
 import '../../../data/services/workout/models/workout_response.dart';
 
 class ComplexViewModel extends BaseViewModel {
@@ -21,7 +22,7 @@ class ComplexViewModel extends BaseViewModel {
 
   ComplexViewModel(BuildContext context)
       : _context = context,
-        super(GetIt.I<IProfileRepository>()) {
+        super(GetIt.I<IProfileRepository>(), GetIt.I<IWorkoutRepository>()) {
     textController = TextEditingController();
     final currentWorkout = Provider.of<WorkoutViewModel>(_context, listen: false).currentWorkout;
     _isTime = currentWorkout.isTime;
@@ -65,10 +66,10 @@ class ComplexViewModel extends BaseViewModel {
     }
   }
 
-  List<SixResultsDayInfo> generateComplexSixDaysResult() {
+  List<SimpleResultsDayInfo> generateComplexSixDaysResult() {
     final exerciseInfo = currentExercise;
 
-    List<SixResultsDayInfo> result = [];
+    List<SimpleResultsDayInfo> result = [];
     String? title;
     for (HistoryInfo history in exerciseInfo.history) {
       List<DayResultInfo> resultStrings = [];
@@ -79,7 +80,7 @@ class ComplexViewModel extends BaseViewModel {
         ));
         title = value.date.toWeekdayWithDate();
       }
-      result.add(SixResultsDayInfo(title ?? '${history.day} ${history.date}', resultStrings));
+      result.add(SimpleResultsDayInfo(title ?? '${history.day} ${history.date}', resultStrings, history));
     }
     return result;
   }

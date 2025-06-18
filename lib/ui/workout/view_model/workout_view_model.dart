@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/config/dio_client.dart';
@@ -10,7 +9,6 @@ import 'package:level_up/ui/core/common_widgets/level_up_button.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
-
 import '../../../utils/misc_utils.dart';
 
 class WorkoutViewModel extends ChangeNotifier {
@@ -99,7 +97,7 @@ class WorkoutViewModel extends ChangeNotifier {
 
         final existing = exercise.history.firstWhere(
           (h) => h.date == today,
-          orElse: () => HistoryInfo(weekday, today, []),
+          orElse: () => HistoryInfo(weekday, today, [], '', DateTime.now().millisecondsSinceEpoch),
         );
 
         existing.values.insert(0, newResult);

@@ -104,12 +104,16 @@ HistoryInfo _$HistoryInfoFromJson(Map<String, dynamic> json) => HistoryInfo(
       (json['values'] as List<dynamic>)
           .map((e) => ResultValue.fromJson(e as Map<String, dynamic>))
           .toList(),
+      json['comment'] as String?,
+      (json['item_id'] as num).toInt(),
     );
 
 Map<String, dynamic> _$HistoryInfoToJson(HistoryInfo instance) =>
     <String, dynamic>{
       'day': instance.day,
       'date': instance.date,
+      'comment': instance.comment,
+      'item_id': instance.itemId,
       'values': instance.values,
     };
 
