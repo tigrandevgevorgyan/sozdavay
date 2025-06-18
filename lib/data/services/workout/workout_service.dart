@@ -3,6 +3,7 @@ import 'package:level_up/data/services/common_models/is_completed_response.dart'
 import 'package:level_up/data/services/workout/models/workout_finish_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:retrofit/retrofit.dart';
+import 'models/workout_comment.dart';
 
 part 'workout_service.g.dart';
 
@@ -45,4 +46,7 @@ abstract class WorkoutService {
 
   @DELETE('/workout/set')
   Future<List<HistoryInfo>> deleteSetResult(@Query('id') int id);
+
+  @POST('/workout/comment/{item_id}')
+  Future<void> updateWorkoutComment(@Path('item_id') int itemId,  @Body() WorkoutComment body);
 }

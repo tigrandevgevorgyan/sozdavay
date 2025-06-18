@@ -7,6 +7,7 @@ import 'package:level_up/data/services/workout/workout_service.dart';
 import 'package:level_up/utils/result.dart';
 
 import '../../services/local_storage.dart';
+import '../../services/workout/models/workout_comment.dart';
 import '../../services/workout/models/workout_sets.dart';
 
 abstract class IWorkoutRepository {
@@ -25,6 +26,9 @@ abstract class IWorkoutRepository {
   Future<Result<List<WorkoutInfo>>> deleteSetResult(int id);
 
   Future<void> sendOfflineOperations();
+
+  Future<Result<void>> updateWorkoutComment(int itemId, WorkoutComment body);
+
 }
 
 class WorkoutRepositoryImp extends IWorkoutRepository {
@@ -171,8 +175,14 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
             if (set.id == null) throw Exception();
             await _tryWithRetry(() => _workoutService.deleteSetResult(set.id!));
             break;
+          case OfflineAction.comment:
+            if (set.itemId == null || set.comment == null) throw Exception();
+            await _tryWithRetry(() => _workoutService.updateWorkoutComment(
+              set.itemId!,
+              WorkoutComment(comment: set.comment!),
+            ));
+            break;
         }
-
         await _localStorage.removeOfflineOperation(set);
       } catch (e) {
         return;
@@ -196,4 +206,15 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
     }
   }
 
+  @override
+  Future<Result<void>> updateWorkoutComment(int itemId, WorkoutComment body) async {
+    final offlineComment = WorkoutSets.comment(itemId: itemId, comment: body.comment);
+    try {
+      await _workoutService.updateWorkoutComment(itemId, body);
+      return Result.ok(null);
+    } catch (e) {
+      await _localStorage.saveOfflineOperation(offlineComment);
+      return Result.ok(null);
+    }
+  }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
+import 'package:level_up/data/repositories/workout_repository/workout_repository.dart';
 import 'package:level_up/data/services/profile/models/user_profile_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:level_up/routing/levelup_router.dart';
@@ -15,10 +16,14 @@ import 'package:level_up/utils/result.dart';
 import 'package:level_up/utils/weight_formatters.dart';
 import 'package:provider/provider.dart';
 
+import '../../../data/services/workout/models/workout_comment.dart';
+
 class BaseViewModel extends ChangeNotifier {
-  BaseViewModel(this.profileRepository);
+  BaseViewModel(this.profileRepository, this.workoutRepository);
 
   final IProfileRepository profileRepository;
+
+  final IWorkoutRepository workoutRepository;
 
   bool _isUpdatingHistory = false;
 
@@ -29,6 +34,12 @@ class BaseViewModel extends ChangeNotifier {
   int? _selectedId;
 
   int? get selectedId => _selectedId;
+
+  List<WorkoutInfo>? _workout;
+
+  set workout(List<WorkoutInfo>? value) {
+    _workout = value;
+  }
 
   set selectedId(int? value) {
     _selectedId = value;
@@ -113,6 +124,53 @@ class BaseViewModel extends ChangeNotifier {
     }
   }
 
+  void onWorkoutNotesClicked(BuildContext context, HistoryInfo history) async {
+    final parsed = DateTime.parse(history.date);
+    final dayName = '${history.day} ${DateFormat('dd.MM.yy').format(parsed)}';
+
+    final params = TextEditingScreenParams(
+      title: 'ЗАМЕТКА $dayName',
+      initialText: history.comment ?? '',
+      onTextUpdated: (newText) async {
+        _updateNoteComment(history.itemId, newText);
+        return Result.ok(true);
+      },
+    );
+
+    if (context.mounted) {
+      GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params);
+    }
+  }
+
+
+  void _updateNoteComment(int itemId, String newComment) async {
+    bool updated = false;
+    for (final workout in _workout ?? []) {
+      for (final exercise in workout.items) {
+        final history = exercise.history.firstWhereOrNull(
+              (h) => h.itemId == itemId,
+        );
+        if (history != null) {
+          final updatedHistory = HistoryInfo(history.day, history.date, history.values, newComment, history.itemId);
+          final index = exercise.history.indexOf(history);
+          exercise.history[index] = updatedHistory;
+          updated = true;
+          notifyListeners();
+          break;
+        }
+      }
+      if (updated) break;
+    }
+    try {
+      await workoutRepository.updateWorkoutComment(
+        itemId,
+        WorkoutComment(comment: newComment),
+      );
+    } catch (e) {
+      debugPrint('Ошибка при отправке комментария: $e');
+    }
+  }
+
   ResultValue? findResultById(BuildContext context, int id) {
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     for (ExerciseInfo exerciseInfo in workout.items) {
@@ -130,8 +188,8 @@ class BaseViewModel extends ChangeNotifier {
     return null;
   }
 
-  List<SixResultsDayInfo> generateSimpleDaysResult(ExerciseInfo exerciseInfo) {
-    List<SixResultsDayInfo> result = [];
+  List<SimpleResultsDayInfo> generateSimpleDaysResult(ExerciseInfo exerciseInfo) {
+    List<SimpleResultsDayInfo> result = [];
     for (HistoryInfo history in exerciseInfo.history) {
       List<DayResultInfo> resultStrings = [];
       String? title;
@@ -139,7 +197,8 @@ class BaseViewModel extends ChangeNotifier {
         title = value.date.toWeekdayWithDate();
         resultStrings.add(DayResultInfo(value.id, '${DoubleFormatter(value.weight).formatDouble()}/${value.repeats}'));
       }
-      result.add(SixResultsDayInfo(title ?? '${history.day} ${history.date}', resultStrings));
+      result.add(SimpleResultsDayInfo(title ?? '${history.day} ${history.date}', resultStrings, history),
+      );
     }
     return result;
   }

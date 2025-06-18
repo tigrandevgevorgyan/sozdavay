@@ -124,9 +124,12 @@ class VideoInfo {
 class HistoryInfo {
   final String day;
   final String date;
+  final String? comment;
+  @JsonKey(name: 'item_id')
+  final int itemId;
   final List<ResultValue> values;
 
-  HistoryInfo(this.day, this.date, this.values);
+  HistoryInfo(this.day, this.date, this.values, this.comment, this.itemId);
 
   factory HistoryInfo.fromJson(Map<String, dynamic> json) => _$HistoryInfoFromJson(json);
 
@@ -163,12 +166,16 @@ extension HistoryInfoCopyWith on HistoryInfo {
   HistoryInfo copyWith({
     String? day,
     String? date,
+    String? comment,
+    int? itemId,
     List<ResultValue>? values,
   }) {
     return HistoryInfo(
       day ?? this.day,
       date ?? this.date,
       values ?? this.values,
+      comment ?? this.comment,
+      itemId ?? this.itemId
     );
   }
 }

@@ -80,6 +80,10 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   bool get shouldBlockFocus => _shouldBlockFocus;
 
+  DateTime? _paidUntil;
+
+  DateTime? get paidUntil => _paidUntil;
+
   void blockFocus() {
     _shouldBlockFocus = true;
   }
@@ -212,8 +216,9 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
         _setPriorityOptions();
 
         if (profile.value.data.paidUntil != null) {
-          DateTime validDateTime = DateFormat("yyyy-MM-dd").parse(profile.value.data.paidUntil!);
-          _validUntilDate = DateFormat("dd.MM.yyyy").format(validDateTime);
+          _paidUntil = DateFormat("yyyy-MM-dd").parse(profile.value.data.paidUntil!);
+           // _paidUntil = DateFormat("yyyy-MM-dd").parse('2025-06-16');
+          _validUntilDate = DateFormat("dd.MM.yyyy").format(_paidUntil!);
         } else {
           _validUntilDate = '';
         }
@@ -224,6 +229,11 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
     }
     _isLoading = false;
     notifyListeners();
+  }
+
+  bool get isSubscriptionExpired {
+    if (paidUntil == null) return true;
+    return DateTime.now().isAfter(paidUntil!);
   }
 
   void _setPriorityOptions() {

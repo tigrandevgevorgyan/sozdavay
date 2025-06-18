@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:level_up/ui/workout/widgets/day_measurements_result.dart';
 
+import '../../../data/services/workout/models/workout_response.dart';
+
 class SimpleResultsWidget extends StatelessWidget {
   const SimpleResultsWidget({super.key, required this.results, this.selectedId, required this.onResultSelected, required this.onNotesClicked});
 
   final int? selectedId;
-  final List<SixResultsDayInfo> results;
-  final Function(int id) onResultSelected;
-  final Function() onNotesClicked;
+  final List<SimpleResultsDayInfo> results;
+  final void Function(int id) onResultSelected;
+  final void Function(HistoryInfo history) onNotesClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +24,7 @@ class SimpleResultsWidget extends StatelessWidget {
             if (index >= results.length) {
               return const Expanded(child: SizedBox());
             }
+            final item = results[index];
             return Expanded(
               flex: 1,
               child: DayMeasurementsResult(
@@ -30,6 +33,7 @@ class SimpleResultsWidget extends StatelessWidget {
                 selectedId: selectedId,
                 onResultSelected: onResultSelected,
                 onNotesClicked: onNotesClicked,
+                history: item.history,
               ),
             );
           }),
@@ -42,9 +46,10 @@ class SimpleResultsWidget extends StatelessWidget {
   }
   }
 
-class SixResultsDayInfo {
+class SimpleResultsDayInfo {
   final String title;
+  final HistoryInfo history;
   final List<DayResultInfo> results;
 
-  SixResultsDayInfo(this.title, this.results);
+  SimpleResultsDayInfo(this.title, this.results, this.history);
 }

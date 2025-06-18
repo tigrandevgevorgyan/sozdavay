@@ -158,7 +158,6 @@ class DoubleWorkoutScreen extends StatelessWidget {
                               final secondDate = secondHistoryItem?.values.firstOrNull?.date;
                               final titleFirst = firstDate?.toWeekdayWithDate();
                               final titleSecond = secondDate?.toWeekdayWithDate();
-
                               return Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 14),
                                 child: Row(
@@ -170,7 +169,8 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                               title: titleFirst ?? '${firstHistoryItem.day} ${firstHistoryItem.date}',
                                               results: generateSingleDayResult(firstHistoryItem),
                                               onResultSelected: (id) => provider.onFirstIdSelected(context, id),
-                                              onNotesClicked: () => provider.onNotesClicked(context),
+                                              onNotesClicked: (history) => provider.onWorkoutNotesClicked(context, history),
+                                              history: firstHistoryItem,
                                             )
                                           : SizedBox.shrink(),
                                     ),
@@ -180,7 +180,8 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                               title: titleSecond ?? '${secondHistoryItem.day} ${secondHistoryItem.date}',
                                               results: generateSingleDayResult(secondHistoryItem),
                                               onResultSelected: (id) => provider.onSecondIdSelected(context, id),
-                                              onNotesClicked: () => provider.onNotesClicked(context),
+                                              onNotesClicked: (history) => provider.onWorkoutNotesClicked(context, history),
+                                              history: secondHistoryItem,
                                             )
                                           : SizedBox.shrink(),
                                     ),

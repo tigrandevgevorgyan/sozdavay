@@ -1,6 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:level_up/config/dio_client.dart';
 import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
 import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
@@ -16,6 +18,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../config/home_banners_assets.dart';
 import '../../../data/services/data/models/main_response.dart';
 import '../../../utils/misc_utils.dart';
+import '../../core/common_widgets/level_up_button.dart';
+import '../../core/themes/text_styles.dart';
 
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel(
@@ -40,6 +44,13 @@ class HomeViewModel extends ChangeNotifier {
 
   late int _planType;
   int get planType => _planType;
+
+  DateTime? _paidUntil;
+
+  DateTime? get paidUntil => _paidUntil;
+
+  late bool _isExpiredDate;
+  bool get isExpiredDate => _isExpiredDate;
 
   late final String trainingImage = HomeBannersAssets.getRandomTrainingImage();
 
@@ -70,7 +81,11 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void _init(BuildContext context) async {
+    // await localStorage.clearSharedPreferences();
     final isSuccess = await _loadProfile(context);
+    if (_isExpiredDate) {
+      _showFinalDialog(context);
+    }
     if (isSuccess && context.mounted) {
       await _loadMainInfo(context);
     }
@@ -221,6 +236,11 @@ class HomeViewModel extends ChangeNotifier {
       case Ok<UserProfileExtendedResponse>():
         _profile = profile.value;
         _planType = _profile!.data.planType;
+        if (_profile!.data.paidUntil != null) {
+          // _paidUntil = DateFormat("yyyy-MM-dd").parse('2025-06-16');
+          _paidUntil = DateFormat("yyyy-MM-dd").parse(_profile!.data.paidUntil!);
+          _isExpiredDate = DateTime.now().isAfter(_paidUntil!);
+        }
         return true;
       case Error<UserProfileExtendedResponse>():
         if (context != null && context.mounted) {
@@ -229,6 +249,53 @@ class HomeViewModel extends ChangeNotifier {
         }
     }
     return false;
+  }
+
+  void _showFinalDialog(BuildContext screenContext) {
+    showDialog(
+      context: screenContext,
+      builder: (BuildContext context) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: EdgeInsets.all(20),
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Color(0xFF141414),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Color(0xFF3C3C3C), width: 0.5),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Подписка закончилась', style: Style.ablation18w900.copyWith(color: Colors.white)),
+                      SizedBox(height: 8),
+                      Text(
+                          'Но это легко исправить! Напишите тренеру, чтобы вернуть доступ',
+                          style: Style.outfit16w300.copyWith(color: Color(0xFFECECEC)),
+                          textAlign: TextAlign.center
+                          ),
+                      SizedBox(height: 24),
+                      LevelUpButton(
+                          text: 'Написать',
+                          buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.medium),
+                          onClick: () {
+                            onChatClicked();
+                          }),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _loadMainInfo(BuildContext? context) async {

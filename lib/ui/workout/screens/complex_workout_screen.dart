@@ -118,7 +118,7 @@ class _ComplexWorkoutScreenState extends State<ComplexWorkoutScreen> {
                               selectedId: provider.selectedId,
                               results: provider.generateComplexSixDaysResult(),
                               onResultSelected: (id) => provider.onResultSelected(context, id),
-                              onNotesClicked: () => provider.onNotesClicked(context),
+                              onNotesClicked: (history) => provider.onWorkoutNotesClicked(context, history),
                             ),
                       SizedBox(height: 16),
                     ],

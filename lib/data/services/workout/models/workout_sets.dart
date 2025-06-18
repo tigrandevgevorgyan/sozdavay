@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'workout_sets.g.dart';
 
-enum OfflineAction { add, update, delete }
+enum OfflineAction { add, update, delete, comment }
 
 @JsonSerializable()
 class WorkoutSets {
@@ -15,6 +15,7 @@ class WorkoutSets {
   final int? time;
   final OfflineAction action;
   final String? date;
+  final String? comment;
 
   WorkoutSets({
     this.id,
@@ -26,6 +27,7 @@ class WorkoutSets {
     this.time,
     this.date,
     required this.action,
+    this.comment,
   });
 
   WorkoutSets._({
@@ -37,6 +39,7 @@ class WorkoutSets {
     this.difficult,
     this.time,
     this.date,
+    this.comment,
     required this.action,
   });
 
@@ -84,6 +87,17 @@ class WorkoutSets {
     return WorkoutSets._(
       id: id,
       action: OfflineAction.delete,
+    );
+  }
+
+  factory WorkoutSets.comment({
+    required int itemId,
+    required  comment,
+  }) {
+    return WorkoutSets._(
+      itemId: itemId,
+      comment: comment,
+      action: OfflineAction.comment,
     );
   }
 

@@ -3,9 +3,10 @@ import 'package:level_up/config/assets.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 
 class SubscriptionBanner extends StatelessWidget {
-  const SubscriptionBanner({super.key, required this.validUntilDate});
+  const SubscriptionBanner({super.key, required this.title, required this.subtitle});
 
-  final String validUntilDate;
+  final String title;
+  final String subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -23,21 +24,21 @@ class SubscriptionBanner extends StatelessWidget {
             )
 
           ),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Подписка', style: Style.outfit14w400),
-                  SizedBox(height: 4),
-                  Text('активна до $validUntilDate', style: Style.ablation15w900),
-                ],
-              ),
-            ),
-          )
+          // Align(
+          //   alignment: Alignment.bottomLeft,
+          //   child: Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          //     child: Column(
+          //       crossAxisAlignment: CrossAxisAlignment.start,
+          //       mainAxisSize: MainAxisSize.min,
+          //       children: [
+          //         Text(subtitle, style: Style.outfit14w400),
+          //         SizedBox(height: 4),
+          //         Text(title, style: Style.ablation15w900),
+          //       ],
+          //     ),
+          //   ),
+          // )
         ],
       ),
     );

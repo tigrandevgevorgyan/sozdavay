@@ -49,7 +49,14 @@ class ProfilePreferencesScreen extends StatelessWidget {
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
-                                SubscriptionBanner(validUntilDate: provider.validUntilDate),
+                                SubscriptionBanner(
+                                  title: provider.isSubscriptionExpired
+                                      ? "Продлить в чате с тренером"
+                                      : "Активна до ${provider.validUntilDate}",
+                                  subtitle: provider.isSubscriptionExpired
+                                      ? "Подписка закончилась"
+                                      : "Подписка",
+                                ),
                                 SizedBox(height: 12),
                                 Consumer<ProfilePreferencesViewModel>(
                                   builder: (context, provider, _) {

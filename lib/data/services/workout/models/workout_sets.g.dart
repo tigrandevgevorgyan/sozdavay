@@ -16,6 +16,7 @@ WorkoutSets _$WorkoutSetsFromJson(Map<String, dynamic> json) => WorkoutSets(
       time: (json['time'] as num?)?.toInt(),
       date: json['date'] as String?,
       action: $enumDecode(_$OfflineActionEnumMap, json['action']),
+      comment: json['comment'] as String?,
     );
 
 Map<String, dynamic> _$WorkoutSetsToJson(WorkoutSets instance) =>
@@ -29,10 +30,12 @@ Map<String, dynamic> _$WorkoutSetsToJson(WorkoutSets instance) =>
       'time': instance.time,
       'action': _$OfflineActionEnumMap[instance.action]!,
       'date': instance.date,
+      'comment': instance.comment,
     };
 
 const _$OfflineActionEnumMap = {
   OfflineAction.add: 'add',
   OfflineAction.update: 'update',
   OfflineAction.delete: 'delete',
+  OfflineAction.comment: 'comment',
 };

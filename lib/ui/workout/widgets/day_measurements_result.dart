@@ -4,15 +4,17 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:level_up/config/assets.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
+import '../../../data/services/workout/models/workout_response.dart';
 
 class DayMeasurementsResult extends StatelessWidget {
-  const DayMeasurementsResult({super.key, required this.title, required this.results, this.selectedId, required this.onResultSelected, required this.onNotesClicked});
+  const DayMeasurementsResult({super.key, required this.title, required this.results, this.selectedId, required this.onResultSelected, required this.onNotesClicked, required this.history});
 
   final String title;
   final int? selectedId;
   final List<DayResultInfo> results;
   final Function(int id) onResultSelected;
-  final Function() onNotesClicked;
+  final void Function(HistoryInfo history) onNotesClicked;
+  final HistoryInfo history;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class DayMeasurementsResult extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             GestureDetector(
-              onTap: onNotesClicked,
+              onTap: () => onNotesClicked(history),
               child: SvgPicture.asset(Assets.pencilIcon),
             ),
             SizedBox(width: 4),
