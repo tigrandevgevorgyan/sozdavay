@@ -8,6 +8,7 @@ part of 'main_response.dart';
 
 MainResponse _$MainResponseFromJson(Map<String, dynamic> json) => MainResponse(
       json['message'] as String?,
+      json['success'] as bool?,
       MainInfo.fromJson(json['data'] as Map<String, dynamic>),
     );
 
@@ -15,6 +16,7 @@ Map<String, dynamic> _$MainResponseToJson(MainResponse instance) =>
     <String, dynamic>{
       'message': instance.message,
       'data': instance.data,
+      'success': instance.success,
     };
 
 MainInfo _$MainInfoFromJson(Map<String, dynamic> json) => MainInfo(

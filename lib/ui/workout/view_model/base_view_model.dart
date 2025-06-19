@@ -37,6 +37,8 @@ class BaseViewModel extends ChangeNotifier {
 
   List<WorkoutInfo>? _workout;
 
+  Map<int, String> _updatedComments = {};
+
   set workout(List<WorkoutInfo>? value) {
     _workout = value;
   }
@@ -127,12 +129,13 @@ class BaseViewModel extends ChangeNotifier {
   void onWorkoutNotesClicked(BuildContext context, HistoryInfo history) async {
     final parsed = DateTime.parse(history.date);
     final dayName = '${history.day} ${DateFormat('dd.MM.yy').format(parsed)}';
+    final initialText = _updatedComments[history.itemId] ?? history.comment ?? '';
 
     final params = TextEditingScreenParams(
       title: 'ЗАМЕТКА $dayName',
-      initialText: history.comment ?? '',
+      initialText: initialText,
       onTextUpdated: (newText) async {
-        _updateNoteComment(history.itemId, newText);
+        await _updateNoteComment(history.itemId, newText);
         return Result.ok(true);
       },
     );
@@ -142,32 +145,16 @@ class BaseViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> _updateNoteComment(int itemId, String newComment) async {
 
-  void _updateNoteComment(int itemId, String newComment) async {
-    bool updated = false;
-    for (final workout in _workout ?? []) {
-      for (final exercise in workout.items) {
-        final history = exercise.history.firstWhereOrNull(
-              (h) => h.itemId == itemId,
-        );
-        if (history != null) {
-          final updatedHistory = HistoryInfo(history.day, history.date, history.values, newComment, history.itemId);
-          final index = exercise.history.indexOf(history);
-          exercise.history[index] = updatedHistory;
-          updated = true;
-          notifyListeners();
-          break;
-        }
-      }
-      if (updated) break;
-    }
+    _updatedComments[itemId] = newComment;
+    notifyListeners();
+
     try {
-      await workoutRepository.updateWorkoutComment(
-        itemId,
-        WorkoutComment(comment: newComment),
-      );
+      await workoutRepository.updateWorkoutComment(itemId, WorkoutComment(comment: newComment));
     } catch (e) {
-      debugPrint('Ошибка при отправке комментария: $e');
+      _updatedComments.remove(itemId);
+      notifyListeners();
     }
   }
 
@@ -197,8 +184,11 @@ class BaseViewModel extends ChangeNotifier {
         title = value.date.toWeekdayWithDate();
         resultStrings.add(DayResultInfo(value.id, '${DoubleFormatter(value.weight).formatDouble()}/${value.repeats}'));
       }
-      result.add(SimpleResultsDayInfo(title ?? '${history.day} ${history.date}', resultStrings, history),
-      );
+
+      final updatedComment = _updatedComments[history.itemId] ?? history.comment;
+      final updatedHistory = HistoryInfo(history.day, history.date, history.values, updatedComment, history.itemId);
+
+      result.add(SimpleResultsDayInfo(title ?? '${history.day} ${history.date}', resultStrings, updatedHistory));
     }
     return result;
   }

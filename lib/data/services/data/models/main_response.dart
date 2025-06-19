@@ -5,9 +5,13 @@ part 'main_response.g.dart';
 
 @JsonSerializable()
 class MainResponse extends BaseResponse {
-  MainResponse(super.message, this.data);
+  MainResponse(super.message, this.success, this.data);
 
   final MainInfo data;
+
+  final bool? success;
+
+  bool get isSuccess => success ?? true;
 
   factory MainResponse.fromJson(Map<String, dynamic> json) => _$MainResponseFromJson(json);
 

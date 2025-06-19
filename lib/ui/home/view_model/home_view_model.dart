@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -17,6 +18,7 @@ import 'package:level_up/utils/result.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../config/home_banners_assets.dart';
 import '../../../data/services/data/models/main_response.dart';
+import '../../../data/services/data/models/refresh_response.dart';
 import '../../../utils/misc_utils.dart';
 import '../../core/common_widgets/level_up_button.dart';
 import '../../core/themes/text_styles.dart';
@@ -42,7 +44,11 @@ class HomeViewModel extends ChangeNotifier {
   UserProfileExtendedResponse? _profile;
   MainInfo? _mainInfo;
 
+  Timer? _refreshTimer;
+  bool _isTimerActive = false;
+
   late int _planType;
+
   int get planType => _planType;
 
   DateTime? _paidUntil;
@@ -50,6 +56,7 @@ class HomeViewModel extends ChangeNotifier {
   DateTime? get paidUntil => _paidUntil;
 
   late bool _isExpiredDate;
+
   bool get isExpiredDate => _isExpiredDate;
 
   late final String trainingImage = HomeBannersAssets.getRandomTrainingImage();
@@ -91,6 +98,51 @@ class HomeViewModel extends ChangeNotifier {
     }
     _isLoading = false;
     notifyListeners();
+  }
+
+  void startRefreshTimer() {
+    if (_isTimerActive) return;
+    _isTimerActive = true;
+
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(
+      const Duration(seconds: 15),
+          (_) => _checkRefresh(),
+    );
+  }
+
+  void stopRefreshTimer() {
+    _refreshTimer?.cancel();
+    _refreshTimer = null;
+    _isTimerActive = false;
+  }
+
+  Future<void> _checkRefresh() async {
+    try {
+      final result = await dataRepository.checkRefresh();
+      switch (result) {
+        case Ok<RefreshResponse>():
+          if (result.value.isNeedToRefresh) {
+            await _loadMainInfo(null);
+          }
+        case Error<RefreshResponse>():
+      }
+    } catch (_) {}
+  }
+
+  Future<T?> retryUntilSuccess<T>(Future<T> Function() request, {
+    Duration delay = const Duration(seconds: 3),
+    int maxAttempts = 5,
+  }) async {
+    int attempts = 0;
+    while (true) {
+      try {
+        return await request();
+      } catch (_) {
+        if (++attempts >= maxAttempts) return null;
+        await Future.delayed(delay);
+      }
+    }
   }
 
   Future<void> reloadMainInfo(BuildContext context) async {
@@ -169,8 +221,10 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void onStartWorkoutClicked(BuildContext context) async {
+    stopRefreshTimer();
     final dayIndex = (_selectedDayIndex ?? DateTime.now().weekday - 1) + 1;
     final result = await GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.workoutPath, extra: dayIndex) as bool?;
+    startRefreshTimer();
     if ((result ?? false) && context.mounted) {
       await _loadMainInfo(context);
       notifyListeners();
@@ -178,12 +232,20 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void onRatingClicked(BuildContext context) {
-    GoRouter.of(context).go(LevelUpRouter.homePath + LevelUpRouter.ratingPath);
+    stopRefreshTimer();
+    GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.ratingPath)
+        .then((_) {
+      startRefreshTimer();
+    });
   }
 
   void onMeasurementsClicked(BuildContext context) {
+    stopRefreshTimer();
     final params = TextEditingScreenParams(title: 'Замеры', initialText: _profile?.data.measurements ?? "", onTextUpdated: _updateMeasurements);
-    GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params);
+    GoRouter.of(context).push(LevelUpRouter.textEditingPath, extra: params)
+        .then((_) {
+      startRefreshTimer();
+    });
   }
 
   void onChatClicked() {
@@ -191,14 +253,18 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void onProfileClicked(BuildContext context) {
+    stopRefreshTimer();
     final hasPlan = hasWorkoutPlan;
     GoRouter.of(context).push(
       LevelUpRouter.homePath + LevelUpRouter.profilePreferencesPath,
       extra: hasPlan,
-    );
+    ).then((_) {
+      startRefreshTimer();
+    });
   }
 
   void logout(BuildContext context) async {
+    stopRefreshTimer();
     _isLoading = true;
     notifyListeners();
     final result = await GetIt.I<IAuthRepository>().logout();
@@ -231,24 +297,27 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<bool> _loadProfile(BuildContext? context) async {
-    final profile = await profileRepository.getProfile();
-    switch (profile) {
-      case Ok<UserProfileExtendedResponse>():
-        _profile = profile.value;
-        _planType = _profile!.data.planType;
-        if (_profile!.data.paidUntil != null) {
-          // _paidUntil = DateFormat("yyyy-MM-dd").parse('2025-06-16');
-          _paidUntil = DateFormat("yyyy-MM-dd").parse(_profile!.data.paidUntil!);
-          _isExpiredDate = DateTime.now().isAfter(_paidUntil!);
-        }
-        return true;
-      case Error<UserProfileExtendedResponse>():
-        if (context != null && context.mounted) {
-          ErrorUtils.showError(context, profile.error.getErrorMessage());
-          return false;
-        }
+    final profile = await retryUntilSuccess(() async {
+      final response = await profileRepository.getProfile();
+      return switch (response) {
+        Ok<UserProfileExtendedResponse> r => r.value,
+        Error<UserProfileExtendedResponse> e => throw e.error,
+      };
+    });
+    if (profile != null) {
+      _profile = profile;
+      _planType = profile.data.planType;
+      if (profile.data.paidUntil != null) {
+        _paidUntil = DateFormat("yyyy-MM-dd").parse(profile.data.paidUntil!);
+        _isExpiredDate = DateTime.now().isAfter(_paidUntil!);
+      }
+      return true;
+    } else {
+      if (context != null && context.mounted) {
+        ErrorUtils.showError(context, 'Не удалось загрузить профиль');
+      }
+      return false;
     }
-    return false;
   }
 
   void _showFinalDialog(BuildContext screenContext) {
@@ -299,13 +368,22 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<void> _loadMainInfo(BuildContext? context) async {
-    final mainInfo = await dataRepository.getMainInfo();
-    switch (mainInfo) {
-      case Ok<MainResponse>():
-        _mainInfo = mainInfo.value.data;
-      case Error<MainResponse>():
+    final result = await retryUntilSuccess<MainResponse>(() async {
+      final response = await dataRepository.getMainInfo();
+      return switch (response) {
+        Ok<MainResponse> r => r.value,
+        Error<MainResponse> e => throw e.error,
+      };
+    });
 
-        _mainInfo = _emptyMainInfo();
+    if (result != null) {
+      _mainInfo = result.data;
+      startRefreshTimer();
+    } else {
+      _mainInfo = _emptyMainInfo();
+      if (context != null && context.mounted) {
+        ErrorUtils.showError(context, 'Не удалось загрузить данные');
+      }
     }
     initSelectedDayIndex();
     notifyListeners();
