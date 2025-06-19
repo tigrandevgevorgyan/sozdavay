@@ -181,7 +181,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
       case Ok<UserProfileShortResponse>():
         if (context.mounted) {
           await dataRepository.getMainInfo();
-          GoRouter.of(context).go(LevelUpRouter.homePath);
+          GoRouter.of(context).pop();
         }
       case Error<UserProfileShortResponse>():
         if (context.mounted) {

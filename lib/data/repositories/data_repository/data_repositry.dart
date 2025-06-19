@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:level_up/data/services/data/models/rating_response.dart';
+import 'package:level_up/data/services/data/models/refresh_response.dart';
 import 'package:level_up/utils/result.dart';
 import '../../services/data/data_service.dart';
 import '../../services/data/models/main_response.dart';
@@ -10,6 +11,8 @@ abstract class IDataRepository {
   Future<Result<RatingResponse>> getRatingInfoFiltered(int category, int periods);
 
   Future<Result<RatingResponse>> getRatingInfo();
+
+  Future<Result<RefreshResponse>> checkRefresh();
 }
 
 class DataRepositoryImpl extends IDataRepository {
@@ -54,6 +57,16 @@ class DataRepositoryImpl extends IDataRepository {
   Future<Result<RatingResponse>> getRatingInfo() async {
     try {
       final result = await dataService.getRating();
+      return Result.ok(result);
+    } on DioException catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<RefreshResponse>> checkRefresh() async{
+    try{
+      final result = await dataService.checkRefresh();
       return Result.ok(result);
     } on DioException catch (e) {
       return Result.error(e);
