@@ -124,6 +124,7 @@ class HomeViewModel extends ChangeNotifier {
         case Ok<RefreshResponse>():
           if (result.value.isNeedToRefresh) {
             await _loadMainInfo(null);
+            notifyListeners();
           }
         case Error<RefreshResponse>():
       }
