@@ -215,8 +215,9 @@ class BaseViewModel extends ChangeNotifier {
   String getWorkoutString(ExerciseInfo exerciseInfo) {
     if (exerciseInfo.sets.isEmpty) return '';
 
-    return exerciseInfo.sets
-        .map((set) {
+      final Map<String, bool> grouped = {};
+
+        for (final set in exerciseInfo.sets) {
           final setsCount = set.setsCount?.abs() ?? 0;
           final from = set.repeatsFrom?.abs();
           final to = set.repeatsTo?.abs();
@@ -237,12 +238,17 @@ class BaseViewModel extends ChangeNotifier {
             repeatsText = '-';
           }
 
-          final hardText = isHard ? '\n1 в отказ' : '';
+          final sets = '$setsCount по $repeatsText';
 
-          return '$setsCount по $repeatsText$hardText';
-        })
-        .where((s) => s.isNotEmpty)
-        .join('\n\n');
+          grouped[sets] = grouped.containsKey(sets)
+              ? grouped[sets]! || isHard
+              : isHard;
+        }
+
+        return grouped.entries.map((entry) {
+          final hardText = entry.value ? '\n1 в отказ' : '';
+          return '${entry.key}$hardText';
+        }).join('\n\n');
   }
 
   String getRangeString(int minValue, int maxValue) {
