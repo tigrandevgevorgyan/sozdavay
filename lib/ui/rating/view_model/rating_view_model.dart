@@ -119,12 +119,9 @@ class RatingViewModel extends ChangeNotifier {
   }
 
   Future<void> _tryLoadFilteredRating(BuildContext context) async {
-    if (_categorySelection == null || _periodSelection == null) {
-      return;
-    }
     _isLoading = true;
     notifyListeners();
-    final result = await dataRepository.getRatingInfoFiltered(_categorySelection!, _periodSelection!);
+    final result = await dataRepository.getRatingInfoFiltered(_categorySelection ?? 0, _periodSelection ?? 0);
     switch (result) {
       case Ok<RatingResponse>():
         _ratingInfo = result.value;
