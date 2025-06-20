@@ -34,6 +34,8 @@ class _ComplexWorkoutScreenState extends State<ComplexWorkoutScreen> {
     return ChangeNotifierProvider(
       create: (context) => ComplexViewModel(context),
       child: Consumer<ComplexViewModel>(builder: (context, provider, _) {
+        final videoLinks = widget.workoutInfo.items.first.getVideoLinks();
+        final hasVideos = videoLinks.isNotEmpty;
         return Column(
           children: [
             WorkoutTopBar(
@@ -48,6 +50,7 @@ class _ComplexWorkoutScreenState extends State<ComplexWorkoutScreen> {
                   child: Column(
                     children: [
                       SizedBox(height: 10),
+                      if (hasVideos)
                       IntrinsicHeight(
                         child: Row(
                           children: [

@@ -69,7 +69,8 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                       SizedBox(height: 4),
                                       LevelUpContainer(
                                         height: 62,
-                                        child: Text(provider.getWorkoutString(workoutInfo.items.first), style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor)),
+                                        child: SingleChildScrollView(
+                                            child: Text(provider.getWorkoutString(workoutInfo.items.first), style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor))),
                                       ),
                                     ],
                                   ),
@@ -91,7 +92,10 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Text(provider.getWorkoutString(workoutInfo.items.last), style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor)),
+                                              Expanded(
+                                                child: SingleChildScrollView(
+                                                    child: Text(provider.getWorkoutString(workoutInfo.items.last), style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor))),
+                                              ),
                                             ],
                                           )),
                                     ],
