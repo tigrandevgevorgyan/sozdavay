@@ -259,7 +259,10 @@ class HomeViewModel extends ChangeNotifier {
     GoRouter.of(context).push(
       LevelUpRouter.homePath + LevelUpRouter.profilePreferencesPath,
       extra: hasPlan,
-    ).then((_) {
+    ).then((result) {
+      if (result == true) {
+        _loadMainInfo(context);
+      }
       startRefreshTimer();
     });
   }

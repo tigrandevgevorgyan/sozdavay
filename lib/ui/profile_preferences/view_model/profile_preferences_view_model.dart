@@ -9,6 +9,7 @@ import 'package:level_up/ui/core/common_widgets/options_dialog.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 import '../../../data/repositories/data_repository/data_repositry.dart';
+import '../../../data/services/data/models/main_response.dart';
 
 class ProfilePreferencesViewModel extends ChangeNotifier {
   final IProfileRepository profileRepository;
@@ -180,8 +181,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
     switch (result) {
       case Ok<UserProfileShortResponse>():
         if (context.mounted) {
-          await dataRepository.getMainInfo();
-          GoRouter.of(context).pop();
+          GoRouter.of(context).pop(true);
         }
       case Error<UserProfileShortResponse>():
         if (context.mounted) {

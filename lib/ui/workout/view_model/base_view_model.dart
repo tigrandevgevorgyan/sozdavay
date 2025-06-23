@@ -223,8 +223,14 @@ class BaseViewModel extends ChangeNotifier {
           final to = set.repeatsTo?.abs();
           final isHard = (set.asMuchAsPossible ?? 0) == 1;
 
+          if ((from ?? 0) == 0 && (to ?? 0) == 0 && isHard) {
+            final sets = '$setsCount в отказ';
+            grouped[sets] = true;
+            continue;
+          }
+
           if (setsCount == 0 || ((from ?? 0) == 0 && (to ?? 0) == 0)) {
-            return '';
+            continue;
           }
 
           String repeatsText;
@@ -246,7 +252,8 @@ class BaseViewModel extends ChangeNotifier {
         }
 
         return grouped.entries.map((entry) {
-          final hardText = entry.value ? '\n1 в отказ' : '';
+          final alreadyHasHard = entry.key.endsWith('в отказ');
+          final hardText = (entry.value && !alreadyHasHard) ? '\n1 в отказ' : '';
           return '${entry.key}$hardText';
         }).join('\n\n');
   }
