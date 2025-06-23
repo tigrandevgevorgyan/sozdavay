@@ -30,6 +30,9 @@ WorkoutInfo _$WorkoutInfoFromJson(Map<String, dynamic> json) => WorkoutInfo(
       (json['items'] as List<dynamic>)
           .map((e) => ExerciseInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
+      (json['superset_repeats_from'] as num?)?.toInt(),
+      (json['superset_repeats_to'] as num?)?.toInt(),
+      json['superset_as_much_as_possible'] as bool?,
     );
 
 Map<String, dynamic> _$WorkoutInfoToJson(WorkoutInfo instance) =>
@@ -38,6 +41,9 @@ Map<String, dynamic> _$WorkoutInfoToJson(WorkoutInfo instance) =>
       'is_double': instance.isDouble,
       'is_complex': instance.isComplex,
       'is_time': instance.isTime,
+      'superset_repeats_from': instance.supersetRepeatsFrom,
+      'superset_repeats_to': instance.supersetRepeatsTo,
+      'superset_as_much_as_possible': instance.supersetAsMuchAsPossible,
       'items': instance.items,
     };
 

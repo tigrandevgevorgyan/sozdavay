@@ -215,7 +215,7 @@ class BaseViewModel extends ChangeNotifier {
   String getWorkoutString(ExerciseInfo exerciseInfo) {
     if (exerciseInfo.sets.isEmpty) return '';
 
-      final Map<String, bool> grouped = {};
+      final Map<String, Map<String, int>> grouped = {};
 
         for (final set in exerciseInfo.sets) {
           final setsCount = set.setsCount?.abs() ?? 0;
@@ -224,8 +224,10 @@ class BaseViewModel extends ChangeNotifier {
           final isHard = (set.asMuchAsPossible ?? 0) == 1;
 
           if ((from ?? 0) == 0 && (to ?? 0) == 0 && isHard) {
-            final sets = '$setsCount в отказ';
-            grouped[sets] = true;
+            final sets = '$setsCount по -';
+            grouped.putIfAbsent(sets, () => {'total': 0, 'hard': 0});
+            grouped[sets]!['total'] = grouped[sets]!['total']! + setsCount;
+            grouped[sets]!['hard'] = grouped[sets]!['hard']! + setsCount;
             continue;
           }
 
@@ -246,16 +248,60 @@ class BaseViewModel extends ChangeNotifier {
 
           final sets = '$setsCount по $repeatsText';
 
-          grouped[sets] = grouped.containsKey(sets)
-              ? grouped[sets]! || isHard
-              : isHard;
+          grouped.putIfAbsent(sets, () => {'total': 0, 'hard': 0});
+          grouped[sets]!['total'] = grouped[sets]!['total']! + setsCount;
+          if (isHard) {
+            grouped[sets]!['hard'] = grouped[sets]!['hard']! + 1;
+          }
         }
 
         return grouped.entries.map((entry) {
-          final alreadyHasHard = entry.key.endsWith('в отказ');
-          final hardText = (entry.value && !alreadyHasHard) ? '\n1 в отказ' : '';
-          return '${entry.key}$hardText';
+          final data = entry.value;
+          final total = data['total']!;
+          final hard = data['hard']!;
+          final normal = total - hard;
+
+          final resultLines = <String>[];
+
+          if (normal > 0) {
+          final baseText = entry.key.replaceFirst(RegExp(r'^\d+'), normal.toString());
+            resultLines.add(baseText);
+          }
+          if (hard > 0) {
+            resultLines.add('$hard в отказ');
+          }
+          return resultLines.join('\n');
+
         }).join('\n\n');
+  }
+
+  String getSupersetWorkoutString(WorkoutInfo workoutInfo) {
+    final from = workoutInfo.supersetRepeatsFrom;
+    final to = workoutInfo.supersetRepeatsTo;
+    final isHard = workoutInfo.supersetAsMuchAsPossible == true;
+    final setsCount = workoutInfo.items[1].sets.first.setsCount ?? 0;
+
+    if (setsCount == 0) {
+      return '';
+    }
+
+    if ((from ?? 0) == 0 && (to ?? 0) == 0 && isHard) {
+      return '$setsCount в отказ';
+    }
+
+    if ((from ?? 0) == 0 && (to ?? 0) == 0) {
+      return '';
+    }
+
+    final repeatsText = from != null && to != null
+        ? (from == to ? '$from' : '$from–$to')
+        : (from ?? to ?? '-').toString();
+
+    final baseText = '${isHard ? setsCount - 1 : setsCount} по $repeatsText';
+
+    final hardText = isHard ? '\n1 в отказ' : '';
+
+    return '$baseText$hardText';
   }
 
   String getRangeString(int minValue, int maxValue) {
