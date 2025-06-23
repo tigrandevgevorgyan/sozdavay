@@ -19,10 +19,25 @@ import 'package:level_up/utils/misc_utils.dart';
 import 'package:provider/provider.dart';
 import '../../../utils/weight_formatters.dart';
 
-class DoubleWorkoutScreen extends StatelessWidget {
+class DoubleWorkoutScreen extends StatefulWidget {
   const DoubleWorkoutScreen({super.key, required this.workoutInfo});
 
   final WorkoutInfo workoutInfo;
+
+  @override
+  State<DoubleWorkoutScreen> createState() => _DoubleWorkoutScreenState();
+}
+
+class _DoubleWorkoutScreenState extends State<DoubleWorkoutScreen> {
+  final ScrollController _firstScrollController = ScrollController();
+  final ScrollController _secondScrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _firstScrollController.dispose();
+    _secondScrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,12 +49,12 @@ class DoubleWorkoutScreen extends StatelessWidget {
           body: Column(
             children: [
               WorkoutTopBar(
-                isRefreshVisible: workoutInfo.items.first.exerciseCount > 1,
-                isSecondRefreshVisible: workoutInfo.items.last.exerciseCount > 1,
+                isRefreshVisible: widget.workoutInfo.items.first.exerciseCount > 1,
+                isSecondRefreshVisible: widget.workoutInfo.items.last.exerciseCount > 1,
                 isUpdatingFirstExercise: provider.isUpdatingExercise,
                 isUpdatingSecondExercise: provider.isUpdatingSecondExercise,
-                firstExerciseName: workoutInfo.items.first.name,
-                secondExerciseName: workoutInfo.items.last.name,
+                firstExerciseName: widget.workoutInfo.items.first.name,
+                secondExerciseName: widget.workoutInfo.items.last.name,
                 onFirstExerciseRefresh: () => provider.changeExercise(context, second: false),
                 onSecondExerciseRefresh: () => provider.onChangeSecondExercise(context),
               ),
@@ -62,15 +77,23 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                     children: [
                                       AspectRatio(
                                         aspectRatio: 9 / 16,
-                                        child: workoutInfo.items.first.getFirstVideoLink() != null
-                                            ? VideoPlayerCard(videoUrl: workoutInfo.items.first.getFirstVideoLink()!)
+                                        child: widget.workoutInfo.items.first.getFirstVideoLink() != null
+                                            ? VideoPlayerCard(videoUrl: widget.workoutInfo.items.first.getFirstVideoLink()!)
                                             : EmptyVideoPlaceholder(),
                                       ),
                                       SizedBox(height: 4),
                                       LevelUpContainer(
                                         height: 62,
-                                        child: SingleChildScrollView(
-                                            child: Text(provider.getWorkoutString(workoutInfo.items.first), style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor))),
+                                        child: Scrollbar(
+                                          controller: _firstScrollController,
+                                          thumbVisibility: true,
+                                          child: SingleChildScrollView(
+                                              controller: _firstScrollController,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(right: 20.0),
+                                                child: Text(provider.getWorkoutString(widget.workoutInfo.items.first), style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor)),
+                                              )),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -82,33 +105,38 @@ class DoubleWorkoutScreen extends StatelessWidget {
                                     children: [
                                       AspectRatio(
                                         aspectRatio: 9 / 16,
-                                        child: workoutInfo.items.last.getFirstVideoLink() != null
-                                            ? VideoPlayerCard(videoUrl: workoutInfo.items.last.getFirstVideoLink()!)
+                                        child: widget.workoutInfo.items.last.getFirstVideoLink() != null
+                                            ? VideoPlayerCard(videoUrl: widget.workoutInfo.items.last.getFirstVideoLink()!)
                                             : EmptyVideoPlaceholder(),
                                       ),
                                       SizedBox(height: 4),
                                       LevelUpContainer(
                                           height: 62,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Expanded(
-                                                child: SingleChildScrollView(
-                                                    child: Text(provider.getWorkoutString(workoutInfo.items.last), style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor))),
+                                                child: Scrollbar(
+                                                  controller: _secondScrollController,
+                                                  thumbVisibility: true,
+                                                  child: SingleChildScrollView(
+                                                    controller: _secondScrollController,
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.only(right: 20.0),
+                                                          child: Text(
+                                                            provider.getSupersetWorkoutString(widget.workoutInfo),
+                                                            style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor),
+                                                          )
+                                                      ),
+                                                ),
                                               ),
-                                            ],
-                                          )),
-                                    ],
+                                      )],
                                   ),
                                 )
                               ],
                             ),
                             SizedBox(height: 4),
                             HorizontalTimer(
-                              title: provider.getRestString(workoutInfo.items.last),
+                              title: provider.getRestString(widget.workoutInfo.items.last),
                               secondsToCount: max(
-                                workoutInfo.items.first.restSeconds ?? 0,
-                                workoutInfo.items.last.restSeconds ?? 0,
+                                widget.workoutInfo.items.first.restSeconds ?? 0,
+                                widget.workoutInfo.items.last.restSeconds ?? 0,
                               ),
                             ),
                             SizedBox(height: 8),
@@ -154,10 +182,10 @@ class DoubleWorkoutScreen extends StatelessWidget {
                             child: Center(child: LevelUpLoader()),
                           )
                         : SliverList.builder(
-                            itemCount: max(workoutInfo.items.first.history.length, workoutInfo.items.last.history.length),
+                            itemCount: max(widget.workoutInfo.items.first.history.length, widget.workoutInfo.items.last.history.length),
                             itemBuilder: (context, index) {
-                              final firstHistoryItem = workoutInfo.items.first.history.elementAtOrNull(index);
-                              final secondHistoryItem = workoutInfo.items.last.history.elementAtOrNull(index);
+                              final firstHistoryItem = widget.workoutInfo.items.first.history.elementAtOrNull(index);
+                              final secondHistoryItem = widget.workoutInfo.items.last.history.elementAtOrNull(index);
                               final firstDate = firstHistoryItem?.values.firstOrNull?.date;
                               final secondDate = secondHistoryItem?.values.firstOrNull?.date;
                               final titleFirst = firstDate?.toWeekdayWithDate();

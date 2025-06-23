@@ -30,9 +30,18 @@ class WorkoutInfo {
   @JsonKey(name: 'is_time')
   final bool isTime;
 
+  @JsonKey(name: 'superset_repeats_from')
+  final int? supersetRepeatsFrom;
+
+  @JsonKey(name: 'superset_repeats_to')
+  final int? supersetRepeatsTo;
+
+  @JsonKey(name: 'superset_as_much_as_possible')
+  final bool? supersetAsMuchAsPossible;
+
   final List<ExerciseInfo> items;
 
-  WorkoutInfo(this.index, this.isDouble, this.isComplex, this.isTime, this.items);
+  WorkoutInfo(this.index, this.isDouble, this.isComplex, this.isTime, this.items, this.supersetRepeatsFrom, this.supersetRepeatsTo, this.supersetAsMuchAsPossible);
 
   factory WorkoutInfo.fromJson(Map<String, dynamic> json) => _$WorkoutInfoFromJson(json);
 
