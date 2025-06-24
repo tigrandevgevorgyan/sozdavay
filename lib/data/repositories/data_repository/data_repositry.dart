@@ -56,7 +56,13 @@ class DataRepositoryImpl extends IDataRepository {
   @override
   Future<Result<RatingResponse>> getRatingInfo() async {
     try {
-      final result = await dataService.getRating();
+      String json = '''
+       {
+         "customer": 0,
+         "category": 0,
+         "period": 3
+       }''';
+      final result = await dataService.getRatingFiltered(json);
       return Result.ok(result);
     } on DioException catch (e) {
       return Result.error(e);

@@ -82,10 +82,17 @@ class RatingViewModel extends ChangeNotifier {
         final categories = result.value.categories;
         _categoryDialogContent.setOptions(categories);
         _categoryDialogContent.prependAllOption(name: 'Все категории', id: 0);
+        _categorySelection = 0;
 
-        _periodDialogContent.setOptions(
-          result.value.periods.map((period) => period.toIdNamePair()).toList(),
-        );
+        final periodOptions = result.value.periods
+            .map((period) {
+          final newName = period.label == 'Год' ? 'Сезон' : period.label;
+          return IdNamePairWithPriority(period.id, newName);
+            }).toList();
+
+        _periodDialogContent.setOptions(periodOptions);
+        _periodSelection = _periodDialogContent.getIdByValue('Сезон');
+
         _generateLocalRating();
       case Error<RatingResponse>():
         if (context.mounted) {

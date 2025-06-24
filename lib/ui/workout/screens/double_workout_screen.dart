@@ -89,8 +89,7 @@ class _DoubleWorkoutScreenState extends State<DoubleWorkoutScreen> {
                                           thumbVisibility: true,
                                           child: SingleChildScrollView(
                                               controller: _firstScrollController,
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(right: 20.0),
+                                              child: Center(
                                                 child: Text(provider.getWorkoutString(widget.workoutInfo.items.first), style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor)),
                                               )),
                                         ),
@@ -117,8 +116,7 @@ class _DoubleWorkoutScreenState extends State<DoubleWorkoutScreen> {
                                                   thumbVisibility: true,
                                                   child: SingleChildScrollView(
                                                     controller: _secondScrollController,
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.only(right: 20.0),
+                                                      child: Center(
                                                           child: Text(
                                                             provider.getSupersetWorkoutString(widget.workoutInfo),
                                                             style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor),
@@ -133,6 +131,7 @@ class _DoubleWorkoutScreenState extends State<DoubleWorkoutScreen> {
                             ),
                             SizedBox(height: 4),
                             HorizontalTimer(
+                              key: UniqueKey(),
                               title: provider.getRestString(widget.workoutInfo.items.last),
                               secondsToCount: max(
                                 widget.workoutInfo.items.first.restSeconds ?? 0,
@@ -234,7 +233,7 @@ class _DoubleWorkoutScreenState extends State<DoubleWorkoutScreen> {
 
   List<DayResultInfo> generateSingleDayResult(HistoryInfo historyInfo) {
     List<DayResultInfo> result = [];
-    for (ResultValue value in historyInfo.values) {
+    for (ResultValue value in historyInfo.values.reversed) {
       result.add(DayResultInfo(value.id, '${DoubleFormatter(value.weight).formatDouble()}/${value.repeats}'));
     }
     return result;

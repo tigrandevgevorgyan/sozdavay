@@ -11,6 +11,7 @@ import 'package:level_up/ui/core/common_widgets/level_up_text_field.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/ui/signin/view_model/signin_view_model.dart';
+import 'package:level_up/utils/phone_formatter.dart';
 import 'package:level_up/utils/phone_mask_formatter.dart';
 import 'package:provider/provider.dart';
 
@@ -46,7 +47,10 @@ class SignInScreen extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 3),
                         child: Text("+7", style: Style.ablation15w900),
                       ),
-                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[+0-9]')), PhoneMaskFormatter()],
+                      inputFormatters: [
+                        PhoneFormatter(),
+                        FilteringTextInputFormatter.allow(RegExp(r'[+0-9]')),
+                        PhoneMaskFormatter()],
                     ),
                     SizedBox(height: 12),
                     LevelUpTextField(
