@@ -73,6 +73,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                                           child: Column(
                                             children: [
                                               SquareTimer(
+                                                key: UniqueKey(),
                                                 title: provider.getRestString(workoutInfo.items.first),
                                                 secondsDuration: workoutInfo.items.first.restSeconds ?? 0,
                                                 haveRest: (workoutInfo.items.first.restSeconds ?? 0) > 0,

@@ -103,4 +103,35 @@ class WorkoutSets {
 
   factory WorkoutSets.fromJson(Map<String, dynamic> json) => _$WorkoutSetsFromJson(json);
   Map<String, dynamic> toJson() => _$WorkoutSetsToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is WorkoutSets &&
+              runtimeType == other.runtimeType &&
+              id == other.id &&
+              itemId == other.itemId &&
+              exerciseId == other.exerciseId &&
+              weight == other.weight &&
+              repeats == other.repeats &&
+              difficult == other.difficult &&
+              time == other.time &&
+              date == other.date &&
+              comment == other.comment &&
+              action == other.action;
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    itemId,
+    exerciseId,
+    weight,
+    repeats,
+    difficult,
+    time,
+    date,
+    comment,
+    action,
+  );
+
 }

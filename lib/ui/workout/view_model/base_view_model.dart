@@ -180,7 +180,7 @@ class BaseViewModel extends ChangeNotifier {
     for (HistoryInfo history in exerciseInfo.history) {
       List<DayResultInfo> resultStrings = [];
       String? title;
-      for (ResultValue value in history.values) {
+      for (ResultValue value in history.values.reversed) {
         title = value.date.toWeekdayWithDate();
         resultStrings.add(DayResultInfo(value.id, '${DoubleFormatter(value.weight).formatDouble()}/${value.repeats}'));
       }

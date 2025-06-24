@@ -21,6 +21,7 @@ class RatingScreen extends StatelessWidget {
       child: Consumer<RatingViewModel>(builder: (context, provider, _) {
         return Scaffold(
           appBar: AppBar(
+            backgroundColor: AppColors.backgroundColor,
             title: Text('Рейтинг', style: Style.ablation18w900),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(
@@ -31,8 +32,7 @@ class RatingScreen extends StatelessWidget {
           backgroundColor: AppColors.backgroundColor,
           body: provider.isLoading
               ? Center(child: LevelUpLoader())
-              : SingleChildScrollView(
-                  child: Padding(
+              : Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,28 +73,29 @@ class RatingScreen extends StatelessWidget {
                             ? Center(
                                 child: Text('Ничего не найдено', style: Style.outfit16w400),
                               )
-                            : ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: provider.ratings.length,
-                                itemBuilder: (context, index) {
-                                  PersonRating currentRating = provider.ratings[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 5),
-                                    child: ProfileTile(
-                                      name: currentRating.name,
-                                      position: currentRating.position,
-                                      score: currentRating.rating,
-                                      tierName: currentRating.tier,
-                                      isMyProfile: currentRating.isMyProfile,
-                                    ),
-                                  );
-                                },
-                              ),
+                            : Expanded(
+                              child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: provider.ratings.length,
+                                  itemBuilder: (context, index) {
+                                    PersonRating currentRating = provider.ratings[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 5),
+                                      child: ProfileTile(
+                                        name: currentRating.name,
+                                        position: currentRating.position,
+                                        score: currentRating.rating,
+                                        tierName: currentRating.tier,
+                                        isMyProfile: currentRating.isMyProfile,
+                                      ),
+                                    );
+                                  },
+                                ),
+                            ),
                         SizedBox(height: 10),
                       ],
                     ),
                   ),
-                ),
         );
       }),
     );

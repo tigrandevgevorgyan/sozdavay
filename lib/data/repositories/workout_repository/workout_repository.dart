@@ -118,11 +118,12 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
 
     try {
       await _tryWithRetry(
-        () => _workoutService.addSetResult(exerciseId, itemId, weight, repeats, difficult, time, date),
+            () => _workoutService.addSetResult(exerciseId, itemId, weight, repeats, difficult, time, date),
         onRetryError: (_) async {
           await _localStorage.saveOfflineOperation(offlineSet);
         },
       );
+      await _localStorage.removeOfflineOperation(offlineSet);
       return Result.ok(<WorkoutInfo>[]);
     } catch (e) {
       return Result.ok([]);
@@ -135,11 +136,12 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
 
     try {
       await _tryWithRetry(
-        () => _workoutService.updateSetResult(id, exerciseId, weight, repeats, difficult, time),
+            () => _workoutService.updateSetResult(id, exerciseId, weight, repeats, difficult, time),
         onRetryError: (e) async {
           await _localStorage.saveOfflineOperation(offlineSet);
         },
       );
+      await _localStorage.removeOfflineOperation(offlineSet);
       return Result.ok(<WorkoutInfo>[]);
     } catch (e) {
       return Result.ok([]);
@@ -185,7 +187,7 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
         }
         await _localStorage.removeOfflineOperation(set);
       } catch (e) {
-        return;
+        continue;
       }
     }
   }
@@ -195,11 +197,12 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
     final offlineSet = WorkoutSets.delete(id: id);
     try {
       await _tryWithRetry(
-        () => _workoutService.deleteSetResult(id),
+            () => _workoutService.deleteSetResult(id),
         onRetryError: (_) async {
           await _localStorage.saveOfflineOperation(offlineSet);
         },
       );
+      await _localStorage.removeOfflineOperation(offlineSet);
       return Result.ok(<WorkoutInfo>[]);
     } catch (e) {
       return Result.ok([]);

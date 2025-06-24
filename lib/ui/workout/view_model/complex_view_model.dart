@@ -73,7 +73,7 @@ class ComplexViewModel extends BaseViewModel {
     String? title;
     for (HistoryInfo history in exerciseInfo.history) {
       List<DayResultInfo> resultStrings = [];
-      for (ResultValue value in history.values) {
+      for (ResultValue value in history.values.reversed) {
         resultStrings.add(DayResultInfo(
           value.id,
           isTime ? value.time.toString() : value.repeats.toString(),
