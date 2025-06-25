@@ -34,8 +34,7 @@ class DioClient {
     interceptors.add(LogInterceptor(request: false, requestBody: true, requestHeader: true, responseBody: true, responseHeader: false, logPrint: (text) => print('$text')));
     interceptors.add(InterceptorsWrapper(onResponse: (response, handler) async {
       if (response.data.toString().toLowerCase().contains('пользователь не найден')) {
-        await GetIt.I<IAuthRepository>().deauthorize();
-        GoRouter.of(LevelUpRouter.instance.context).go(LevelUpRouter.splashPath);
+        return handler.reject(UserNotFoundError(response), true);
       }
       return handler.next(response);
     }));
@@ -53,3 +52,14 @@ extension ErrorParsing on Exception {
     return toString().replaceAll('Exception:', '');
   }
 }
+
+class UserNotFoundError extends DioException {
+  UserNotFoundError(Response response)
+      : super(
+    requestOptions: response.requestOptions,
+    response: response,
+    type: DioExceptionType.badResponse,
+    message: 'Пользователь не найден',
+  );
+}
+

@@ -3,6 +3,7 @@ import 'package:level_up/data/services/auth/auth_service.dart';
 import 'package:level_up/data/services/auth/models/access_token_response.dart';
 import 'package:level_up/data/services/local_storage.dart';
 import 'package:level_up/utils/result.dart';
+import '../../../config/dio_client.dart';
 
 abstract class IAuthRepository {
   String? get accessToken;
@@ -51,6 +52,8 @@ class AuthRepository extends IAuthRepository {
       }
       await _localStorage.saveAccessToken(_token!);
       return Result.ok(result);
+    } on UserNotFoundError catch (e) {
+      return Result.error(e);
     } on DioException catch (e) {
       return Result.error(e);
     }

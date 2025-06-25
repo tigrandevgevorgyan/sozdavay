@@ -60,7 +60,7 @@ class SignInScreen extends StatelessWidget {
                       maxLength: 4,
                     ),
                     SizedBox(height: 16),
-                    ErrorTextWidget(error: provider.error),
+                    InfoAndErrorTextWidget(text: provider.message, isError: provider.isErrorMessage),
                     provider.isActionInProgress
                         ? LevelUpLoader()
                         : LevelUpButton(
