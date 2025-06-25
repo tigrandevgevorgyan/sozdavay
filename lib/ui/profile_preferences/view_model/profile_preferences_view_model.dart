@@ -165,7 +165,8 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
         return;
       }
     } else {
-      if (_categorySelection == null ||
+      if (_nameController.text.trim().isEmpty ||
+          _categorySelection == null ||
           _trainingWeeklySelection == null ||
           _levelSelection == null ||
           _goalSelection == null ||

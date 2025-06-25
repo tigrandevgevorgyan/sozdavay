@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 
-class ErrorTextWidget extends StatelessWidget {
-  const ErrorTextWidget({super.key, required this.error});
+class InfoAndErrorTextWidget extends StatelessWidget {
+  const InfoAndErrorTextWidget({super.key, required this.text, required this.isError});
 
-  final String? error;
+  final String? text;
+  final bool isError;
 
   @override
   Widget build(BuildContext context) {
-    if (error == null) {
+    if (text == null) {
       return SizedBox.shrink();
     }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Text(error!, style: Style.outfit16w400.copyWith(color: Colors.red)),
+      child: Text(
+          text!,
+          style: Style.outfit16w400.copyWith(
+              color: isError
+            ? Colors.red
+            : Colors.green,
+          )),
     );
   }
 }

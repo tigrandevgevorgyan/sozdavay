@@ -29,9 +29,11 @@ class SignInViewModel extends ChangeNotifier {
 
   bool get isScreenReady => _isFormValid;
 
-  String? _error;
+  String? _message;
+  bool _isErrorMessage = true;
 
-  String? get error => _error;
+  String? get message => _message;
+  bool get isErrorMessage => _isErrorMessage;
 
   bool _isActionInProgress = false;
 
@@ -40,24 +42,40 @@ class SignInViewModel extends ChangeNotifier {
   String get _phoneNumber => '+7${phoneController.text.replaceAll(' ', '').replaceAll('(', '').replaceAll(')', '')}';
 
   void onSignInClick(BuildContext context) {
+    _message = null;
+    _isErrorMessage = true;
+
     FocusScope.of(context).unfocus();
-    _error = null;
     _signIn(context);
   }
 
   void requestCode() async {
+    _message = null;
+    _isErrorMessage = true;
+
+    if (_phoneController.text.isEmpty) {
+      _message = 'Введите номер';
+      notifyListeners();
+      return;
+    }
+    if (_phoneNumber.length != 12) {
+      _message = 'Введите номер полностью';
+      notifyListeners();
+      return;
+    }
     _isActionInProgress = true;
     notifyListeners();
     final result = await authRepository.requestCode(_phoneNumber);
     switch (result) {
       case Ok<void>():
-        // _isCodeRequested = true;
-        print("12313");
+        _message = 'В течение минуты позвоним и продиктуем код';
+        _isErrorMessage = false;
+        break;
       case Error<void>():
-        _error = result.error.getErrorMessage();
+        _message = result.error.getErrorMessage();
+        break;
     }
     _isActionInProgress = false;
-    _checkIsFormValid();
     notifyListeners();
   }
 
@@ -74,7 +92,6 @@ class SignInViewModel extends ChangeNotifier {
         if (firstLoginResult is Ok<bool>) {
           isFirst = firstLoginResult.value;
         }
-        // final testProfile = await profileRepository.getProfile(); //TODO: remove!!!!!!!!!!!!!!!!!!!!!!!!
         if (isFirst) {
           await authRepository.markFirstLoginShown();
           if (context.mounted) {
@@ -85,8 +102,17 @@ class SignInViewModel extends ChangeNotifier {
             GoRouter.of(context).go(LevelUpRouter.homePath);
           }
         }
+        break;
       case Error<AccessTokenResponse>():
-        _error = result.error.getErrorMessage();
+        _codeController.clear();
+        _message = result.error.getErrorMessage();
+        if (result.error is UserNotFoundError) {
+          await authRepository.deauthorize();
+          _message = 'Пользователь не найден';
+          _phoneController.clear();
+          _codeController.clear();
+        }
+        break;
     }
     _isActionInProgress = false;
     notifyListeners();

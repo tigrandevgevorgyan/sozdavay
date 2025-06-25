@@ -116,7 +116,7 @@ class ProfilePreferencesScreen extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 12),
-                        if (provider.error != null) ErrorTextWidget(error: provider.error),
+                        if (provider.error != null) InfoAndErrorTextWidget(text: provider.error, isError: true),
                         provider.isUpdating
                             ? LevelUpLoader()
                             : LevelUpButton(
