@@ -8,6 +8,7 @@ import 'package:level_up/ui/splash/widgets/splash_screen.dart';
 import 'package:level_up/ui/text_editing_screen/text_editing_screen.dart';
 import 'package:level_up/ui/workout/screens/video_player_screen.dart';
 import 'package:level_up/ui/workout/screens/workout_base_screen.dart';
+import '../ui/profile_preferences/view_model/profile_preferences_view_model.dart';
 
 class LevelUpRouter {
   static final LevelUpRouter _instance = LevelUpRouter._internal();
@@ -64,10 +65,11 @@ class LevelUpRouter {
             GoRoute(
               path: profilePreferencesPath,
               pageBuilder: (context, state) {
-                final hasWorkoutPlan = state.extra as bool;
+                final params = state.extra as ProfilePreferencesParams;
                 return getPage(
                   child: ProfilePreferencesScreen(
-                    hasWorkoutPlan: hasWorkoutPlan,
+                    hasWorkoutPlan: params.hasWorkoutPlan,
+                    isFirstLogin: params.isFirstLogin,
                   ),
                   state: state,
                 );
@@ -87,10 +89,11 @@ class LevelUpRouter {
             GoRoute(
               path: profilePreferencesPath,
               pageBuilder: (context, state) {
-                final hasWorkoutPlan = state.extra as bool;
+                final params = state.extra as ProfilePreferencesParams;
                 return getPage(
                   child: ProfilePreferencesScreen(
-                    hasWorkoutPlan: hasWorkoutPlan,
+                    hasWorkoutPlan: params.hasWorkoutPlan,
+                    isFirstLogin: params.isFirstLogin,
                   ),
                   state: state,
                 );

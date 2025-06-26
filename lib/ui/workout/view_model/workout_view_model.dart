@@ -66,8 +66,8 @@ class WorkoutViewModel extends ChangeNotifier {
         notifyListeners();
       case Error<List<WorkoutInfo>>():
         if (context.mounted) {
-          notifyListeners();
           ErrorUtils.showError(context, result.error.getErrorMessage());
+          notifyListeners();
         }
     }
   }

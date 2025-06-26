@@ -22,6 +22,7 @@ import '../../../data/services/data/models/refresh_response.dart';
 import '../../../utils/misc_utils.dart';
 import '../../core/common_widgets/level_up_button.dart';
 import '../../core/themes/text_styles.dart';
+import '../../profile_preferences/view_model/profile_preferences_view_model.dart';
 
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel(
@@ -127,6 +128,7 @@ class HomeViewModel extends ChangeNotifier {
             notifyListeners();
           }
         case Error<RefreshResponse>():
+          break;
       }
     } catch (_) {}
   }
@@ -258,7 +260,10 @@ class HomeViewModel extends ChangeNotifier {
     final hasPlan = hasWorkoutPlan;
     GoRouter.of(context).push(
       LevelUpRouter.homePath + LevelUpRouter.profilePreferencesPath,
-      extra: hasPlan,
+      extra: ProfilePreferencesParams(
+        hasWorkoutPlan: hasPlan,
+        isFirstLogin: false,
+      ),
     ).then((result) {
       if (result == true) {
         _loadMainInfo(context);

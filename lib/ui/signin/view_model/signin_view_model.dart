@@ -6,6 +6,7 @@ import 'package:level_up/data/repositories/profile_service/profile_repository.da
 import 'package:level_up/data/services/auth/models/access_token_response.dart';
 import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/utils/result.dart';
+import '../../profile_preferences/view_model/profile_preferences_view_model.dart';
 
 class SignInViewModel extends ChangeNotifier {
   SignInViewModel({required this.authRepository, required this.profileRepository}) {
@@ -95,7 +96,11 @@ class SignInViewModel extends ChangeNotifier {
         if (isFirst) {
           await authRepository.markFirstLoginShown();
           if (context.mounted) {
-            GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath, extra: false);
+            GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath,
+              extra: ProfilePreferencesParams(
+              hasWorkoutPlan: false,
+              isFirstLogin: true,
+            ),);
           }
         } else {
           if (context.mounted) {

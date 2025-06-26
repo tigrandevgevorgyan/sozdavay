@@ -15,13 +15,14 @@ import 'package:level_up/ui/profile_preferences/widgets/subscription_banner.dart
 import 'package:provider/provider.dart';
 
 class ProfilePreferencesScreen extends StatelessWidget {
-  const ProfilePreferencesScreen({super.key, required this.hasWorkoutPlan});
+  const ProfilePreferencesScreen({super.key, required this.hasWorkoutPlan, required this.isFirstLogin});
   final bool hasWorkoutPlan;
+  final bool isFirstLogin;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (BuildContext context) => ProfilePreferencesViewModel(context, dataRepository: GetIt.I<IDataRepository>(), profileRepository: GetIt.I<IProfileRepository>(), hasWorkoutPlan: hasWorkoutPlan),
+      create: (BuildContext context) => ProfilePreferencesViewModel(context, dataRepository: GetIt.I<IDataRepository>(), profileRepository: GetIt.I<IProfileRepository>(), hasWorkoutPlan: hasWorkoutPlan, isFirstLogin: isFirstLogin),
       child: Consumer<ProfilePreferencesViewModel>(builder: (context, provider, _) {
         return Scaffold(
           appBar: AppBar(
