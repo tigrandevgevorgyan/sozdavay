@@ -32,6 +32,9 @@ class ProfilePreferencesScreen extends StatelessWidget {
               child: Image.asset(Assets.logo),
             ),
             centerTitle: true,
+            automaticallyImplyLeading: isFirstLogin
+            ? false
+            : true,
           ),
           backgroundColor: AppColors.backgroundColor,
           body: GestureDetector(

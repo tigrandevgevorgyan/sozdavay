@@ -69,7 +69,7 @@ class HomeViewModel extends ChangeNotifier {
 
   String get level => _mainInfo?.label ?? '';
 
-  int get rating => _mainInfo?.levelRating ?? 0;
+  int get rating => _mainInfo?.rating ?? 0;
 
   int get perMonth => _mainInfo?.workout.month ?? 0;
 
@@ -89,7 +89,6 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void _init(BuildContext context) async {
-    // await localStorage.clearSharedPreferences();
     final isSuccess = await _loadProfile(context);
     if (_isExpiredDate) {
       _showFinalDialog(context);

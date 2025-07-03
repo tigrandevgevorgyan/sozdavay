@@ -64,9 +64,7 @@ class _OptionsDialogState extends State<OptionsDialog> {
                   newRatio = maxAllowedHeightRatio;
                 }
                 heightRatio = newRatio;
-                // if (!widget.isScrollAllowed){
                 maxHeightRatio = heightRatio;
-                // }
               });
             },
             child: Padding(

@@ -25,7 +25,7 @@ class BaseViewModel extends ChangeNotifier {
 
   final IWorkoutRepository workoutRepository;
 
-  bool _isUpdatingHistory = false;
+  final bool _isUpdatingHistory = false;
 
   bool get isUpdatingHistory => _isUpdatingHistory;
 
@@ -37,7 +37,7 @@ class BaseViewModel extends ChangeNotifier {
 
   List<WorkoutInfo>? _workout;
 
-  Map<int, String> _updatedComments = {};
+  final Map<int, String> _updatedComments = {};
 
   set workout(List<WorkoutInfo>? value) {
     _workout = value;
@@ -61,7 +61,6 @@ class BaseViewModel extends ChangeNotifier {
   Future<void> changeExercise(BuildContext context, {int? exerciseIndex, required bool second}) async {
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     if (exerciseIndex == null) {
-      // if id is provided, then ui logic is handled somewhere else
       isUpdatingExercise = true;
       notifyListeners();
     }

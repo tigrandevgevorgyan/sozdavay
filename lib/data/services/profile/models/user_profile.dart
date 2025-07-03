@@ -8,8 +8,6 @@ class UserProfile {
   final int id;
   final String name;
   final String phone;
-
-  // final String? sex;
   final int? days;
   final IdNamePairWithPriority? category;
   final IdNamePairWithPriority? age;

@@ -77,9 +77,9 @@ class WorkoutViewModel extends ChangeNotifier {
     _isLoading = false;
     switch (result) {
       case Ok<IsCompletedResponse>():
-        debugPrint('workout record deleted'); // this is a silent request, so any response is ignored
+        break;
       case Error<IsCompletedResponse>():
-        debugPrint('error in delete request');
+        break;
     }
   }
 
@@ -225,7 +225,6 @@ class WorkoutViewModel extends ChangeNotifier {
   void _showFinalDialog(BuildContext screenContext) {
     showDialog(
       context: screenContext,
-      // barrierColor: Colors.black.withOpacity(0.5), // Semi-transparent barrier
       builder: (BuildContext context) {
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
