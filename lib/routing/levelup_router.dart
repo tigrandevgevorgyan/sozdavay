@@ -143,9 +143,6 @@ class LevelUpRouter {
       initialLocation: splashPath,
       routes: routes,
       debugLogDiagnostics: false,
-      // redirect: (context, state) {
-      //   return null;
-      // }
     );
   }
 

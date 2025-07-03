@@ -21,8 +21,6 @@ abstract class ILocalStorage {
 
   Future<Result<void>> setFirstLoginShown();
 
-  Future<void> clearSharedPreferences();
-
 }
 
 class LocalStorageImpl extends ILocalStorage {
@@ -124,10 +122,5 @@ class LocalStorageImpl extends ILocalStorage {
     }
   }
 
-  @override
-  Future<void> clearSharedPreferences() async {
-    final sp = await SharedPreferences.getInstance();
-    await sp.clear();
-  }
 }
 

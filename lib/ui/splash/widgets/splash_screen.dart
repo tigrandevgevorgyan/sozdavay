@@ -48,23 +48,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkAndroidScheduleExactAlarmPermission() async {
     final status = await Permission.scheduleExactAlarm.status;
-    print('Schedule exact alarm permission: $status.');
     if (status.isDenied) {
-      print('Requesting schedule exact alarm permission...');
       final res = await Permission.scheduleExactAlarm.request();
-      print('Schedule exact alarm permission ${res.isGranted ? '' : 'not'} granted.');
     }
   }
 
   Future<void> _requestNotificationPermission() async {
     final status = await Permission.notification.request();
 
-    if (status.isGranted) {
-      // Permission granted
-      print("Notification Permission Granted!");
-    } else {
-      // Permission denied
-      print("Notification Permission Denied!");
-    }
   }
 }

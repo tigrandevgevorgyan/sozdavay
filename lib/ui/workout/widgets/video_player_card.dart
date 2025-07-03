@@ -65,9 +65,6 @@ class _VideoPlayerCardState extends State<VideoPlayerCard> {
                 ? Center(
                     child: AspectRatio(
                       aspectRatio: _controller.value.aspectRatio,
-                      // child: Container(
-                      //   color: Colors.grey,
-                      // ),
                       child: VideoPlayer(_controller),
                     ),
                   )

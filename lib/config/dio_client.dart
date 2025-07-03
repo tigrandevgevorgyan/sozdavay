@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
@@ -15,7 +16,6 @@ class DioClient {
     final client = Dio(BaseOptions(
       baseUrl: 'http://176.123.169.218:8080/api',
       connectTimeout: const Duration(milliseconds: 15000),
-      //followRedirects: true,
       validateStatus: (status) => (status ?? 200) < 500,
       receiveTimeout: const Duration(milliseconds: 15000),
       headers: headers,
@@ -31,7 +31,7 @@ class DioClient {
       }
       return handler.next(options);
     }));
-    interceptors.add(LogInterceptor(request: false, requestBody: true, requestHeader: true, responseBody: true, responseHeader: false, logPrint: (text) => print('$text')));
+    if (!kReleaseMode) {interceptors.add(LogInterceptor(request: false, requestBody: true, requestHeader: true, responseBody: true, responseHeader: false));}
     interceptors.add(InterceptorsWrapper(onResponse: (response, handler) async {
       if (response.data.toString().toLowerCase().contains('пользователь не найден')) {
         return handler.reject(UserNotFoundError(response), true);

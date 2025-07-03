@@ -17,7 +17,6 @@ class LevelUpButton extends StatelessWidget {
           elevation: WidgetStateProperty.all(0),
           minimumSize: WidgetStatePropertyAll(Size.fromHeight(buttonStyle.height.toDouble())),
           shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(buttonStyle.radius))),
-          //visualDensity: VisualDensity.compact,
           backgroundColor: isEnabled == false ? WidgetStatePropertyAll(buttonStyle.inactiveColor) : WidgetStatePropertyAll(buttonStyle.activeColor),
         ),
         onPressed: onClick,
