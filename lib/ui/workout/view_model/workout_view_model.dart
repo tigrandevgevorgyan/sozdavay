@@ -5,8 +5,7 @@ import 'package:level_up/config/dio_client.dart';
 import 'package:level_up/data/repositories/workout_repository/workout_repository.dart';
 import 'package:level_up/data/services/common_models/is_completed_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
-import 'package:level_up/ui/core/common_widgets/level_up_button.dart';
-import 'package:level_up/ui/core/themes/text_styles.dart';
+import 'package:level_up/ui/workout/widgets/workout_show_dialog.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 import '../../../utils/misc_utils.dart';
@@ -213,7 +212,9 @@ class WorkoutViewModel extends ChangeNotifier {
     switch (result) {
       case Ok<void>():
         if (context.mounted) {
-          GoRouter.of(context).pop(true);
+          Future.microtask(() {
+            GoRouter.of(context).pop(true);
+          });
         }
       case Error<void>():
         if (context.mounted) {
@@ -222,49 +223,15 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
-  void _showFinalDialog(BuildContext screenContext) {
+  void _showFinalDialog(BuildContext context) {
     showDialog(
-      context: screenContext,
-      builder: (BuildContext context) {
-        return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Dialog(
-            backgroundColor: Colors.transparent,
-            insetPadding: EdgeInsets.all(20),
-            child: Center(
-              child: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Color(0xFF141414),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Color(0xFF3C3C3C), width: 0.5),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(height: 30),
-                    Text('Последнее упражнение', style: Style.ablation18w900.copyWith(color: Colors.white)),
-                    SizedBox(height: 24),
-                    LevelUpButton(
-                        text: 'Закончить тренировку',
-                        buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.medium),
-                        onClick: () {
-                          GoRouter.of(context).pop();
-                          _finishWorkout(screenContext);
-                        }),
-                    SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: GestureDetector(onTap: () => GoRouter.of(context).pop(), child: Text('Продолжить', style: Style.ablation14w900.copyWith(color: Colors.white))),
-                    ),
-                    SizedBox(height: 14),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
+      context: context,
+      builder: (_) => WorkoutShowDialog(
+        title: 'Последнее упражнение',
+        confirmText: 'Закончить тренировку',
+        onConfirm: () => _finishWorkout(context),
+        cancelText: 'Продолжить',
+      ),
     );
   }
 }

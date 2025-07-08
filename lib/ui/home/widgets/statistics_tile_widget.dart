@@ -45,7 +45,7 @@ class StatisticsTileWidget extends StatelessWidget {
                 flex: 1,
                 child: GestureDetector(
                   onTap: onYearlyClicked,
-                  child: SmallStatisticsTile(number: yearlyValue, label: 'за год', onClick: () {}),
+                  child: SmallStatisticsTile(number: yearlyValue, label: 'за сезон', onClick: () {}),
                 ),
               ),
             ],

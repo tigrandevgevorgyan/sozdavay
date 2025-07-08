@@ -16,6 +16,7 @@ class VideoPlayerScreen extends StatefulWidget {
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   late VideoPlayerController _controller;
+  late final VoidCallback _listener;
 
   bool _isControlsVisible = true;
 
@@ -24,14 +25,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     super.initState();
     _controller = VideoPlayerController.networkUrl(Uri.parse(widget.params.url))
       ..initialize().then((_) {
+        _controller.setVolume(0.0);
         setState(() {});
         _controller.play();
       });
-    _controller.addListener(
-      () {
-        setState(() {});
-      },
-    );
+    _listener = () {
+      if (!mounted) return;
+      setState(() {});
+    };
+    _controller.addListener(_listener);
   }
 
   @override
@@ -79,6 +81,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   void dispose() {
+    _controller.removeListener(_listener);
+    _controller.pause();
     _controller.dispose();
     super.dispose();
   }

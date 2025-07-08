@@ -73,10 +73,10 @@ class SimpleWorkoutScreen extends StatelessWidget {
                                           child: Column(
                                             children: [
                                               SquareTimer(
-                                                key: UniqueKey(),
                                                 title: provider.getRestString(workoutInfo.items.first),
                                                 secondsDuration: workoutInfo.items.first.restSeconds ?? 0,
                                                 haveRest: (workoutInfo.items.first.restSeconds ?? 0) > 0,
+                                                timerKey: 'timer_${workoutInfo.items.first.id}_${workoutInfo.items.last.id}',
                                               ),
                                             ],
                                           ),
@@ -98,7 +98,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                               controller: provider.weightController,
                               hintText: 'Вес',
                               textSize: 12,
-                              keyboardType: TextInputType.number,
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
                               inputFormatters: [WeightTextInputFormatter()],
                             ),
                           ),
@@ -109,7 +109,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                               controller: provider.repeatsController,
                               hintText: 'Повторы',
                               textSize: 12,
-                              keyboardType: TextInputType.number,
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
                               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
                             ),
                           ),

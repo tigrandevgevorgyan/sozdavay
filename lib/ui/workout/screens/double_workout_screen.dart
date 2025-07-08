@@ -131,12 +131,12 @@ class _DoubleWorkoutScreenState extends State<DoubleWorkoutScreen> {
                             ),
                             SizedBox(height: 4),
                             HorizontalTimer(
-                              key: UniqueKey(),
                               title: provider.getRestString(widget.workoutInfo.items.last),
                               secondsToCount: max(
                                 widget.workoutInfo.items.first.restSeconds ?? 0,
                                 widget.workoutInfo.items.last.restSeconds ?? 0,
                               ),
+                              timerKey: 'timer_${widget.workoutInfo.items.first.id}_${widget.workoutInfo.items.last.id}',
                             ),
                             SizedBox(height: 8),
                             SizedBox(
@@ -262,7 +262,7 @@ class DoubleResultsRecording extends StatelessWidget {
                 hintText: 'Вес',
                 textSize: 12,
                 height: TextFieldHeight.medium,
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [WeightTextInputFormatter()],
               ),
               SizedBox(height: 4),
@@ -271,7 +271,7 @@ class DoubleResultsRecording extends StatelessWidget {
                 hintText: 'Повторы',
                 textSize: 12,
                 height: TextFieldHeight.medium,
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[+0-9]'))],
               ),
             ],
