@@ -71,6 +71,8 @@ class HomeViewModel extends ChangeNotifier {
 
   int get rating => _mainInfo?.rating ?? 0;
 
+  int get levelRating => _mainInfo?.levelRating?? 0;
+
   int get perMonth => _mainInfo?.workout.month ?? 0;
 
   int get perYear => _mainInfo?.workout.year ?? 0;

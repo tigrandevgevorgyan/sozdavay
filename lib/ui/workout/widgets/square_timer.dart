@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:math';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,13 +9,15 @@ import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/utils/alarm_utils.dart';
 import 'package:level_up/utils/timer_state_storage.dart';
 import '../../../utils/notifications.dart';
+import '../../../utils/timer_state_manager.dart';
 
 class SquareTimer extends StatefulWidget {
-  const SquareTimer({super.key, required this.title, required this.secondsDuration, required this.haveRest});
+  const SquareTimer({super.key, required this.title, required this.secondsDuration, required this.haveRest, required this.timerKey});
 
   final String title;
   final int secondsDuration;
   final bool haveRest;
+  final String timerKey;
 
   @override
   State<SquareTimer> createState() => _SquareTimerState();
@@ -24,7 +26,11 @@ class SquareTimer extends StatefulWidget {
 class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin {
   final AudioPlayer audioPlayer = AudioPlayer();
   AnimationController? _controller;
+  Timer? _updateTimer;
+
   bool _isRunning = false;
+  bool _isCompleted = false;
+  double _currentProgress = 0.0;
 
   late final AppLifecycleListener _lifecycleListener;
 
@@ -34,29 +40,57 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
     cancelSquareNotification();
     cancelCountdownNotification(1);
     TimerStateStorage.clear(1);
+    _initializeTimer();
+    _restoreTimerState();
+  }
+
+  @override
+  void didUpdateWidget(SquareTimer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.timerKey != widget.timerKey) {
+      _saveCurrentState(oldWidget.timerKey);
+      _restoreTimerState();
+    }
+  }
+
+  void _initializeTimer() {
     _controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: widget.secondsDuration),
     )..addListener(() {
-      if (context.mounted) {
-        setState(() {});
+      if (!mounted) return;
+
+      final value = _controller!.value;
+
+      if (!_isCompleted) {
+        if (value >= 0.98) {
+          _controller!.stop();
+          _onTimerCompleted();
+        } else {
+          setState(() {
+            _currentProgress = value;
+          });
+        }
       }
     });
-    _controller!.addStatusListener(
-          (status) async {
-        if (status.isCompleted) {
-          setState(() {
-            _isRunning = false;
-          });
-          final wasOnBackground = await TimerStateStorage.wasTriggered(1);
-          if (!wasOnBackground) {
-            audioPlayer.play(AssetSource('sounds/notification_sound.wav'));
-          }
-          await TimerStateStorage.clear(1);
+
+    _controller!.addStatusListener((status) async {
+      if (status.isCompleted && !_isCompleted) {
+        setState(() {
+          _isRunning = false;
+          _isCompleted = true;
+        });
+
+        TimerStateManager.removeTimer(widget.timerKey);
+
+        final wasOnBackground = await TimerStateStorage.wasTriggered(1);
+        if (!wasOnBackground) {
+          audioPlayer.play(AssetSource('sounds/notification_sound.wav'));
         }
-      },
-    );
-    _controller?.reset();
+        await TimerStateStorage.clear(1);
+      }
+    });
+
     _lifecycleListener = AppLifecycleListener(
       onResume: () async {
         cancelSquareNotification();
@@ -67,15 +101,99 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       },
       onPause: () {
         if (_isRunning) {
-          final remainingTime = widget.secondsDuration * 1000 - ( widget.secondsDuration * 1000 * (_controller?.value ?? 0.0)).toInt();
-          final time = Duration(milliseconds: remainingTime);
-          final triggerTime = DateTime.now().add(time);
-          TimerStateStorage.save(1, triggerTime);
-          scheduleSquareNotification(triggerTime);
-          showCountdownNotification(time, 1);
+          final savedState = TimerStateManager.getTimerState(widget.timerKey);
+          if (savedState != null && !savedState.isCompleted) {
+            final remainingSeconds = savedState.remainingSeconds;
+            final time = Duration(seconds: remainingSeconds);
+            final triggerTime = DateTime.now().add(time);
+            TimerStateStorage.save(1, triggerTime);
+            scheduleSquareNotification(triggerTime);
+            showCountdownNotification(time, 1);
+          }
         }
       },
     );
+  }
+
+  void _restoreTimerState() {
+    final savedState = TimerStateManager.getTimerState(widget.timerKey);
+
+    if (savedState != null && savedState.isRunning && !savedState.isCompleted) {
+      setState(() {
+        _isRunning = true;
+        _isCompleted = false;
+        _currentProgress = savedState.progress;
+      });
+
+      _startPeriodicUpdate();
+
+      _controller?.reset();
+      _controller?.forward(from: savedState.progress);
+    } else {
+      setState(() {
+        _isRunning = false;
+        _isCompleted = false;
+        _currentProgress = 0.0;
+      });
+      _controller?.reset();
+    }
+  }
+
+  void _saveCurrentState(String? timerKey) {
+    final key = timerKey ?? widget.timerKey;
+
+    if (_isRunning && !_isCompleted) {
+      final elapsedSeconds = (widget.secondsDuration * _currentProgress).round();
+      final startTime = DateTime.now().subtract(Duration(seconds: elapsedSeconds));
+
+      TimerStateManager.saveTimerState(
+        key,
+        TimerState(
+          startTime: startTime,
+          totalSeconds: widget.secondsDuration,
+          isRunning: true,
+        ),
+      );
+    } else if (_isCompleted || !_isRunning) {
+      TimerStateManager.removeTimer(key);
+    }
+  }
+
+  void _startPeriodicUpdate() {
+    _updateTimer?.cancel();
+    _updateTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+      final savedState = TimerStateManager.getTimerState(widget.timerKey);
+      if (savedState != null && savedState.isRunning && !savedState.isCompleted) {
+        setState(() {
+          _currentProgress = savedState.progress;
+        });
+
+        _controller?.value = _currentProgress;
+
+        if (savedState.isCompleted) {
+          _onTimerCompleted();
+          timer.cancel();
+        }
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  void _onTimerCompleted() async {
+    setState(() {
+      _isRunning = false;
+      _isCompleted = true;
+      _currentProgress = 1.0;
+    });
+
+    TimerStateManager.removeTimer(widget.timerKey);
+
+    final wasOnBackground = await TimerStateStorage.wasTriggered(1);
+    if (!wasOnBackground) {
+      audioPlayer.play(AssetSource('sounds/notification_sound.wav'));
+    }
+    await TimerStateStorage.clear(1);
   }
 
   @override
@@ -88,7 +206,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
           Padding(
             padding: const EdgeInsets.only(left: 3, right: 2, top: 2, bottom: 2),
             child: CustomPaint(
-              painter: TimerPainter(_controller?.value ?? 0, _controller?.isCompleted ?? false),
+              painter: TimerPainter(_currentProgress, _isCompleted),
             ),
           ),
           Positioned.fill(
@@ -99,9 +217,9 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
                   GestureDetector(
                       onTap: _onPlayTap,
                       child: widget.haveRest
-                              ? SvgPicture.asset(_isRunning ? Assets.stopIcon : Assets.playIcon)
-                              : SizedBox.shrink()
-                      ),
+                          ? SvgPicture.asset(_isRunning ? Assets.stopIcon : Assets.playIcon)
+                          : SizedBox.shrink()
+                  ),
                   SizedBox(height: 18),
                   Text(widget.title, style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
                 ],
@@ -114,33 +232,58 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   }
 
   void _onPlayTap() {
-    if (_controller?.isAnimating ?? false) {
+    if (_isRunning) {
       _controller?.stop();
+      _updateTimer?.cancel();
+
       setState(() {
         _isRunning = false;
       });
+
+      TimerStateManager.removeTimer(widget.timerKey);
       cancelSquareNotification();
       cancelCountdownNotification(1);
       TimerStateStorage.clear(1);
     } else {
-      cancelSquareNotification();
-      cancelCountdownNotification(1);
-      TimerStateStorage.clear(1);
-      _controller?.reset();
-      _controller?.forward();
-      setState(() {
-        _isRunning = true;
-      });
+      _startNewTimer();
     }
+  }
+
+  void _startNewTimer() {
+    cancelSquareNotification();
+    cancelCountdownNotification(1);
+    TimerStateStorage.clear(1);
+
+    TimerStateManager.stopAllExcept(widget.timerKey);
+
+    setState(() {
+      _isRunning = true;
+      _isCompleted = false;
+      _currentProgress = 0.0;
+    });
+
+    TimerStateManager.saveTimerState(
+      widget.timerKey,
+      TimerState(
+        startTime: DateTime.now(),
+        totalSeconds: widget.secondsDuration,
+        isRunning: true,
+      ),
+    );
+
+    _controller?.reset();
+    _controller?.forward();
+    _startPeriodicUpdate();
   }
 
   @override
   void dispose() {
-    super.dispose();
-    audioPlayer.dispose();
-    _controller?.reset();
+    _saveCurrentState(null);
     _controller?.dispose();
+    _updateTimer?.cancel();
+    audioPlayer.dispose();
     _lifecycleListener.dispose();
+    super.dispose();
   }
 }
 
@@ -175,7 +318,7 @@ class TimerPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return this != oldDelegate;
+  bool shouldRepaint(covariant TimerPainter oldDelegate) {
+    return oldDelegate.value != value || oldDelegate.isCompleted != isCompleted;
   }
 }

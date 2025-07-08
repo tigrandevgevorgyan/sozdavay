@@ -105,7 +105,7 @@ class _ComplexWorkoutScreenState extends State<ComplexWorkoutScreen> {
                                 controller: provider.textController,
                                 hintText: provider.isTime ? 'время' : 'раунды',
                                 textSize: 15,
-                                keyboardType: TextInputType.number,
+                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
                               ),
                             ),
