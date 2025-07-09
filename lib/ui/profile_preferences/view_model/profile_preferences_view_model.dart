@@ -101,9 +101,9 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   void onGenderWeightClicked(BuildContext context) async {
     blockFocus();
-    final result = await OptionsDialog.showDialog(context, categorySelection, categoriesDialogContent.title, categoriesDialogContent.optionsValues);
+    final result = await OptionsDialog.showDialog(context, categorySelection != null ? [categorySelection!] : [], categoriesDialogContent.title, categoriesDialogContent.optionsValues);
     if (result != null) {
-      _categorySelection = categoriesDialogContent.getIdByValue(result);
+      _categorySelection = categoriesDialogContent.getIdByValue(result.first);
       notifyListeners();
     }
     await Future.delayed(Duration(milliseconds: 100));
@@ -112,9 +112,9 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   void onLevelClicked(BuildContext context) async {
     blockFocus();
-    final result = await OptionsDialog.showDialog(context, levelSelection, levelDialogContent.title, levelDialogContent.optionsValues);
+    final result = await OptionsDialog.showDialog(context, levelSelection != null ? [levelSelection!] : [], levelDialogContent.title, levelDialogContent.optionsValues);
     if (result != null) {
-      _levelSelection = levelDialogContent.getIdByValue(result);
+      _levelSelection = levelDialogContent.getIdByValue(result.first);
       notifyListeners();
     }
     await Future.delayed(Duration(milliseconds: 100));
@@ -123,10 +123,10 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   void onGoalClicked(BuildContext context) async {
     blockFocus();
-    final result = await OptionsDialog.showDialog(context, goalSelection, goalDialogContent.title, goalDialogContent.optionsValues);
+    final result = await OptionsDialog.showDialog(context, goalSelection != null ? [goalSelection!] : [], goalDialogContent.title, goalDialogContent.optionsValues);
 
     if (result != null) {
-      _goalSelection = goalDialogContent.getIdByValue(result);
+      _goalSelection = goalDialogContent.getIdByValue(result.first);
       _setPriorityOptions();
       notifyListeners();
     }
@@ -136,9 +136,9 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   void onPriorityClicked(BuildContext context) async {
     blockFocus();
-    final result = await OptionsDialog.showDialog(context, prioritySelection, priorityDialogContent.title, priorityDialogContent.optionsValues);
+    final result = await OptionsDialog.showDialog(context, prioritySelection != null ? [prioritySelection!] : [], priorityDialogContent.title, priorityDialogContent.optionsValues);
     if (result != null) {
-      _prioritySelection = priorityDialogContent.getIdByValue(result);
+      _prioritySelection = priorityDialogContent.getIdByValue(result.first);
       notifyListeners();
     }
     await Future.delayed(Duration(milliseconds: 100));
@@ -147,9 +147,9 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   void onTrainingWeeklyClicked(BuildContext context) async {
     blockFocus();
-    final result = await OptionsDialog.showDialog(context, trainingWeeklySelection, trainingWeeklyDialogContent.title, trainingWeeklyDialogContent.optionsValues);
+    final result = await OptionsDialog.showDialog(context, trainingWeeklySelection != null ? [trainingWeeklySelection!] : [], trainingWeeklyDialogContent.title, trainingWeeklyDialogContent.optionsValues);
     if (result != null) {
-      _trainingWeeklySelection = trainingWeeklyDialogContent.getIdByValue(result);
+      _trainingWeeklySelection = trainingWeeklyDialogContent.getIdByValue(result.first);
       notifyListeners();
     }
     await Future.delayed(Duration(milliseconds: 100));

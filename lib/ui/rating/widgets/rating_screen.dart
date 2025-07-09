@@ -43,7 +43,7 @@ class RatingScreen extends StatelessWidget {
                         SizedBox(height: 8),
                         OptionsInputField(
                           hint: 'Категория',
-                          value: provider.categorySelection,
+                          value: provider.categoriesDisplayText,
                           onClick: () => provider.onCategoryClicked(context),
                         ),
                         SizedBox(height: 10),
