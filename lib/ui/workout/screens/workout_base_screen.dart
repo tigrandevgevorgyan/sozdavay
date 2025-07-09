@@ -61,7 +61,6 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
                           onLeftArrowClicked: provider.onPreviousClicked,
                           onRightArrowClicked: () => provider.onNextClicked(context),
                           onHomeClicked: () {
-                            provider.deleteWorkout();
                             GoRouter.of(context).pop();
                           },
                         ),

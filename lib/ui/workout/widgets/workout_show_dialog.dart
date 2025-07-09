@@ -39,7 +39,9 @@ class WorkoutShowDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 30),
-                Text(title, style: Style.ablation18w900.copyWith(color: Colors.white)),
+                Center(
+                    child: Text(title, style: Style.ablation18w900.copyWith(color: Colors.white),
+                        textAlign: TextAlign.center)),
                 const SizedBox(height: 24),
                 LevelUpButton(
                   text: confirmText,
