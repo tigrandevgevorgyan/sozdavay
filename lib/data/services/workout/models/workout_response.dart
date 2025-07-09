@@ -6,10 +6,11 @@ part 'workout_response.g.dart';
 
 @JsonSerializable()
 class WorkoutResponse extends BaseResponse {
-  WorkoutResponse(super.message, this.data, this.workoutId);
+  WorkoutResponse(super.message, this.data, this.workoutId, this.day);
 
   @JsonKey(name: 'workout_id')
   final int? workoutId;
+  final int? day;
   final List<WorkoutInfo> data;
 
   factory WorkoutResponse.fromJson(Map<String, dynamic> json) => _$WorkoutResponseFromJson(json);

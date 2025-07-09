@@ -13,6 +13,7 @@ import 'package:level_up/ui/home/widgets/calendar_widget.dart';
 import 'package:level_up/ui/home/widgets/start_training_banner.dart';
 import 'package:level_up/ui/home/widgets/statistics_tile_widget.dart';
 import 'package:provider/provider.dart';
+import '../../../data/repositories/workout_repository/workout_repository.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -25,6 +26,7 @@ class HomeScreen extends StatelessWidget {
         dataRepository: GetIt.I<IDataRepository>(),
         profileRepository: GetIt.I<IProfileRepository>(),
         localStorage: GetIt.I<ILocalStorage>(),
+        workoutRepository: GetIt.I<IWorkoutRepository>(),
       ),
       child: Consumer<HomeViewModel>(
         builder: (context, provider, _) {

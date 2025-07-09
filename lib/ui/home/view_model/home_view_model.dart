@@ -17,26 +17,32 @@ import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../config/home_banners_assets.dart';
+import '../../../data/repositories/workout_repository/workout_repository.dart';
+import '../../../data/services/common_models/is_completed_response.dart';
 import '../../../data/services/data/models/main_response.dart';
 import '../../../data/services/data/models/refresh_response.dart';
+import '../../../data/services/workout/models/workout_response.dart';
 import '../../../utils/misc_utils.dart';
 import '../../core/common_widgets/level_up_button.dart';
 import '../../core/themes/text_styles.dart';
 import '../../profile_preferences/view_model/profile_preferences_view_model.dart';
+import '../../workout/widgets/workout_show_dialog.dart';
 
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel(
-    BuildContext context,{
+    BuildContext context, {
+    required this.workoutRepository,
     required this.dataRepository,
     required this.profileRepository,
     required this.localStorage,
-      }) {
+  }) {
     _init(context);
   }
 
   final ILocalStorage localStorage;
   final IProfileRepository profileRepository;
   final IDataRepository dataRepository;
+  final IWorkoutRepository workoutRepository;
 
   bool _isLoading = true;
 
@@ -71,7 +77,7 @@ class HomeViewModel extends ChangeNotifier {
 
   int get rating => _mainInfo?.rating ?? 0;
 
-  int get levelRating => _mainInfo?.levelRating?? 0;
+  int get levelRating => _mainInfo?.levelRating ?? 0;
 
   int get perMonth => _mainInfo?.workout.month ?? 0;
 
@@ -81,7 +87,7 @@ class HomeViewModel extends ChangeNotifier {
       _mainInfo?.schedule
           .where(
             (day) => day.isActive,
-          )
+      )
           .firstOrNull
           ?.name ??
       '';
@@ -227,12 +233,73 @@ class HomeViewModel extends ChangeNotifier {
   void onStartWorkoutClicked(BuildContext context) async {
     stopRefreshTimer();
     final dayIndex = (_selectedDayIndex ?? DateTime.now().weekday - 1) + 1;
-    final result = await GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.workoutPath, extra: dayIndex) as bool?;
-    startRefreshTimer();
-    if ((result ?? false) && context.mounted) {
-      await _loadMainInfo(context);
-      notifyListeners();
+    final result = await workoutRepository.loadWorkout(dayIndex: dayIndex);
+    switch (result) {
+      case Ok<WorkoutResponse>():
+        final actualDayIndex = (result.value.day ?? 1) - 1;
+        final workoutId = result.value.workoutId ?? 0;
+        final currentWorkoutName = actualDayIndex >= 0 && actualDayIndex < (_mainInfo?.schedule.length ?? 0)
+            ? (_mainInfo?.schedule[actualDayIndex].name ?? 'тренировка')
+            : 'тренировка';
+        if (result.value.day != dayIndex) {
+          if (context.mounted) {
+            _wrongTrainingDialog(context, workoutId, dayIndex, currentWorkoutName);
+          }
+        } else {
+          if (context.mounted) {
+            final completed = await GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.workoutPath, extra: dayIndex) as bool?;
+            startRefreshTimer();
+
+            if ((completed ?? false) && context.mounted) {
+              await _loadMainInfo(context);
+              notifyListeners();
+            }
+          }
+        }
+      case Error<WorkoutResponse>():
+        if (context.mounted) {
+          ErrorUtils.showError(context, result.error.getErrorMessage());
+        }
     }
+  }
+
+  void deleteWorkoutAndStartNew(BuildContext context, int workoutId, int dayIndex) async {
+    final result = await workoutRepository.deleteWorkout(workoutId);
+    _isLoading = false;
+    notifyListeners();
+    switch (result) {
+      case Ok<IsCompletedResponse>():
+        if (context.mounted) {
+          final completed = await GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.workoutPath, extra: dayIndex) as bool?;
+          startRefreshTimer();
+
+          if ((completed ?? false) && context.mounted) {
+            await _loadMainInfo(context);
+            notifyListeners();
+          }
+        }
+        break;
+      case Error<IsCompletedResponse>():
+        break;
+    }
+  }
+
+  void _wrongTrainingDialog(BuildContext context, int workoutId, int dayIndex, String workoutName) {
+    showDialog(
+      context: context,
+      builder: (_) =>
+          WorkoutShowDialog(
+            title: 'Начав эту тренировку, вы удалите прогресс по текущей "$workoutName".',
+            confirmText: 'Продолжить',
+            onConfirm: () {
+              deleteWorkoutAndStartNew(context, workoutId, dayIndex);
+            },
+            cancelText: 'Назад',
+            onCancel: () {
+              startRefreshTimer();
+              },
+          ),
+    );
   }
 
   void onRatingClicked(BuildContext context) {
@@ -358,7 +425,7 @@ class HomeViewModel extends ChangeNotifier {
                           'Но это легко исправить! Напишите тренеру, чтобы вернуть доступ',
                           style: Style.outfit16w300.copyWith(color: Color(0xFFECECEC)),
                           textAlign: TextAlign.center
-                          ),
+                      ),
                       SizedBox(height: 24),
                       LevelUpButton(
                           text: 'Написать',

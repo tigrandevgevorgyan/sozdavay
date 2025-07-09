@@ -71,17 +71,6 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
-  void deleteWorkout() async {
-    final result = await workoutRepository.deleteWorkout(_workoutId);
-    _isLoading = false;
-    switch (result) {
-      case Ok<IsCompletedResponse>():
-        break;
-      case Error<IsCompletedResponse>():
-        break;
-    }
-  }
-
   Future<void> addSetResult(BuildContext context, int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date) async {
     if (_workout == null) return;
 
