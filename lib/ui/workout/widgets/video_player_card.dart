@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/config/assets.dart';
@@ -17,8 +20,10 @@ class VideoPlayerCard extends StatefulWidget {
 }
 
 class _VideoPlayerCardState extends State<VideoPlayerCard> {
-  late VideoPlayerController _controller;
+  VideoPlayerController? _controller;
+  VoidCallback? _listener;
   String currentVideoUrl = '';
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -27,26 +32,60 @@ class _VideoPlayerCardState extends State<VideoPlayerCard> {
 
   }
 
-  void _initController(){
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
-      ..initialize().then((_) {
-        setState(() {});
-      });
-    _controller.addListener(
-          () {
-        setState(() {});
-      },
-    );
-    currentVideoUrl = widget.videoUrl;
-  }
+  Future<void> _initController() async {
+    final url = widget.videoUrl;
 
+    if (url.trim().isEmpty) return;
+
+    if (_controller != null) {
+      _controller?.removeListener(_listener ?? () {});
+      _controller?.pause();
+      _controller?.dispose();
+    }
+
+    setState(() {
+      _isInitialized = false;
+    });
+
+    try {
+      File? file;
+
+      try {
+        file = await DefaultCacheManager().getSingleFile(url);
+      } catch (_) {
+        file = null;
+      }
+
+      final controller = file != null
+          ? VideoPlayerController.file(file)
+          : VideoPlayerController.networkUrl(Uri.parse(url));
+
+      await controller.initialize();
+      controller.setLooping(false);
+      controller.setVolume(0);
+
+      _listener = () {
+        if (mounted) setState(() {});
+      };
+      controller.addListener(_listener!);
+
+      if (!mounted) return;
+
+      setState(() {
+        _controller = controller;
+        _isInitialized = true;
+        currentVideoUrl = url;
+      });
+    } catch (e) {
+      debugPrint('Ошибка инициализации видео $e');
+    }
+  }
 
 
   @override
   void didUpdateWidget(VideoPlayerCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (currentVideoUrl != widget.videoUrl) {
-      _controller.dispose();
       _initController();
     }
 
@@ -54,6 +93,7 @@ class _VideoPlayerCardState extends State<VideoPlayerCard> {
 
   @override
   Widget build(BuildContext context) {
+    final isReady = _controller?.value.isInitialized ?? false;
     return ClipRRect(
       borderRadius: BorderRadius.all(Radius.circular(4)),
       child: Container(
@@ -61,11 +101,11 @@ class _VideoPlayerCardState extends State<VideoPlayerCard> {
         color: Colors.white24,
         child: Stack(
           children: [
-            _controller.value.isInitialized
+            isReady
                 ? Center(
                     child: AspectRatio(
-                      aspectRatio: _controller.value.aspectRatio,
-                      child: VideoPlayer(_controller),
+                      aspectRatio: _controller?.value.aspectRatio ?? 16 / 9,
+                      child: _controller != null ? VideoPlayer(_controller!) : const SizedBox(),
                     ),
                   )
                 : SizedBox.shrink(),
@@ -73,13 +113,15 @@ class _VideoPlayerCardState extends State<VideoPlayerCard> {
               Positioned.fill(
                 child: InkWell(
                   onTap: () {
-                    setState(() {
-                      _controller.value.isPlaying ? _controller.pause() : _controller.play();
-                    });
+                    final playing = _controller?.value.isPlaying ?? false;
+                    if (isReady) {
+                      playing ? _controller?.pause() : _controller?.play();
+                      setState(() {});
+                    }
                   },
                   child: Align(
                     alignment: Alignment.center,
-                    child: SvgPicture.asset(_controller.value.isPlaying ? Assets.pauseIcon : Assets.playIcon),
+                    child: SvgPicture.asset((_controller?.value.isPlaying ?? false) ? Assets.pauseIcon : Assets.playIcon),
                   ),
                 ),
               ),
@@ -99,15 +141,18 @@ class _VideoPlayerCardState extends State<VideoPlayerCard> {
   }
 
   void goToPlayerScreen() {
-    if (_controller.value.isInitialized) {
-      _controller.pause();
+    final isReady = _controller?.value.isInitialized ?? false;
+    if (isReady) {
+      _controller?.pause();
     }
     GoRouter.of(context).push(LevelUpRouter.videoPlayerPath, extra: VideoPlayerScreenParams(url: widget.videoUrl, time: 0));
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.removeListener(_listener ?? () {});
+    _controller?.pause();
+    _controller?.dispose();
     super.dispose();
   }
 }

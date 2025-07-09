@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:level_up/data/services/common_models/is_completed_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:level_up/data/services/workout/workout_service.dart';
@@ -46,9 +48,36 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
       final result = await _workoutService.startWorkout(dayIndex);
       _workoutResponse = result;
       _lastDayIndex = dayIndex;
+      _preloadWorkoutVideos(result);
       return Result.ok(result);
     } on DioException catch (e) {
       return Result.error(e);
+    }
+  }
+
+  Future<void> _preloadWorkoutVideos(WorkoutResponse workout) async {
+    final cache = DefaultCacheManager();
+    final videoUrls = <String>{};
+
+    for (final block in workout.data) {
+      for (final item in block.items) {
+        final videos = item.videos ?? [];
+
+        for (final video in videos) {
+          final url = video.url;
+
+          if (url.trim().isNotEmpty) {
+            videoUrls.add(url);
+          }
+        }
+      }
+    }
+
+    for (final url in videoUrls) {
+      try {
+        await cache.downloadFile(url);
+      } catch (e) {
+      }
     }
   }
 
@@ -86,6 +115,7 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
       final dayIndex = _lastDayIndex ?? 0;
       final result = await _workoutService.changeExercise(index, second, dayIndex);
       _workoutResponse = result;
+      _preloadWorkoutVideos(result);
       return Result.ok(result.data);
     } on DioException catch (e) {
       return Result.error(e);
