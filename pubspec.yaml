@@ -38,6 +38,7 @@ dependencies:
   url_launcher: ^6.3.1
   intl: ^0.20.2
   auto_size_text: ^3.0.0
+  flutter_cache_manager: ^3.4.1
 
   flutter_native_splash: ^2.4.6
   alarm: ^5.1.4

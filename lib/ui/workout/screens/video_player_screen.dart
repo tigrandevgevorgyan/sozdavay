@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/config/assets.dart';
@@ -15,29 +18,64 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late VideoPlayerController _controller;
-  late final VoidCallback _listener;
+  VideoPlayerController? _controller;
+  VoidCallback? _listener;
 
   bool _isControlsVisible = true;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.params.url))
-      ..initialize().then((_) {
-        _controller.setVolume(0.0);
-        setState(() {});
-        _controller.play();
-      });
-    _listener = () {
+    _initController();
+  }
+
+  Future<void> _initController() async {
+    try {
+      File? file;
+      try {
+        file = await DefaultCacheManager().getSingleFile(widget.params.url);
+      } catch (_) {
+        file = null;
+      }
+
+      final controller = file != null
+          ? VideoPlayerController.file(file)
+          : VideoPlayerController.networkUrl(Uri.parse(widget.params.url));
+
+      await controller.initialize();
+      await controller.setVolume(0.0);
+      await controller.seekTo(Duration(seconds: widget.params.time));
+
+      _listener = () {
+        if (mounted) setState(() {});
+      };
+      controller.addListener(_listener!);
+
       if (!mounted) return;
-      setState(() {});
-    };
-    _controller.addListener(_listener);
+
+      setState(() {
+        _controller = controller;
+      });
+
+      _controller?.play();
+    } catch (e) {
+      debugPrint('Ошибка при инициализации видео $e');
+    }
   }
 
   @override
+  void dispose() {
+    _controller?.removeListener(_listener ?? () {});
+    _controller?.pause();
+    _controller?.dispose();
+    super.dispose();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
+    final isReady = _controller?.value.isInitialized ?? false;
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: AppColors.backgroundContentColor,
@@ -50,41 +88,43 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           },
           child: Stack(
             children: [
-              _controller.value.isInitialized
+              isReady
                   ? Center(
                 child: AspectRatio(
-                  aspectRatio: _controller.value.aspectRatio,
-                  child: VideoPlayer(_controller),
+                  aspectRatio: _controller?.value.aspectRatio ?? 16 / 9,
+                  child: VideoPlayer(_controller!),
                 ),
               )
                   : SizedBox.shrink(),
               if (_isControlsVisible)
                 VideoControls(
-                  isPlaying: _controller.value.isPlaying,
-                  videoDuration: _controller.value.duration,
-                  currentPlayTime: _controller.value.position,
+                  isPlaying: _controller?.value.isPlaying ?? false,
+                  videoDuration: _controller?.value.duration ?? Duration.zero,
+                  currentPlayTime: _controller?.value.position ?? Duration.zero,
                   onCloseClicked: () => GoRouter.of(context).pop(),
                   onPlayToggleClicked: () {
+                  if (_controller != null) {
                     setState(() {
-                      _controller.value.isPlaying ? _controller.pause() : _controller.play();
+                      _controller!.value.isPlaying
+                          ? _controller!.pause()
+                          : _controller!.play();
                     });
+                  }
+                },
+                 onRewindClicked: () {
+                    final current = _controller?.value.position ?? Duration.zero;
+                    _controller?.seekTo(current - Duration(seconds: 10));
                   },
-                  onRewindClicked: () => _controller.seekTo(Duration(seconds: _controller.value.position.inSeconds - 10)),
-                  onForwardClicked: () => _controller.seekTo(Duration(seconds: _controller.value.position.inSeconds + 10)),
+                  onForwardClicked: () {
+                    final current = _controller?.value.position ?? Duration.zero;
+                    _controller?.seekTo(current + Duration(seconds: 10));
+                  }
                 )
             ],
           ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(_listener);
-    _controller.pause();
-    _controller.dispose();
-    super.dispose();
   }
 }
 
