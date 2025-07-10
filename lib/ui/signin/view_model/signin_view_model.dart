@@ -4,8 +4,10 @@ import 'package:level_up/config/dio_client.dart';
 import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/auth/models/access_token_response.dart';
+import 'package:level_up/data/services/profile/models/user_profile_response.dart';
 import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/utils/result.dart';
+import '../../../utils/error_utils.dart';
 import '../../profile_preferences/view_model/profile_preferences_view_model.dart';
 
 class SignInViewModel extends ChangeNotifier {
@@ -39,6 +41,14 @@ class SignInViewModel extends ChangeNotifier {
   bool _isActionInProgress = false;
 
   bool get isActionInProgress => _isActionInProgress;
+
+  late int _planType;
+
+  int get planType => _planType;
+
+  bool get hasWorkoutPlan {
+    return _planType == 2;
+  }
 
   String get _phoneNumber => '+7${phoneController.text.replaceAll(' ', '').replaceAll('(', '').replaceAll(')', '')}';
 
@@ -87,29 +97,37 @@ class SignInViewModel extends ChangeNotifier {
     final result = await authRepository.signIn(_phoneNumber, code);
     switch (result) {
       case Ok<AccessTokenResponse>():
-        final firstLoginResult = await authRepository.isFirstLogin();
-        bool isFirst = false;
-
-        if (firstLoginResult is Ok<bool>) {
-          isFirst = firstLoginResult.value;
-        }
-        if (isFirst) {
-          await authRepository.markFirstLoginShown();
-          if (context.mounted) {
-            GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath,
+        final profileResult = await profileRepository.getProfile();
+        switch (profileResult) {
+          case Ok<UserProfileExtendedResponse>():
+            final profile = profileResult.value.data;
+            _planType = profile.planType;
+            final isProfileNotFull =
+                profile.category == null ||
+                profile.experience == null ||
+                profile.goal == null ||
+                profile.priority == null ||
+                profile.days == null;
+            if (context.mounted) {
+              if (isProfileNotFull) {
+        GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath,
               extra: ProfilePreferencesParams(
-              hasWorkoutPlan: false,
-              isFirstLogin: true,
+              hasWorkoutPlan: hasWorkoutPlan,
+              isFirstLogin: false,
+              isAfterLogin: true,
             ),);
-          }
-        } else {
-          if (context.mounted) {
-            GoRouter.of(context).go(LevelUpRouter.homePath);
-          }
+              } else {
+                GoRouter.of(context).go(LevelUpRouter.homePath);
+              }
+            }
+            break;
+          case Error<UserProfileExtendedResponse>():
+            if (context.mounted) {
+              ErrorUtils.showError(context, profileResult.error.getErrorMessage());
+            }
         }
         break;
       case Error<AccessTokenResponse>():
-        _codeController.clear();
         _message = result.error.getErrorMessage();
         if (result.error is UserNotFoundError) {
           await authRepository.deauthorize();
