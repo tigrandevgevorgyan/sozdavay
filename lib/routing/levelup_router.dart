@@ -70,6 +70,7 @@ class LevelUpRouter {
                   child: ProfilePreferencesScreen(
                     hasWorkoutPlan: params.hasWorkoutPlan,
                     isFirstLogin: params.isFirstLogin,
+                    isAfterLogin: params.isAfterLogin,
                   ),
                   state: state,
                 );
@@ -94,6 +95,7 @@ class LevelUpRouter {
                   child: ProfilePreferencesScreen(
                     hasWorkoutPlan: params.hasWorkoutPlan,
                     isFirstLogin: params.isFirstLogin,
+                    isAfterLogin: params.isAfterLogin,
                   ),
                   state: state,
                 );

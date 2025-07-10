@@ -331,6 +331,7 @@ class HomeViewModel extends ChangeNotifier {
       extra: ProfilePreferencesParams(
         hasWorkoutPlan: hasPlan,
         isFirstLogin: false,
+        isAfterLogin: false,
       ),
     ).then((result) {
       if (result == true) {
@@ -373,7 +374,7 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> _loadProfile(BuildContext? context) async {
+  Future<bool> _loadProfile(BuildContext context) async {
     final profile = await retryUntilSuccess(() async {
       final response = await profileRepository.getProfile();
       return switch (response) {
@@ -387,6 +388,26 @@ class HomeViewModel extends ChangeNotifier {
       if (profile.data.paidUntil != null) {
         _paidUntil = DateFormat("yyyy-MM-dd").parse(profile.data.paidUntil!);
         _isExpiredDate = DateTime.now().isAfter(_paidUntil!);
+      }
+      final profileData = profile.data;
+      final isProfileNotFull =
+          profileData.category == null ||
+              profileData.experience == null ||
+              profileData.goal == null ||
+              profileData.priority == null ||
+              profileData.days == null;
+      if (context.mounted) {
+        if (isProfileNotFull) {
+          GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath,
+            extra: ProfilePreferencesParams(
+              hasWorkoutPlan: hasWorkoutPlan,
+              isFirstLogin: false,
+              isAfterLogin: true,
+            ),);
+          return false;
+        } else {
+          return true;
+        }
       }
       return true;
     } else {

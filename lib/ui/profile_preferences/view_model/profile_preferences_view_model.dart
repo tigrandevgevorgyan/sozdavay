@@ -16,6 +16,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
   final IDataRepository dataRepository;
   final bool hasWorkoutPlan;
   final bool isFirstLogin;
+  final bool isAfterLogin;
 
   final levelDialogContent = PreferencesOptionsDialogContent('Ваш Уровень сложности');
 
@@ -33,7 +34,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   List<IdNamePairWithPriority> _allPriorities = [];
 
-  ProfilePreferencesViewModel(BuildContext context, {required this.profileRepository, required this.hasWorkoutPlan, required this.dataRepository, required this.isFirstLogin}) {
+  ProfilePreferencesViewModel(BuildContext context, {required this.isAfterLogin, required this.profileRepository, required this.hasWorkoutPlan, required this.dataRepository, required this.isFirstLogin}) {
     _nameController = TextEditingController();
     _loadProfileAndOptions(context);
   }
@@ -182,7 +183,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
     final result = await profileRepository.updateProfile(_nameController.text, _categorySelection!, _trainingWeeklySelection!, _levelSelection!, _goalSelection!, _prioritySelection);
     switch (result) {
       case Ok<UserProfileShortResponse>():
-        if (isFirstLogin) {
+        if (isAfterLogin) {
           GoRouter.of(context).go(LevelUpRouter.homePath);
         } else {
           GoRouter.of(context).pop(true);
@@ -305,7 +306,8 @@ class PreferencesOptionsDialogContent {
 class ProfilePreferencesParams {
   final bool hasWorkoutPlan;
   final bool isFirstLogin;
+  final bool isAfterLogin;
 
-  ProfilePreferencesParams({required this.hasWorkoutPlan, required this.isFirstLogin});
+  ProfilePreferencesParams({required this.isAfterLogin, required this.hasWorkoutPlan, required this.isFirstLogin});
 }
 
