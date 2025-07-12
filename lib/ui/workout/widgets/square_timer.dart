@@ -75,19 +75,8 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
     });
 
     _controller!.addStatusListener((status) async {
-      if (status.isCompleted && !_isCompleted) {
-        setState(() {
-          _isRunning = false;
-          _isCompleted = true;
-        });
-
-        TimerStateManager.removeTimer(widget.timerKey);
-
-        final wasOnBackground = await TimerStateStorage.wasTriggered(1);
-        if (!wasOnBackground) {
-          audioPlayer.play(AssetSource('sounds/notification_sound.wav'));
-        }
-        await TimerStateStorage.clear(1);
+      if (status == AnimationStatus.completed) {
+        _onTimerCompleted();
       }
     });
 
@@ -191,7 +180,23 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
 
     final wasOnBackground = await TimerStateStorage.wasTriggered(1);
     if (!wasOnBackground) {
-      audioPlayer.play(AssetSource('sounds/notification_sound.wav'));
+      await audioPlayer.setAudioContext(AudioContext(
+        android: AudioContextAndroid(
+          isSpeakerphoneOn: false,
+          stayAwake: false,
+          contentType: AndroidContentType.music,
+          usageType: AndroidUsageType.assistanceSonification,
+          audioFocus: AndroidAudioFocus.gainTransientMayDuck,
+        ),
+        iOS: AudioContextIOS(
+          category: AVAudioSessionCategory.playback,
+          options: {AVAudioSessionOptions.mixWithOthers},
+        ),
+      ));
+      await audioPlayer.play(AssetSource('sounds/htc_basic.mp3'));
+      Timer(Duration(seconds: 8), () {
+        audioPlayer.stop();
+      });
     }
     await TimerStateStorage.clear(1);
   }

@@ -6,14 +6,14 @@ AlarmSettings createNotification(int id, DateTime alarmTime) {
   return AlarmSettings(
     id: id,
     dateTime: alarmTime,
-    assetAudioPath: 'assets/sounds/notification_sound.wav',
+    assetAudioPath: 'assets/sounds/htc_basic.mp3',
     loopAudio: false,
     vibrate: true,
     warningNotificationOnKill: Platform.isIOS,
     androidFullScreenIntent: true,
     volumeSettings: VolumeSettings.fade(
       volume: 0.8,
-      fadeDuration: Duration(seconds: 5),
+      fadeDuration: Duration(seconds: 6),
       volumeEnforced: true,
     ),
     notificationSettings: const NotificationSettings(
