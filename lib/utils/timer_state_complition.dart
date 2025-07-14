@@ -14,7 +14,7 @@ class TimerCompletionService {
   }
 
   Future<void> onTimerCompleted(String timerKey, int timerId) async {
-    final wasOnBackground = await TimerStateStorage.wasTriggered(2);
+    final wasOnBackground = await TimerStateStorage.wasTriggered(timerId);
     if (!wasOnBackground) {
       await _audioPlayer.setAudioContext(AudioContext(
         android: AudioContextAndroid(

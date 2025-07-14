@@ -25,7 +25,6 @@ class SquareTimer extends StatefulWidget {
 }
 
 class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin {
-  final AudioPlayer audioPlayer = AudioPlayer();
   AnimationController? _controller;
   Timer? _updateTimer;
 
@@ -129,17 +128,23 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   void _restoreTimerState() {
     final savedState = TimerStateManager.getTimerState(widget.timerKey);
 
-    if (savedState != null && savedState.isRunning && !savedState.isCompletedByTime) {
+    if (savedState != null) {
       setState(() {
-        _isRunning = true;
-        _isCompleted = false;
+        _isRunning = savedState.isRunning;
+        _isCompleted = savedState.isCompleted;
         _currentProgress = savedState.progress;
       });
 
-      _startPeriodicUpdate();
-
-      _controller?.reset();
-      _controller?.forward(from: savedState.progress);
+      if (savedState.isRunning && !savedState.isCompleted) {
+        _startPeriodicUpdate();
+        _controller?.reset();
+        _controller?.forward(from: savedState.progress);
+      } else if (savedState.isCompleted) {
+        _controller?.reset();
+        _controller?.forward(from: 1.0);
+      } else {
+        _controller?.reset();
+      }
     } else {
       setState(() {
         _isRunning = false;
@@ -163,9 +168,20 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
           startTime: startTime,
           totalSeconds: widget.secondsDuration,
           isRunning: true,
+          isCompleted: false,
         ),
       );
-    } else if (_isCompleted || !_isRunning) {
+    } else if (_isCompleted) {
+      TimerStateManager.saveTimerState(
+        key,
+        TimerState(
+          startTime: DateTime.now(),
+          totalSeconds: widget.secondsDuration,
+          isRunning: false,
+          isCompleted: true,
+        ),
+      );
+    } else {
       TimerStateManager.removeTimer(key);
     }
   }
@@ -200,7 +216,15 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       _currentProgress = 1.0;
     });
 
-    TimerStateManager.removeTimer(widget.timerKey);
+    TimerStateManager.saveTimerState(
+      widget.timerKey,
+      TimerState(
+        startTime: DateTime.now(),
+        totalSeconds: widget.secondsDuration,
+        isRunning: false,
+        isCompleted: true,
+      ),
+    );
 
     await TimerCompletionService().onTimerCompleted(widget.timerKey, 1);
   }
@@ -253,9 +277,22 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       cancelSquareNotification();
       cancelCountdownNotification(1);
       TimerStateStorage.clear(1);
+    } else if (_isCompleted) {
+      _resetTimer();
     } else {
       _startNewTimer();
     }
+  }
+
+  void _resetTimer() {
+    setState(() {
+      _isRunning = false;
+      _isCompleted = false;
+      _currentProgress = 0.0;
+    });
+
+    _controller?.reset();
+    TimerStateManager.removeTimer(widget.timerKey);
   }
 
   void _startNewTimer() {
@@ -264,6 +301,12 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
     TimerStateStorage.clear(1);
 
     TimerStateManager.stopAllExcept(widget.timerKey);
+    TimerStateManager.setCompletionCallback(widget.timerKey, () {
+      TimerCompletionService().onTimerCompleted(widget.timerKey, 1);
+      if (mounted) {
+        _setCompletedState();
+      }
+    });
 
     setState(() {
       _isRunning = true;
@@ -277,6 +320,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
         startTime: DateTime.now(),
         totalSeconds: widget.secondsDuration,
         isRunning: true,
+        isCompleted: false,
       ),
     );
 
@@ -290,7 +334,6 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
     _saveCurrentState(null);
     _controller?.dispose();
     _updateTimer?.cancel();
-    audioPlayer.dispose();
     _lifecycleListener.dispose();
     super.dispose();
   }

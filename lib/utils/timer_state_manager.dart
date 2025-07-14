@@ -8,21 +8,30 @@ class TimerStateManager {
 
   static void saveTimerState(String key, TimerState state) {
     _timers[key] = state;
-    _startGlobalTimer();
+    if (!state.isCompleted) {
+      _startGlobalTimer();
+    }
   }
 
   static TimerState? getTimerState(String key) {
     final state = _timers[key];
-    if (state != null && state.isCompletedByTime) {
+    if (state != null && !state.isCompleted && state.isCompletedByTime) {
+      _timers[key] = state.copyWith(isCompleted: true, isRunning: false);
       _completionCallbacks[key]?.call();
-      removeTimer(key);
-      return null;
+      return _timers[key];
     }
     return state;
   }
 
   static void setCompletionCallback(String key, Function() callback) {
     _completionCallbacks[key] = callback;
+  }
+
+  static void markAsCompleted(String key) {
+    final state = _timers[key];
+    if (state != null) {
+      _timers[key] = state.copyWith(isCompleted: true, isRunning: false);
+    }
   }
 
   static void removeTimer(String key) {
@@ -36,12 +45,14 @@ class TimerStateManager {
 
   static void clearAll() {
     _timers.clear();
+    _completionCallbacks.clear();
   }
 
   static void stopAllExcept(String keyToKeep) {
     final keysToRemove = _timers.keys.where((k) => k != keyToKeep).toList();
     for (final key in keysToRemove) {
       _timers.remove(key);
+      _completionCallbacks.remove(key);
     }
   }
 
@@ -52,37 +63,39 @@ class TimerStateManager {
       final completedKeys = <String>[];
 
       for (final entry in _timers.entries) {
-        if (entry.value.isCompletedByTime) {
+        if (!entry.value.isCompleted && entry.value.isCompletedByTime) {
           completedKeys.add(entry.key);
         }
       }
 
       for (final key in completedKeys) {
+        markAsCompleted(key);
         _completionCallbacks[key]?.call();
-        removeTimer(key);
       }
-
-      if (_timers.isEmpty) {
+      final hasActiveTimers = _timers.values.any((state) => !state.isCompleted);
+      if (!hasActiveTimers) {
         timer.cancel();
         _globalTimer = null;
       }
     });
   }
-
 }
 
 class TimerState {
   final DateTime startTime;
   final int totalSeconds;
   final bool isRunning;
+  final bool isCompleted;
 
   TimerState({
     required this.startTime,
     required this.totalSeconds,
     required this.isRunning,
+    this.isCompleted = false,
   });
 
   double get progress {
+    if (isCompleted) return 1.0;
     if (!isRunning) return 0.0;
 
     final elapsed = DateTime.now().difference(startTime).inMilliseconds;
@@ -95,11 +108,25 @@ class TimerState {
   bool get isCompletedByTime => progress >= 1.0;
 
   int get remainingSeconds {
+    if (isCompleted) return 0;
     if (!isRunning) return totalSeconds;
 
     final elapsed = DateTime.now().difference(startTime).inSeconds;
     final remaining = totalSeconds - elapsed;
 
     return remaining.clamp(0, totalSeconds);
+  }
+  TimerState copyWith({
+    DateTime? startTime,
+    int? totalSeconds,
+    bool? isRunning,
+    bool? isCompleted,
+  }) {
+    return TimerState(
+      startTime: startTime ?? this.startTime,
+      totalSeconds: totalSeconds ?? this.totalSeconds,
+      isRunning: isRunning ?? this.isRunning,
+      isCompleted: isCompleted ?? this.isCompleted,
+    );
   }
 }

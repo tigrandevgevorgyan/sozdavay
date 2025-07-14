@@ -36,7 +36,7 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
   @override
   void initState() {
     super.initState();
-    cancelSquareNotification();
+    cancelHorizontalNotification();
     cancelCountdownNotification(2);
     TimerStateStorage.clear(2);
     _initializeTimer();
@@ -127,17 +127,23 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
   void _restoreTimerState() {
     final savedState = TimerStateManager.getTimerState(widget.timerKey);
 
-    if (savedState != null && savedState.isRunning && !savedState.isCompletedByTime) {
+    if (savedState != null) {
       setState(() {
-        _isRunning = true;
-        _isCompleted = false;
+        _isRunning = savedState.isRunning;
+        _isCompleted = savedState.isCompleted;
         _currentProgress = savedState.progress;
       });
 
-      _startPeriodicUpdate();
-
-      _controller?.reset();
-      _controller?.forward(from: savedState.progress);
+      if (savedState.isRunning && !savedState.isCompleted) {
+        _startPeriodicUpdate();
+        _controller?.reset();
+        _controller?.forward(from: savedState.progress);
+      } else if (savedState.isCompleted) {
+        _controller?.reset();
+        _controller?.forward(from: 1.0);
+      } else {
+        _controller?.reset();
+      }
     } else {
       setState(() {
         _isRunning = false;
@@ -161,9 +167,20 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
           startTime: startTime,
           totalSeconds: widget.secondsToCount,
           isRunning: true,
+          isCompleted: false,
         ),
       );
-    } else if (_isCompleted || !_isRunning) {
+    } else if (_isCompleted) {
+      TimerStateManager.saveTimerState(
+        key,
+        TimerState(
+          startTime: DateTime.now(),
+          totalSeconds: widget.secondsToCount,
+          isRunning: false,
+          isCompleted: true,
+        ),
+      );
+    } else {
       TimerStateManager.removeTimer(key);
     }
   }
@@ -198,7 +215,15 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
       _currentProgress = 1.0;
     });
 
-    TimerStateManager.removeTimer(widget.timerKey);
+    TimerStateManager.saveTimerState(
+      widget.timerKey,
+      TimerState(
+        startTime: DateTime.now(),
+        totalSeconds: widget.secondsToCount,
+        isRunning: false,
+        isCompleted: true,
+      ),
+    );
 
     await TimerCompletionService().onTimerCompleted(widget.timerKey, 2);
   }
@@ -255,9 +280,22 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
       cancelSquareNotification();
       cancelCountdownNotification(2);
       TimerStateStorage.clear(2);
+    } else if (_isCompleted) {
+      _resetTimer();
     } else {
       _startNewTimer();
     }
+  }
+
+  void _resetTimer() {
+    setState(() {
+      _isRunning = false;
+      _isCompleted = false;
+      _currentProgress = 0.0;
+    });
+
+    _controller?.reset();
+    TimerStateManager.removeTimer(widget.timerKey);
   }
 
   void _startNewTimer() {
@@ -266,6 +304,13 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
     TimerStateStorage.clear(2);
 
     TimerStateManager.stopAllExcept(widget.timerKey);
+
+    TimerStateManager.setCompletionCallback(widget.timerKey, () {
+      TimerCompletionService().onTimerCompleted(widget.timerKey, 2);
+      if (mounted) {
+        _setCompletedState();
+      }
+    });
 
     setState(() {
       _isRunning = true;
@@ -279,6 +324,7 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
         startTime: DateTime.now(),
         totalSeconds: widget.secondsToCount,
         isRunning: true,
+        isCompleted: false,
       ),
     );
 
