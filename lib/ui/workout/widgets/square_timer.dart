@@ -32,11 +32,17 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   bool _isCompleted = false;
   double _currentProgress = 0.0;
 
-  late final AppLifecycleListener _lifecycleListener;
+  AppLifecycleListener? _lifecycleListener;
 
   @override
   void initState() {
     super.initState();
+    if (widget.secondsDuration <= 0 || !widget.haveRest) {
+      _isRunning = false;
+      _isCompleted = false;
+      _currentProgress = 0.0;
+      return;
+    }
     cancelSquareNotification();
     cancelCountdownNotification(1);
     TimerStateStorage.clear(1);
@@ -67,6 +73,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   }
 
   void _setCompletedState() {
+    if (!mounted) return;
     setState(() {
       _isRunning = false;
       _isCompleted = true;
@@ -126,9 +133,10 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   }
 
   void _restoreTimerState() {
+    if (widget.secondsDuration <= 0) return;
     final savedState = TimerStateManager.getTimerState(widget.timerKey);
 
-    if (savedState != null) {
+    if (savedState != null && savedState.totalSeconds > 0) {
       setState(() {
         _isRunning = savedState.isRunning;
         _isCompleted = savedState.isCompleted;
@@ -156,6 +164,8 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   }
 
   void _saveCurrentState(String? timerKey) {
+    if (widget.secondsDuration <= 0) return;
+
     final key = timerKey ?? widget.timerKey;
 
     if (_isRunning && !_isCompleted) {
@@ -231,6 +241,13 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    if (widget.secondsDuration <= 0 || !widget.haveRest) {
+      return Expanded(
+        child: Center(
+          child: Text("Без отдыха", style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
+        ),
+      );
+    }
     return Expanded(
       child: Stack(
         fit: StackFit.expand,
@@ -334,7 +351,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
     _saveCurrentState(null);
     _controller?.dispose();
     _updateTimer?.cancel();
-    _lifecycleListener.dispose();
+    _lifecycleListener?.dispose();
     super.dispose();
   }
 }

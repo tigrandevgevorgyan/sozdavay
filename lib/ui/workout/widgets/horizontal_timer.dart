@@ -31,11 +31,17 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
   bool _isCompleted = false;
   double _currentProgress = 0.0;
 
-  late final AppLifecycleListener _lifecycleListener;
+  AppLifecycleListener? _lifecycleListener;
 
   @override
   void initState() {
     super.initState();
+    if (widget.secondsToCount <= 0) {
+      _isRunning = false;
+      _isCompleted = false;
+      _currentProgress = 0.0;
+      return;
+    }
     cancelHorizontalNotification();
     cancelCountdownNotification(2);
     TimerStateStorage.clear(2);
@@ -66,6 +72,7 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
   }
 
   void _setCompletedState() {
+    if (!mounted) return;
     setState(() {
       _isRunning = false;
       _isCompleted = true;
@@ -125,9 +132,10 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
   }
 
   void _restoreTimerState() {
+    if (widget.secondsToCount <= 0) return;
     final savedState = TimerStateManager.getTimerState(widget.timerKey);
 
-    if (savedState != null) {
+    if (savedState != null && savedState.totalSeconds > 0) {
       setState(() {
         _isRunning = savedState.isRunning;
         _isCompleted = savedState.isCompleted;
@@ -155,6 +163,7 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
   }
 
   void _saveCurrentState(String? timerKey) {
+    if (widget.secondsToCount <= 0) return;
     final key = timerKey ?? widget.timerKey;
 
     if (_isRunning && !_isCompleted) {
@@ -230,6 +239,11 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    if (widget.secondsToCount <= 0) {
+      return Expanded(
+          child: Text("Без отдыха", style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
+      );
+    }
     return Stack(
       children: [
         SizedBox(
@@ -338,7 +352,7 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
     _saveCurrentState(null);
     _controller?.dispose();
     _updateTimer?.cancel();
-    _lifecycleListener.dispose();
+    _lifecycleListener?.dispose();
     super.dispose();
   }
 }

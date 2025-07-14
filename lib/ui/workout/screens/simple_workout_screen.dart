@@ -76,7 +76,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                                                 title: provider.getRestString(workoutInfo.items.first),
                                                 secondsDuration: workoutInfo.items.first.restSeconds ?? 0,
                                                 haveRest: (workoutInfo.items.first.restSeconds ?? 0) > 0,
-                                                timerKey: 'timer_${workoutInfo.items.first.id}_${workoutInfo.items.last.id}',
+                                                timerKey: 'square_timer_${workoutInfo.items.first.id}_${workoutInfo.items.first.restSeconds}'
                                               ),
                                             ],
                                           ),

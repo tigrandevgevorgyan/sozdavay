@@ -136,7 +136,7 @@ class _DoubleWorkoutScreenState extends State<DoubleWorkoutScreen> {
                                 widget.workoutInfo.items.first.restSeconds ?? 0,
                                 widget.workoutInfo.items.last.restSeconds ?? 0,
                               ),
-                              timerKey: 'timer_${widget.workoutInfo.items.first.id}_${widget.workoutInfo.items.last.id}',
+                              timerKey: 'horizontal_timer_${widget.workoutInfo.items.last.id}_${widget.workoutInfo.items.last.restSeconds}'
                             ),
                             SizedBox(height: 8),
                             SizedBox(
