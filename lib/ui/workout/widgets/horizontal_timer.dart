@@ -240,8 +240,19 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
   @override
   Widget build(BuildContext context) {
     if (widget.secondsToCount <= 0) {
-      return Expanded(
-          child: Text("Без отдыха", style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
+      return LevelUpContainer(
+        height: 40,
+        color: AppColors.backgroundContentColor,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Без отдыха",
+              style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor),
+            ),
+          ),
+        ),
       );
     }
     return Stack(
