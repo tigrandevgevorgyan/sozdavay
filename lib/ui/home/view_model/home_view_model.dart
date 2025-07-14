@@ -394,7 +394,6 @@ class HomeViewModel extends ChangeNotifier {
           profileData.category == null ||
               profileData.experience == null ||
               profileData.goal == null ||
-              profileData.priority == null ||
               profileData.days == null;
       if (context.mounted) {
         if (isProfileNotFull) {

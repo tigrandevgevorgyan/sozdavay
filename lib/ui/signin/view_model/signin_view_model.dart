@@ -106,7 +106,6 @@ class SignInViewModel extends ChangeNotifier {
                 profile.category == null ||
                 profile.experience == null ||
                 profile.goal == null ||
-                profile.priority == null ||
                 profile.days == null;
             if (context.mounted) {
               if (isProfileNotFull) {
