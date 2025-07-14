@@ -292,7 +292,7 @@ class HomeViewModel extends ChangeNotifier {
       context: context,
       builder: (_) =>
           WorkoutShowDialog(
-            title: 'Начав эту тренировку, вы удалите прогресс по текущей "$workoutName".',
+            title: 'Тренировка "$workoutName" не завершена. Если в ней были записи - они не сохранятся.',
             confirmText: 'Продолжить',
             onConfirm: () {
               deleteWorkoutAndStartNew(context, workoutId, dayIndex);
