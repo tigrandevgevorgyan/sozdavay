@@ -12,7 +12,7 @@ AlarmSettings createNotification(int id, DateTime alarmTime) {
     warningNotificationOnKill: Platform.isIOS,
     androidFullScreenIntent: true,
     volumeSettings: VolumeSettings.fade(
-      volume: 0.8,
+      volume: 0.0,
       fadeDuration: Duration(seconds: 6),
       volumeEnforced: true,
     ),
