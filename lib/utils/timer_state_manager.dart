@@ -1,17 +1,37 @@
 
+import 'dart:async';
+
 class TimerStateManager {
   static final Map<String, TimerState> _timers = {};
+  static final Map<String, Function()> _completionCallbacks = {};
+  static Timer? _globalTimer;
 
   static void saveTimerState(String key, TimerState state) {
     _timers[key] = state;
+    _startGlobalTimer();
   }
 
   static TimerState? getTimerState(String key) {
-    return _timers[key];
+    final state = _timers[key];
+    if (state != null && state.isCompletedByTime) {
+      _completionCallbacks[key]?.call();
+      removeTimer(key);
+      return null;
+    }
+    return state;
+  }
+
+  static void setCompletionCallback(String key, Function() callback) {
+    _completionCallbacks[key] = callback;
   }
 
   static void removeTimer(String key) {
     _timers.remove(key);
+    _completionCallbacks.remove(key);
+    if (_timers.isEmpty) {
+      _globalTimer?.cancel();
+      _globalTimer = null;
+    }
   }
 
   static void clearAll() {
@@ -23,6 +43,30 @@ class TimerStateManager {
     for (final key in keysToRemove) {
       _timers.remove(key);
     }
+  }
+
+  static void _startGlobalTimer() {
+    if (_globalTimer != null) return;
+
+    _globalTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
+      final completedKeys = <String>[];
+
+      for (final entry in _timers.entries) {
+        if (entry.value.isCompletedByTime) {
+          completedKeys.add(entry.key);
+        }
+      }
+
+      for (final key in completedKeys) {
+        _completionCallbacks[key]?.call();
+        removeTimer(key);
+      }
+
+      if (_timers.isEmpty) {
+        timer.cancel();
+        _globalTimer = null;
+      }
+    });
   }
 
 }
@@ -48,7 +92,7 @@ class TimerState {
     return progress.clamp(0.0, 1.0);
   }
 
-  bool get isCompleted => progress >= 1.0;
+  bool get isCompletedByTime => progress >= 1.0;
 
   int get remainingSeconds {
     if (!isRunning) return totalSeconds;
