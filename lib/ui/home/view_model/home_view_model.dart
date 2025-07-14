@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -23,10 +24,12 @@ import '../../../data/services/data/models/main_response.dart';
 import '../../../data/services/data/models/refresh_response.dart';
 import '../../../data/services/workout/models/workout_response.dart';
 import '../../../utils/misc_utils.dart';
+import '../../../utils/timer_state_manager.dart';
 import '../../core/common_widgets/level_up_button.dart';
 import '../../core/themes/text_styles.dart';
 import '../../profile_preferences/view_model/profile_preferences_view_model.dart';
 import '../../workout/widgets/workout_show_dialog.dart';
+import 'package:path_provider/path_provider.dart';
 
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel(
@@ -341,6 +344,27 @@ class HomeViewModel extends ChangeNotifier {
     });
   }
 
+
+  Future<void> cleanAppStateOnLogout() async {
+
+    await localStorage.clearSharedPreferences();
+
+    final tempDir = await getTemporaryDirectory();
+    if (tempDir.existsSync()) {
+      try {
+        tempDir.deleteSync(recursive: true);
+      } catch (_) {}
+    }
+
+    try {
+      final notificationPlugin = FlutterLocalNotificationsPlugin();
+      await notificationPlugin.cancelAll();
+    } catch (_) {}
+
+    TimerStateManager.clearAll();
+  }
+
+
   void logout(BuildContext context) async {
     stopRefreshTimer();
     _isLoading = true;
@@ -351,6 +375,7 @@ class HomeViewModel extends ChangeNotifier {
     switch (result) {
       case Ok<void>():
         GetIt.I<IProfileRepository>().onLogout();
+        await cleanAppStateOnLogout();
         if (context.mounted) {
           GoRouter.of(context).go(LevelUpRouter.signInPath);
         }
