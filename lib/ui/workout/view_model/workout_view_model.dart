@@ -74,7 +74,8 @@ class WorkoutViewModel extends ChangeNotifier {
   Future<void> addSetResult(BuildContext context, int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date) async {
     if (_workout == null) return;
 
-    final newResult = ResultValue(DateTime.now().millisecondsSinceEpoch, weight.toDouble(), repeats, difficult, time, date);
+    final localId = DateTime.now().millisecondsSinceEpoch;
+    final newResult = ResultValue(localId, weight.toDouble(), repeats, difficult, time, date);
 
     final today = getToday();
     final weekday = getWeekday();
@@ -85,7 +86,7 @@ class WorkoutViewModel extends ChangeNotifier {
 
         final existing = exercise.history.firstWhere(
           (h) => h.date == today,
-          orElse: () => HistoryInfo(weekday, today, [], '', DateTime.now().millisecondsSinceEpoch),
+          orElse: () => HistoryInfo(weekday, today, [], '', itemId),
         );
 
         existing.values.insert(0, newResult);
@@ -101,9 +102,35 @@ class WorkoutViewModel extends ChangeNotifier {
 
     final result = await workoutRepository.addSetResult(exerciseId, itemId, weight, repeats, difficult, time, date);
 
-    if (result case Error()) {
-      if (context.mounted) {
-        ErrorUtils.showError(context, result.error.getErrorMessage());
+    if (result case Ok<List<HistoryInfo>>(value: final histories)) {
+      final today = getToday();
+
+      final todayHistory = histories.firstWhere(
+            (h) => h.date == today && h.itemId == itemId,
+        orElse: () => histories.first,
+      );
+
+      if (todayHistory.values.isNotEmpty) {
+        final realId = todayHistory.values.first.id;
+        _replaceTempIdInHistory(exerciseId, localId, realId, itemId);
+      }
+    }
+  }
+
+  void _replaceTempIdInHistory(int exerciseId, int localId, int realId, int itemId) {
+    for (final workout in _workout!) {
+      for (final exercise in workout.items) {
+        if (exercise.id != exerciseId || exercise.itemId != itemId) continue;
+
+        for (final history in exercise.history) {
+          final index = history.values.indexWhere((v) => v.id == localId);
+          if (index != -1) {
+            final updated = history.values[index].copyWith(id: realId);
+            history.values[index] = updated;
+            notifyListeners();
+            return;
+          }
+        }
       }
     }
   }
@@ -191,10 +218,13 @@ class WorkoutViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void onHomeClicked() async {
+    await workoutRepository.sendOfflineOperations();
+  }
+
   void _finishWorkout(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
-    await workoutRepository.sendOfflineOperations();
     final result = await workoutRepository.finishWorkout();
     _isLoading = false;
     notifyListeners();

@@ -1,13 +1,11 @@
 import 'dart:async';
-
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:level_up/data/services/common_models/is_completed_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:level_up/data/services/workout/workout_service.dart';
 import 'package:level_up/utils/result.dart';
-
+import '../../../config/dio_client.dart';
 import '../../services/local_storage.dart';
 import '../../services/workout/models/workout_comment.dart';
 import '../../services/workout/models/workout_sets.dart';
@@ -17,15 +15,15 @@ abstract class IWorkoutRepository {
 
   Future<Result<List<WorkoutInfo>>> changeExercise(int index, bool second);
 
-  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date);
+  Future<Result<List<HistoryInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date);
 
   Future<Result<void>> finishWorkout();
 
   Future<Result<IsCompletedResponse>> deleteWorkout(int workoutId);
 
-  Future<Result<List<WorkoutInfo>>> updateSetResult(int id, int exerciseId, double weight, int repeats, int difficult, int time);
+  Future<Result<List<HistoryInfo>>> updateSetResult(int id, int exerciseId, double weight, int repeats, int difficult, int time);
 
-  Future<Result<List<WorkoutInfo>>> deleteSetResult(int id);
+  Future<Result<List<HistoryInfo>>> deleteSetResult(int id);
 
   Future<void> sendOfflineOperations();
 
@@ -122,15 +120,14 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
     }
   }
 
-  Future<void> _tryWithRetry(
-    Future<void> Function() operation, {
+  Future<T> _tryWithRetry<T>(
+    Future<T> Function() operation, {
     int maxTryCount = 3,
     void Function(Object error)? onRetryError,
   }) async {
     for (int tryCount = 1; tryCount <= maxTryCount; tryCount++) {
       try {
-        await operation();
-        return;
+        return await operation();
       } catch (e) {
         if (tryCount == 1 && onRetryError != null) {
           onRetryError(e);
@@ -140,40 +137,47 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
         await Future.delayed(Duration(seconds: 1));
       }
     }
+    throw Exception();
   }
 
   @override
-  Future<Result<List<WorkoutInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date) async {
+  Future<Result<List<HistoryInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date) async {
     final offlineSet = WorkoutSets.add(itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time, date: date);
 
     try {
-      await _tryWithRetry(
+      final response = await _tryWithRetry(
             () => _workoutService.addSetResult(exerciseId, itemId, weight, repeats, difficult, time, date),
         onRetryError: (_) async {
           await _localStorage.saveOfflineOperation(offlineSet);
         },
       );
       await _localStorage.removeOfflineOperation(offlineSet);
-      return Result.ok(<WorkoutInfo>[]);
-    } catch (e) {
+      return Result.ok(response);
+    } on DataNotFoundError {
+      await _localStorage.removeOfflineOperation(offlineSet);
+      return Result.error(Exception("Данные не найдены"));
+    } catch (_) {
       return Result.ok([]);
     }
   }
 
   @override
-  Future<Result<List<WorkoutInfo>>> updateSetResult(int id, int exerciseId, double weight, int repeats, int difficult, int time) async {
+  Future<Result<List<HistoryInfo>>> updateSetResult(int id, int exerciseId, double weight, int repeats, int difficult, int time) async {
     final offlineSet = WorkoutSets.update(id: id, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time);
 
     try {
-      await _tryWithRetry(
+      final response = await _tryWithRetry(
             () => _workoutService.updateSetResult(id, exerciseId, weight, repeats, difficult, time),
         onRetryError: (e) async {
           await _localStorage.saveOfflineOperation(offlineSet);
         },
       );
       await _localStorage.removeOfflineOperation(offlineSet);
-      return Result.ok(<WorkoutInfo>[]);
-    } catch (e) {
+      return Result.ok(response);
+    } on DataNotFoundError {
+      await _localStorage.removeOfflineOperation(offlineSet);
+      return Result.error(Exception("Данные не найдены"));
+    } catch (_) {
       return Result.ok([]);
     }
   }
@@ -216,25 +220,31 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
             break;
         }
         await _localStorage.removeOfflineOperation(set);
-      } catch (e) {
+      } on DataNotFoundError {
+        await _localStorage.removeOfflineOperation(WorkoutSets.fromJson(map));
+        continue;
+      } catch (_) {
         continue;
       }
     }
   }
 
   @override
-  Future<Result<List<WorkoutInfo>>> deleteSetResult(int id) async {
+  Future<Result<List<HistoryInfo>>> deleteSetResult(int id) async {
     final offlineSet = WorkoutSets.delete(id: id);
     try {
-      await _tryWithRetry(
+      final response = await _tryWithRetry(
             () => _workoutService.deleteSetResult(id),
         onRetryError: (_) async {
           await _localStorage.saveOfflineOperation(offlineSet);
         },
       );
       await _localStorage.removeOfflineOperation(offlineSet);
-      return Result.ok(<WorkoutInfo>[]);
-    } catch (e) {
+      return Result.ok(response);
+    } on DataNotFoundError {
+      await _localStorage.removeOfflineOperation(offlineSet);
+      return Result.error(Exception("Данные не найдены"));
+    } catch (_) {
       return Result.ok([]);
     }
   }
