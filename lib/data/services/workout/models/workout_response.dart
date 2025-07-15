@@ -164,11 +164,12 @@ class ResultValue {
 
 extension ResultValueCopyWith on ResultValue {
   ResultValue copyWith({
+    int? id,
     double? weight,
     int? repeats,
     int? time,
   }) {
-    return ResultValue(id, weight ?? this.weight, repeats ?? this.repeats, difficult, time ?? this.time, date);
+    return ResultValue(id ?? this.id, weight ?? this.weight, repeats ?? this.repeats, difficult, time ?? this.time, date);
   }
 }
 

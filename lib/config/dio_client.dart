@@ -1,10 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get_it/get_it.dart';
-import 'package:go_router/go_router.dart';
-import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
 import 'package:level_up/data/services/local_storage.dart';
-import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/utils/result.dart';
 
 class DioClient {
@@ -36,6 +32,9 @@ class DioClient {
       if (response.data.toString().toLowerCase().contains('пользователь не найден')) {
         return handler.reject(UserNotFoundError(response), true);
       }
+      if (response.data.toString().toLowerCase().contains('данные не найдены') || (response.data is Map<String, dynamic> && response.data['success'] == false)) {
+        return handler.reject(DataNotFoundError(response), true);
+      }
       return handler.next(response);
     }));
 
@@ -60,6 +59,16 @@ class UserNotFoundError extends DioException {
     response: response,
     type: DioExceptionType.badResponse,
     message: 'Пользователь не найден',
+  );
+}
+
+class DataNotFoundError extends DioException {
+  DataNotFoundError(Response response)
+      : super(
+    requestOptions: response.requestOptions,
+    response: response,
+    type: DioExceptionType.badResponse,
+    message: 'Данные не найдены',
   );
 }
 

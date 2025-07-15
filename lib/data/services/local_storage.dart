@@ -69,7 +69,12 @@ class LocalStorageImpl extends ILocalStorage {
       final key = _workoutSetsKey;
       final list = sp.getStringList(key) ?? [];
       final encoded = jsonEncode(set.toJson());
-      list.removeWhere((entry) => entry == encoded);
+      list.removeWhere((entry) {
+        final existing = jsonDecode(entry);
+        return existing['action'] == set.action &&
+            existing['item_id'] == set.itemId &&
+            existing['date'] == set.date;
+      });
       list.add(encoded);
       await sp.setStringList(key, list);
       return Result.ok(null);

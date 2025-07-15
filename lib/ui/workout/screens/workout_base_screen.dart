@@ -62,6 +62,7 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
                           onRightArrowClicked: () => provider.onNextClicked(context),
                           onHomeClicked: () {
                             GoRouter.of(context).pop();
+                            provider.onHomeClicked();
                           },
                         ),
                         SizedBox(height: 10),
