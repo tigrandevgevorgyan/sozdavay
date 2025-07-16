@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
     <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <application
         android:label="220LBS"
         android:name="${applicationName}"
@@ -44,6 +45,10 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/notification_icon" />
+
+        <meta-data
+            android:name="android.media.AudioFocus"
+            android:value="false" />
 
         <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/colorAccent" />
     </application>

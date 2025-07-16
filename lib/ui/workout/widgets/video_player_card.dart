@@ -57,8 +57,20 @@ class _VideoPlayerCardState extends State<VideoPlayerCard> {
       }
 
       final controller = file != null
-          ? VideoPlayerController.file(file)
-          : VideoPlayerController.networkUrl(Uri.parse(url));
+          ? VideoPlayerController.file(
+        file,
+        videoPlayerOptions: VideoPlayerOptions(
+          mixWithOthers: true,
+          allowBackgroundPlayback: false,
+        ),
+      )
+          : VideoPlayerController.networkUrl(
+        Uri.parse(url),
+        videoPlayerOptions: VideoPlayerOptions(
+          mixWithOthers: true,
+          allowBackgroundPlayback: false,
+        ),
+      );
 
       await controller.initialize();
       controller.setLooping(false);

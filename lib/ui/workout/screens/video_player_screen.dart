@@ -39,8 +39,20 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       }
 
       final controller = file != null
-          ? VideoPlayerController.file(file)
-          : VideoPlayerController.networkUrl(Uri.parse(widget.params.url));
+          ? VideoPlayerController.file(
+        file,
+        videoPlayerOptions: VideoPlayerOptions(
+          mixWithOthers: true,
+          allowBackgroundPlayback: false,
+        ),
+      )
+          : VideoPlayerController.networkUrl(
+        Uri.parse(widget.params.url),
+        videoPlayerOptions: VideoPlayerOptions(
+          mixWithOthers: true,
+          allowBackgroundPlayback: false,
+        ),
+      );
 
       await controller.initialize();
       await controller.setVolume(0.0);
