@@ -2,7 +2,21 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'workout_sets.g.dart';
 
-enum OfflineAction { add, update, delete, comment }
+@JsonEnum(fieldRename: FieldRename.none)
+enum OfflineAction {
+  @JsonValue('add')
+  add,
+
+  @JsonValue('update')
+  update,
+
+  @JsonValue('delete')
+  delete,
+
+  @JsonValue('comment')
+  comment,
+}
+
 
 @JsonSerializable()
 class WorkoutSets {
@@ -51,6 +65,7 @@ class WorkoutSets {
     required int difficult,
     required int time,
     required String date,
+    int? id,
   }) {
     return WorkoutSets._(
       itemId: itemId,
@@ -61,18 +76,22 @@ class WorkoutSets {
       time: time,
       date: date,
       action: OfflineAction.add,
+      id: id,
     );
   }
 
   factory WorkoutSets.update({
+    required int itemId,
     required int id,
     required int exerciseId,
     required double weight,
     required int repeats,
     required int difficult,
     required int time,
+    required String date,
   }) {
     return WorkoutSets._(
+      itemId: itemId,
       id: id,
       exerciseId: exerciseId,
       weight: weight,
@@ -80,6 +99,7 @@ class WorkoutSets {
       difficult: difficult,
       time: time,
       action: OfflineAction.update,
+      date: date,
     );
   }
 
@@ -135,3 +155,32 @@ class WorkoutSets {
   );
 
 }
+
+extension WorkoutSetsCopyWith on WorkoutSets {
+  WorkoutSets copyWith({
+    int? id,
+    int? itemId,
+    int? exerciseId,
+    double? weight,
+    int? repeats,
+    int? difficult,
+    int? time,
+    String? date,
+    String? comment,
+    OfflineAction? action,
+  }) {
+    return WorkoutSets(
+      id: id ?? this.id,
+      itemId: itemId ?? this.itemId,
+      exerciseId: exerciseId ?? this.exerciseId,
+      weight: weight ?? this.weight,
+      repeats: repeats ?? this.repeats,
+      difficult: difficult ?? this.difficult,
+      time: time ?? this.time,
+      date: date ?? this.date,
+      comment: comment ?? this.comment,
+      action: action ?? this.action,
+    );
+  }
+}
+
