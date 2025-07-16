@@ -100,7 +100,7 @@ class WorkoutViewModel extends ChangeNotifier {
       }
     }
 
-    final result = await workoutRepository.addSetResult(exerciseId, itemId, weight, repeats, difficult, time, date);
+    final result = await workoutRepository.addSetResult(exerciseId, itemId, weight, repeats, difficult, time, date,  localId: localId);
 
     if (result case Ok<List<HistoryInfo>>(value: final histories)) {
       final today = getToday();
@@ -135,7 +135,7 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateSetResult(BuildContext context, int id, int exerciseId, double weight, int repeats, int difficult, int time) async {
+  Future<void> updateSetResult(BuildContext context, int id, int itemId, int exerciseId, double weight, int repeats, int difficult, int time, String date) async {
     if (_workout == null) return;
 
     for (final workout in _workout!) {
@@ -166,7 +166,7 @@ class WorkoutViewModel extends ChangeNotifier {
         }
       }
     }
-    final result = await workoutRepository.updateSetResult(id, exerciseId, weight, repeats, difficult, time);
+    final result = await workoutRepository.updateSetResult(id, itemId, exerciseId, weight, repeats, difficult, time, date);
 
     if (result case Error()) {
       if (context.mounted) {

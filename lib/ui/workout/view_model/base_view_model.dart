@@ -78,7 +78,7 @@ class BaseViewModel extends ChangeNotifier {
       final viewModel = Provider.of<WorkoutViewModel>(context, listen: false);
 
       if (_selectedId != null) {
-        await viewModel.updateSetResult(context, _selectedId!, exerciseId, weight, repeats, 1, time);
+        await viewModel.updateSetResult(context, _selectedId!, itemId, exerciseId, weight, repeats, 1, time, date);
       } else {
         await viewModel.addSetResult(context, exerciseId, itemId, weight, repeats, 1, time, date);
       }

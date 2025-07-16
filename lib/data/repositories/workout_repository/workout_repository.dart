@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:level_up/data/services/common_models/is_completed_response.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
@@ -15,17 +16,17 @@ abstract class IWorkoutRepository {
 
   Future<Result<List<WorkoutInfo>>> changeExercise(int index, bool second);
 
-  Future<Result<List<HistoryInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date);
+  Future<Result<List<HistoryInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date, {required int localId});
 
   Future<Result<void>> finishWorkout();
 
   Future<Result<IsCompletedResponse>> deleteWorkout(int workoutId);
 
-  Future<Result<List<HistoryInfo>>> updateSetResult(int id, int exerciseId, double weight, int repeats, int difficult, int time);
+  Future<Result<List<HistoryInfo>>> updateSetResult(int id, int itemId, int exerciseId, double weight, int repeats, int difficult, int time, String date);
 
   Future<Result<List<HistoryInfo>>> deleteSetResult(int id);
 
-  Future<void> sendOfflineOperations();
+  Future<Result<int>> sendOfflineOperations();
 
   Future<Result<void>> updateWorkoutComment(int itemId, WorkoutComment body);
 
@@ -141,8 +142,8 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   }
 
   @override
-  Future<Result<List<HistoryInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date) async {
-    final offlineSet = WorkoutSets.add(itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time, date: date);
+  Future<Result<List<HistoryInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date, {required int localId}) async {
+    final offlineSet = WorkoutSets.add(itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time, date: date, id: localId);
 
     try {
       final response = await _tryWithRetry(
@@ -157,13 +158,14 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
       await _localStorage.removeOfflineOperation(offlineSet);
       return Result.error(Exception("Данные не найдены"));
     } catch (_) {
+      debugPrint('НЕ УДАЛОСЬ ДОБАВИТЬ СЕТ');
       return Result.ok([]);
     }
   }
 
   @override
-  Future<Result<List<HistoryInfo>>> updateSetResult(int id, int exerciseId, double weight, int repeats, int difficult, int time) async {
-    final offlineSet = WorkoutSets.update(id: id, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time);
+  Future<Result<List<HistoryInfo>>> updateSetResult(int id, int itemId, int exerciseId, double weight, int repeats, int difficult, int time, String date) async {
+    final offlineSet = WorkoutSets.update(id: id, itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time, date: date);
 
     try {
       final response = await _tryWithRetry(
@@ -178,25 +180,24 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
       await _localStorage.removeOfflineOperation(offlineSet);
       return Result.error(Exception("Данные не найдены"));
     } catch (_) {
+      debugPrint('НЕ УДАЛОСЬ ОБНОВИТЬ СЕТ');
       return Result.ok([]);
     }
   }
 
   @override
-  Future<void> sendOfflineOperations() async {
+  Future<Result<int>> sendOfflineOperations() async {
     final storedResult = await _localStorage.getOfflineOperations();
 
-    if (storedResult is! Ok<List<Map<String, dynamic>>>) {
-      return;
-    }
+    if (storedResult is! Ok<List<WorkoutSets>>) return Result.error(Exception('НЕ УДАЛОСЬ ЗАГРУЗИТЬ ОФФЛАЙН-ОПЕРАЦИИ'));
 
     final operations = storedResult.value;
-    if (operations.isEmpty) return;
+    if (operations.isEmpty) return Result.ok(0);
 
-    for (final map in operations) {
+    int successCount = 0;
+
+    for (final set in operations) {
       try {
-        final set = WorkoutSets.fromJson(map);
-
         switch (set.action) {
           case OfflineAction.add:
             await _tryWithRetry(() => _workoutService.addSetResult(set.exerciseId!, set.itemId!, set.weight!, set.repeats!, set.difficult!, set.time!, set.date!));
@@ -220,13 +221,15 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
             break;
         }
         await _localStorage.removeOfflineOperation(set);
+        successCount++;
       } on DataNotFoundError {
-        await _localStorage.removeOfflineOperation(WorkoutSets.fromJson(map));
+        await _localStorage.removeOfflineOperation(set);
         continue;
       } catch (_) {
-        continue;
+        debugPrint('ОШИБКА ОТПРАВКИ ОФФЛАЙН ОПЕРАЦИЙ');
       }
     }
+    return Result.ok(successCount);
   }
 
   @override
@@ -245,6 +248,7 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
       await _localStorage.removeOfflineOperation(offlineSet);
       return Result.error(Exception("Данные не найдены"));
     } catch (_) {
+      debugPrint('НЕ УДАЛОСЬ УДАЛИТЬ СЕТ');
       return Result.ok([]);
     }
   }
