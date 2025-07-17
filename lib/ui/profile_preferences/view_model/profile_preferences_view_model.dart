@@ -180,7 +180,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
     }
     _isUpdating = true;
     notifyListeners();
-    final result = await profileRepository.updateProfile(_nameController.text, _categorySelection!, _trainingWeeklySelection!, _levelSelection!, _goalSelection!, _prioritySelection);
+    final result = await profileRepository.updateProfile(_nameController.text, _categorySelection ?? 0, _trainingWeeklySelection ?? 0, _levelSelection ?? 0, _goalSelection ?? 0, _prioritySelection ?? 0);
     switch (result) {
       case Ok<UserProfileShortResponse>():
         if (isAfterLogin) {

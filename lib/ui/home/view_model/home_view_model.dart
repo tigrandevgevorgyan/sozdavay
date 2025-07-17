@@ -415,13 +415,9 @@ class HomeViewModel extends ChangeNotifier {
         _isExpiredDate = DateTime.now().isAfter(_paidUntil!);
       }
       final profileData = profile.data;
-      final isProfileNotFull =
-          profileData.category == null ||
-              profileData.experience == null ||
-              profileData.goal == null ||
-              profileData.days == null;
+      final isProfileNotFull = (profileData.goal == null || profileData.days == null);
       if (context.mounted) {
-        if (isProfileNotFull) {
+        if (!hasWorkoutPlan && isProfileNotFull) {
           GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath,
             extra: ProfilePreferencesParams(
               hasWorkoutPlan: hasWorkoutPlan,

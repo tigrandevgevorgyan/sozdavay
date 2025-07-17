@@ -102,13 +102,9 @@ class SignInViewModel extends ChangeNotifier {
           case Ok<UserProfileExtendedResponse>():
             final profile = profileResult.value.data;
             _planType = profile.planType;
-            final isProfileNotFull =
-                profile.category == null ||
-                profile.experience == null ||
-                profile.goal == null ||
-                profile.days == null;
+            final isProfileNotFull = (profile.goal == null || profile.days == null);
             if (context.mounted) {
-              if (isProfileNotFull) {
+              if (!hasWorkoutPlan && isProfileNotFull) {
         GoRouter.of(context).go(LevelUpRouter.signInPath + LevelUpRouter.profilePreferencesPath,
               extra: ProfilePreferencesParams(
               hasWorkoutPlan: hasWorkoutPlan,
