@@ -32,6 +32,7 @@ class _ComplexWorkoutScreenState extends State<ComplexWorkoutScreen> {
     final sideHorizontalPadding = 12.0;
     final minHorizontalPadding = 4.0;
     return ChangeNotifierProvider(
+      key: ValueKey('${widget.workoutInfo.items.first.itemId}_${widget.workoutInfo.items.first.id}'),
       create: (context) => ComplexViewModel(context),
       child: Consumer<ComplexViewModel>(builder: (context, provider, _) {
         final videoLinks = widget.workoutInfo.items.first.getVideoLinks();
