@@ -13,11 +13,10 @@ import '../../../utils/timer_state_complition.dart';
 import '../../../utils/timer_state_manager.dart';
 
 class SquareTimer extends StatefulWidget {
-  const SquareTimer({super.key, required this.title, required this.secondsDuration, required this.haveRest, required this.timerKey});
+  const SquareTimer({super.key, required this.title, required this.secondsToCount, required this.timerKey});
 
   final String title;
-  final int secondsDuration;
-  final bool haveRest;
+  final int secondsToCount;
   final String timerKey;
 
   @override
@@ -37,7 +36,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    if (widget.secondsDuration <= 0 || !widget.haveRest) {
+    if (widget.secondsToCount <= 0) {
       _isRunning = false;
       _isCompleted = false;
       _currentProgress = 0.0;
@@ -84,7 +83,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   void _initializeTimer() {
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: widget.secondsDuration),
+      duration: Duration(seconds: widget.secondsToCount),
     )..addListener(() {
       if (!mounted) return;
 
@@ -133,7 +132,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   }
 
   void _restoreTimerState() {
-    if (widget.secondsDuration <= 0) return;
+    if (widget.secondsToCount <= 0) return;
     final savedState = TimerStateManager.getTimerState(widget.timerKey);
 
     if (savedState != null && savedState.totalSeconds > 0) {
@@ -164,19 +163,19 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   }
 
   void _saveCurrentState(String? timerKey) {
-    if (widget.secondsDuration <= 0) return;
+    if (widget.secondsToCount <= 0) return;
 
     final key = timerKey ?? widget.timerKey;
 
     if (_isRunning && !_isCompleted) {
-      final elapsedSeconds = (widget.secondsDuration * _currentProgress).round();
+      final elapsedSeconds = (widget.secondsToCount * _currentProgress).round();
       final startTime = DateTime.now().subtract(Duration(seconds: elapsedSeconds));
 
       TimerStateManager.saveTimerState(
         key,
         TimerState(
           startTime: startTime,
-          totalSeconds: widget.secondsDuration,
+          totalSeconds: widget.secondsToCount,
           isRunning: true,
           isCompleted: false,
         ),
@@ -186,7 +185,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
         key,
         TimerState(
           startTime: DateTime.now(),
-          totalSeconds: widget.secondsDuration,
+          totalSeconds: widget.secondsToCount,
           isRunning: false,
           isCompleted: true,
         ),
@@ -230,7 +229,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       widget.timerKey,
       TimerState(
         startTime: DateTime.now(),
-        totalSeconds: widget.secondsDuration,
+        totalSeconds: widget.secondsToCount,
         isRunning: false,
         isCompleted: true,
       ),
@@ -241,7 +240,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    if (widget.secondsDuration <= 0 || !widget.haveRest) {
+    if (widget.secondsToCount <= 0) {
       return Expanded(
         child: Center(
           child: Text("Без отдыха", style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
@@ -266,9 +265,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
                 children: [
                   GestureDetector(
                       onTap: _onPlayTap,
-                      child: widget.haveRest
-                          ? SvgPicture.asset(_isRunning ? Assets.stopIcon : Assets.playIcon)
-                          : SizedBox.shrink()
+                      child: SvgPicture.asset(_isRunning ? Assets.stopIcon : Assets.playIcon)
                   ),
                   SizedBox(height: 18),
                   Text(widget.title, style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
@@ -335,7 +332,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       widget.timerKey,
       TimerState(
         startTime: DateTime.now(),
-        totalSeconds: widget.secondsDuration,
+        totalSeconds: widget.secondsToCount,
         isRunning: true,
         isCompleted: false,
       ),

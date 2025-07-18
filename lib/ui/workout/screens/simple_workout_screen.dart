@@ -74,8 +74,7 @@ class SimpleWorkoutScreen extends StatelessWidget {
                                             children: [
                                               SquareTimer(
                                                 title: provider.getRestString(workoutInfo.items.first),
-                                                secondsDuration: workoutInfo.items.first.restSeconds ?? 0,
-                                                haveRest: (workoutInfo.items.first.restSeconds ?? 0) > 0,
+                                                secondsToCount: workoutInfo.items.first.restSeconds ?? 0,
                                                 timerKey: 'square_timer_${workoutInfo.items.first.id}_${workoutInfo.items.first.restSeconds}'
                                               ),
                                             ],
