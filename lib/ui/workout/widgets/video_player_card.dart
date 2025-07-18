@@ -37,15 +37,13 @@ class _VideoPlayerCardState extends State<VideoPlayerCard> {
 
     if (url.trim().isEmpty) return;
 
-    if (_controller != null) {
-      _controller?.removeListener(_listener ?? () {});
-      _controller?.pause();
-      _controller?.dispose();
-    }
+    final oldController = _controller;
 
-    setState(() {
-      _isInitialized = false;
-    });
+    _isInitialized = false;
+    _controller = null;
+    _listener = null;
+
+    setState(() {});
 
     try {
       File? file;
@@ -56,40 +54,44 @@ class _VideoPlayerCardState extends State<VideoPlayerCard> {
         file = null;
       }
 
-      final controller = file != null
-          ? VideoPlayerController.file(
-        file,
-        videoPlayerOptions: VideoPlayerOptions(
-          mixWithOthers: true,
-          allowBackgroundPlayback: false,
-        ),
-      )
-          : VideoPlayerController.networkUrl(
-        Uri.parse(url),
-        videoPlayerOptions: VideoPlayerOptions(
-          mixWithOthers: true,
-          allowBackgroundPlayback: false,
-        ),
-      );
+      final newController = file != null
+          ? VideoPlayerController.file(file, videoPlayerOptions: VideoPlayerOptions(
+        mixWithOthers: true,
+        allowBackgroundPlayback: false,
+      ))
+          : VideoPlayerController.networkUrl(Uri.parse(url), videoPlayerOptions: VideoPlayerOptions(
+        mixWithOthers: true,
+        allowBackgroundPlayback: false,
+      ));
 
-      await controller.initialize();
-      controller.setLooping(false);
-      controller.setVolume(0);
+      await newController.initialize();
 
-      _listener = () {
+      if (!mounted) {
+        await newController.dispose();
+        return;
+      }
+
+      newController.setLooping(false);
+      newController.setVolume(0);
+
+      listener() {
         if (mounted) setState(() {});
-      };
-      controller.addListener(_listener!);
+      }
 
-      if (!mounted) return;
+      newController.addListener(listener);
 
       setState(() {
-        _controller = controller;
+        _controller = newController;
+        _listener = listener;
         _isInitialized = true;
         currentVideoUrl = url;
       });
+      oldController?.removeListener(_listener ?? () {});
+      oldController?.dispose();
     } catch (e) {
-      debugPrint('Ошибка инициализации видео $e');
+      debugPrint('Ошибка инициализации видео: $e');
+      oldController?.removeListener(_listener ?? () {});
+      oldController?.dispose();
     }
   }
 
@@ -163,7 +165,6 @@ class _VideoPlayerCardState extends State<VideoPlayerCard> {
   @override
   void dispose() {
     _controller?.removeListener(_listener ?? () {});
-    _controller?.pause();
     _controller?.dispose();
     super.dispose();
   }
