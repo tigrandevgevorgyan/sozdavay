@@ -9,11 +9,13 @@ class TimerCompletionService {
   TimerCompletionService._internal();
 
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final Set<int> _playedTimers = {};
 
   void initialize() {
   }
 
   Future<void> onTimerCompleted(String timerKey, int timerId) async {
+    if (_playedTimers.contains(timerId)) return;
     final wasOnBackground = await TimerStateStorage.wasTriggered(timerId);
     if (!wasOnBackground) {
       await _audioPlayer.setAudioContext(AudioContext(
@@ -34,9 +36,13 @@ class TimerCompletionService {
         _audioPlayer.stop();
       });
     }
+    _playedTimers.add(timerId);
     await TimerStateStorage.clear(timerId);
   }
 
+  Future<void> onStartNewTimer() async {
+    _playedTimers.clear();
+  }
   void dispose() {
     _audioPlayer.dispose();
   }

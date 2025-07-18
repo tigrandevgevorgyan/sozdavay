@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:level_up/config/assets.dart';
@@ -328,6 +327,7 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
     cancelCountdownNotification(2);
     TimerStateStorage.clear(2);
 
+    TimerCompletionService().onStartNewTimer();
     TimerStateManager.stopAllExcept(widget.timerKey);
 
     TimerStateManager.setCompletionCallback(widget.timerKey, () {

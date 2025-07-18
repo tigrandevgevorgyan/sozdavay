@@ -314,6 +314,8 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
     cancelCountdownNotification(1);
     TimerStateStorage.clear(1);
 
+    TimerCompletionService().onStartNewTimer();
+
     TimerStateManager.stopAllExcept(widget.timerKey);
     TimerStateManager.setCompletionCallback(widget.timerKey, () {
       TimerCompletionService().onTimerCompleted(widget.timerKey, 1);
