@@ -131,6 +131,7 @@ class _DoubleWorkoutScreenState extends State<DoubleWorkoutScreen> {
                             ),
                             SizedBox(height: 4),
                             HorizontalTimer(
+                              key: ValueKey('horizontal_timer_${widget.workoutInfo.items.first.id}_${widget.workoutInfo.items.first.restSeconds}'),
                               title: provider.getRestString(widget.workoutInfo.items.last),
                               secondsToCount: max(
                                 widget.workoutInfo.items.first.restSeconds ?? 0,
