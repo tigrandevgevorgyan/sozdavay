@@ -30,6 +30,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   bool _isRunning = false;
   bool _isCompleted = false;
   double _currentProgress = 0.0;
+  bool _isAppPaused = false;
 
   AppLifecycleListener? _lifecycleListener;
 
@@ -109,6 +110,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
 
     _lifecycleListener = AppLifecycleListener(
       onResume: () async {
+        _isAppPaused = false;
         cancelSquareNotification();
         await cancelCountdownNotification(1);
         if (_isRunning) {
@@ -116,6 +118,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
         }
       },
       onPause: () {
+        _isAppPaused = true;
         if (_isRunning) {
           final savedState = TimerStateManager.getTimerState(widget.timerKey);
           if (savedState != null && !savedState.isCompletedByTime) {
@@ -200,11 +203,12 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
     _updateTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
       final savedState = TimerStateManager.getTimerState(widget.timerKey);
       if (savedState != null && savedState.isRunning && !savedState.isCompletedByTime) {
+      if (mounted) {
         setState(() {
           _currentProgress = savedState.progress;
         });
-
         _controller?.value = _currentProgress;
+      }
 
         if (savedState.isCompletedByTime) {
           _onTimerCompleted();
@@ -348,9 +352,16 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   @override
   void dispose() {
     _saveCurrentState(null);
-    _controller?.dispose();
-    _updateTimer?.cancel();
-    _lifecycleListener?.dispose();
+    if (_isAppPaused && _isRunning && !_isCompleted) {
+      final savedState = TimerStateManager.getTimerState(widget.timerKey);
+      if (savedState != null && !savedState.isCompletedByTime) {
+        final remainingSeconds = savedState.remainingSeconds;
+        final triggerTime = DateTime.now().add(Duration(seconds: remainingSeconds));
+        TimerStateStorage.save(1, triggerTime);
+
+        scheduleSquareNotification(triggerTime);
+      }
+    }
     super.dispose();
   }
 }
