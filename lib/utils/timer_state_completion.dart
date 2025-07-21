@@ -23,7 +23,7 @@ class TimerCompletionService {
           isSpeakerphoneOn: false,
           stayAwake: false,
           contentType: AndroidContentType.music,
-          usageType: AndroidUsageType.assistanceSonification,
+          usageType: AndroidUsageType.media,
           audioFocus: AndroidAudioFocus.gainTransientMayDuck,
         ),
         iOS: AudioContextIOS(
@@ -31,6 +31,7 @@ class TimerCompletionService {
           options: {AVAudioSessionOptions.mixWithOthers},
         ),
       ));
+      await _audioPlayer.setVolume(0.6);
       await _audioPlayer.play(AssetSource('sounds/htc_basic.mp3'));
       Timer(Duration(seconds: 8), () {
         _audioPlayer.stop();

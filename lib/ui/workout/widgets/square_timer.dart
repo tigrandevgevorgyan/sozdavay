@@ -9,7 +9,7 @@ import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/utils/alarm_utils.dart';
 import 'package:level_up/utils/timer_state_storage.dart';
 import '../../../utils/notifications.dart';
-import '../../../utils/timer_state_complition.dart';
+import '../../../utils/timer_state_completion.dart';
 import '../../../utils/timer_state_manager.dart';
 
 class SquareTimer extends StatefulWidget {
