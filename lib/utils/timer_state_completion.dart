@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:flutter/scheduler.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:level_up/utils/timer_state_storage.dart';
 
@@ -16,8 +16,11 @@ class TimerCompletionService {
 
   Future<void> onTimerCompleted(String timerKey, int timerId) async {
     if (_playedTimers.contains(timerId)) return;
+
+    final isAppInBackground = SchedulerBinding.instance.lifecycleState != AppLifecycleState.resumed;
+
     final wasOnBackground = await TimerStateStorage.wasTriggered(timerId);
-    if (!wasOnBackground) {
+    if (!wasOnBackground && !isAppInBackground) {
       await _audioPlayer.setAudioContext(AudioContext(
         android: AudioContextAndroid(
           isSpeakerphoneOn: false,
