@@ -14,6 +14,8 @@ import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:level_up/ui/workout/widgets/error_placeholder.dart';
 import 'package:provider/provider.dart';
 
+import '../../../utils/timer_state_manager.dart';
+
 class WorkoutBaseScreen extends StatefulWidget {
   const WorkoutBaseScreen({super.key});
 
@@ -34,6 +36,10 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
       _didInit = true;
     }
   }
+  //
+  // void _clearAllTimers() {
+  //   TimerStateManager.clearAll();
+  // }
 
   @override
   Widget build(BuildContext context) {

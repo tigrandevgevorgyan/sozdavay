@@ -44,6 +44,11 @@ class TimerCompletionService {
     await TimerStateStorage.clear(timerId);
   }
 
+  void reset() {
+    _playedTimers.clear();
+    _audioPlayer.stop();
+  }
+
   Future<void> onStartNewTimer() async {
     _playedTimers.clear();
   }

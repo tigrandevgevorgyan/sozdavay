@@ -139,9 +139,9 @@ class RatingViewModel extends ChangeNotifier {
         _categorySelection = 0;
         _selectedCategories = [0];
         final periodOptions = result.value.periods
-            .map((period) {
-          return IdNamePairWithPriority(period.id, period.label);
-        }).toList();
+            .where((period) => period.label != 'Год')
+            .map((period) => IdNamePairWithPriority(period.id, period.label))
+            .toList();
 
         _periodDialogContent.setOptions(periodOptions);
         _periodSelection = _periodDialogContent.getIdByValue('Сезон');

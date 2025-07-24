@@ -54,10 +54,12 @@ Map<String, dynamic> _$DayInfoToJson(DayInfo instance) => <String, dynamic>{
 WorkoutStats _$WorkoutStatsFromJson(Map<String, dynamic> json) => WorkoutStats(
       (json['month'] as num?)?.toInt(),
       (json['year'] as num?)?.toInt(),
+      (json['season'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$WorkoutStatsToJson(WorkoutStats instance) =>
     <String, dynamic>{
       'month': instance.month,
       'year': instance.year,
+      'season': instance.season,
     };

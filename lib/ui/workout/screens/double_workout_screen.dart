@@ -117,8 +117,7 @@ class _DoubleWorkoutScreenState extends State<DoubleWorkoutScreen> {
                                                   child: SingleChildScrollView(
                                                     controller: _secondScrollController,
                                                       child: Center(
-                                                          child: Text(
-                                                            provider.getSupersetWorkoutString(widget.workoutInfo),
+                                                          child: Text(provider.getWorkoutString(widget.workoutInfo.items.last),
                                                             style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor),
                                                           )
                                                       ),

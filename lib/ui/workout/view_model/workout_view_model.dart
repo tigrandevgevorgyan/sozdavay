@@ -9,6 +9,7 @@ import 'package:level_up/ui/workout/widgets/workout_show_dialog.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 import '../../../utils/misc_utils.dart';
+import '../../../utils/timer_state_manager.dart';
 
 class WorkoutViewModel extends ChangeNotifier {
   final int dayIndex;
@@ -219,6 +220,7 @@ class WorkoutViewModel extends ChangeNotifier {
   }
 
   void onHomeClicked() async {
+    // TimerStateManager.disposeAllLifecycles();
     await workoutRepository.sendOfflineOperations();
   }
 
@@ -230,6 +232,7 @@ class WorkoutViewModel extends ChangeNotifier {
     notifyListeners();
     switch (result) {
       case Ok<void>():
+        // TimerStateManager.disposeAllLifecycles();
         if (context.mounted) {
           Future.microtask(() {
             GoRouter.of(context).pop(true);
