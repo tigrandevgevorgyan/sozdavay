@@ -214,7 +214,7 @@ class BaseViewModel extends ChangeNotifier {
   String getWorkoutString(ExerciseInfo exerciseInfo) {
     if (exerciseInfo.sets.isEmpty) return '';
 
-      final Map<String, Map<String, int>> grouped = {};
+      final List<String> results = [];
 
         for (final set in exerciseInfo.sets) {
           final setsCount = set.setsCount?.abs() ?? 0;
@@ -222,15 +222,16 @@ class BaseViewModel extends ChangeNotifier {
           final to = set.repeatsTo?.abs();
           final isHard = (set.asMuchAsPossible ?? 0) == 1;
 
+      if (setsCount == 0) {
+        continue;
+      }
+
           if ((from ?? 0) == 0 && (to ?? 0) == 0 && isHard) {
-            final sets = '$setsCount по -';
-            grouped.putIfAbsent(sets, () => {'total': 0, 'hard': 0});
-            grouped[sets]!['total'] = grouped[sets]!['total']! + setsCount;
-            grouped[sets]!['hard'] = grouped[sets]!['hard']! + setsCount;
+             results.add('$setsCount в отказ');
             continue;
           }
 
-          if (setsCount == 0 || ((from ?? 0) == 0 && (to ?? 0) == 0)) {
+          if ((from ?? 0) == 0 && (to ?? 0) == 0) {
             continue;
           }
 
@@ -245,33 +246,18 @@ class BaseViewModel extends ChangeNotifier {
             repeatsText = '-';
           }
 
-          final sets = '$setsCount по $repeatsText';
-
-          grouped.putIfAbsent(sets, () => {'total': 0, 'hard': 0});
-          grouped[sets]!['total'] = grouped[sets]!['total']! + setsCount;
           if (isHard) {
-            grouped[sets]!['hard'] = grouped[sets]!['hard']! + 1;
+          if (setsCount > 1) {
+          final normalSets = setsCount - 1;
+              results.add('$normalSets по $repeatsText');
           }
-        }
+            results.add('1 в отказ');
+      } else {
+        results.add('$setsCount по $repeatsText');
+      }
+    }
 
-        return grouped.entries.map((entry) {
-          final data = entry.value;
-          final total = data['total']!;
-          final hard = data['hard']!;
-          final normal = total - hard;
-
-          final resultLines = <String>[];
-
-          if (normal > 0) {
-          final baseText = entry.key.replaceFirst(RegExp(r'^\d+'), normal.toString());
-            resultLines.add(baseText);
-          }
-          if (hard > 0) {
-            resultLines.add('$hard в отказ');
-          }
-          return resultLines.join('\n');
-
-        }).join('\n\n');
+    return results.join('\n\n');
   }
 
   String getSupersetWorkoutString(WorkoutInfo workoutInfo) {

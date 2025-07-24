@@ -61,7 +61,9 @@ class ExerciseInfo {
   final int exerciseCount;
 
   final String? description;
+  @JsonKey(defaultValue: [], disallowNullValue: true)
   final List<VideoInfo> videos;
+  @JsonKey(defaultValue: [], disallowNullValue: true)
   final List<SetInfo> sets;
 
   @JsonKey(name: 'rest_seconds')
