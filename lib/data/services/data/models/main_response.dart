@@ -52,10 +52,11 @@ class DayInfo {
 
 @JsonSerializable()
 class WorkoutStats {
-  WorkoutStats(this.month, this.year);
+  WorkoutStats(this.month, this.year, this.season);
 
   final int? month;
   final int? year;
+  final int? season;
 
   factory WorkoutStats.fromJson(Map<String, dynamic> json) => _$WorkoutStatsFromJson(json);
 

@@ -86,7 +86,7 @@ class HomeViewModel extends ChangeNotifier {
 
   int get perMonth => _mainInfo?.workout.month ?? 0;
 
-  int get perYear => _mainInfo?.workout.year ?? 0;
+  int get perSeason => _mainInfo?.workout.season ?? 0;
 
   String get trainingName =>
       _mainInfo?.schedule
@@ -510,6 +510,6 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   MainInfo _emptyMainInfo() {
-    return MainInfo(WorkoutStats(0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '', 0, 0);
+    return MainInfo(WorkoutStats(0, 0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '', 0, 0);
   }
 }

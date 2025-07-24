@@ -5,6 +5,7 @@ import 'package:level_up/ui/workout/view_model/base_view_model.dart';
 import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:provider/provider.dart';
 import '../../../data/repositories/workout_repository/workout_repository.dart';
+import '../../../utils/timer_state_completion.dart';
 
 class DoubleViewModel extends BaseViewModel {
   late TextEditingController repeatsFirstController;
@@ -93,6 +94,7 @@ class DoubleViewModel extends BaseViewModel {
 
   @override
   void dispose() {
+    TimerCompletionService().reset();
     repeatsFirstController.dispose();
     repeatsSecondController.dispose();
     weightFirstController.dispose();
