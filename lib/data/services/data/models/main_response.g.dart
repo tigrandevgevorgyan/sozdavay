@@ -27,6 +27,7 @@ MainInfo _$MainInfoFromJson(Map<String, dynamic> json) => MainInfo(
       (json['rating'] as num).toInt(),
       json['label'] as String,
       (json['level_rating'] as num).toInt(),
+      (json['season_rating'] as num).toInt(),
     );
 
 Map<String, dynamic> _$MainInfoToJson(MainInfo instance) => <String, dynamic>{
@@ -34,6 +35,7 @@ Map<String, dynamic> _$MainInfoToJson(MainInfo instance) => <String, dynamic>{
       'schedule': instance.schedule,
       'rating': instance.rating,
       'level_rating': instance.levelRating,
+      'season_rating': instance.seasonRating,
       'label': instance.label,
     };
 

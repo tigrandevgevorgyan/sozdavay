@@ -82,6 +82,8 @@ class HomeViewModel extends ChangeNotifier {
 
   int get levelRating => _mainInfo?.levelRating ?? 0;
 
+  int get seasonRating => _mainInfo?.seasonRating ?? 0;
+
   int get perMonth => _mainInfo?.workout.month ?? 0;
 
   int get perYear => _mainInfo?.workout.year ?? 0;
@@ -508,6 +510,6 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   MainInfo _emptyMainInfo() {
-    return MainInfo(WorkoutStats(0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '', 0);
+    return MainInfo(WorkoutStats(0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '', 0, 0);
   }
 }

@@ -60,7 +60,7 @@ class DataRepositoryImpl extends IDataRepository {
        {
          "customer": 0,
          "category": 0,
-         "period": 3
+         "period": 4
        }''';
       final result = await dataService.getRatingFiltered(json);
       return Result.ok(result);

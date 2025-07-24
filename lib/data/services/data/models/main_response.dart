@@ -25,9 +25,11 @@ class MainInfo {
   final int rating;
   @JsonKey(name: 'level_rating')
   final int levelRating;
+  @JsonKey(name: 'season_rating')
+  final int seasonRating;
   final String label;
 
-  MainInfo(this.workout, this.schedule, this.rating, this.label, this.levelRating);
+  MainInfo(this.workout, this.schedule, this.rating, this.label, this.levelRating, this.seasonRating);
 
   factory MainInfo.fromJson(Map<String, dynamic> json) => _$MainInfoFromJson(json);
 
