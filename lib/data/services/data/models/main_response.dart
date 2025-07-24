@@ -22,11 +22,11 @@ class MainResponse extends BaseResponse {
 class MainInfo {
   final WorkoutStats workout;
   final List<DayInfo> schedule;
-  final int rating;
+  final int? rating;
   @JsonKey(name: 'level_rating')
-  final int levelRating;
+  final int? levelRating;
   @JsonKey(name: 'season_rating')
-  final int seasonRating;
+  final int? seasonRating;
   final String label;
 
   MainInfo(this.workout, this.schedule, this.rating, this.label, this.levelRating, this.seasonRating);

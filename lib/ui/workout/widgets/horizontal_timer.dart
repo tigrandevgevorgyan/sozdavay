@@ -42,6 +42,10 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
       _currentProgress = 0.0;
       return;
     }
+    TimerStateManager.registerLifecycleDisposer(widget.timerKey, () {
+      _lifecycleListener?.dispose();
+      _lifecycleListener = null;
+    });
     cancelHorizontalNotification();
     cancelCountdownNotification(2);
     TimerStateStorage.clear(2);
@@ -305,7 +309,7 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
       });
 
       TimerStateManager.removeTimer(widget.timerKey);
-      cancelSquareNotification();
+      cancelHorizontalNotification();
       cancelCountdownNotification(2);
       TimerStateStorage.clear(2);
     } else if (_isCompleted) {
@@ -327,7 +331,7 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
   }
 
   void _startNewTimer() {
-    cancelSquareNotification();
+    cancelHorizontalNotification();
     cancelCountdownNotification(2);
     TimerStateStorage.clear(2);
 
@@ -362,17 +366,11 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
     _startPeriodicUpdate();
   }
 
-  // void disposeLifecycleListener() {
-  //   _lifecycleListener?.dispose();
-  //   _lifecycleListener = null;
-  // }
-
   @override
   void dispose() {
     _saveCurrentState(null);
     _controller?.dispose();
     _updateTimer?.cancel();
-    // _lifecycleListener?.dispose();
     if (_isAppPaused && _isRunning && !_isCompleted) {
       final savedState = TimerStateManager.getTimerState(widget.timerKey);
       if (savedState != null && !savedState.isCompletedByTime) {

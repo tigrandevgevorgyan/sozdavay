@@ -43,10 +43,10 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
       _currentProgress = 0.0;
       return;
     }
-    // TimerStateManager.registerLifecycleDisposer(widget.timerKey, () {
-    //   _lifecycleListener?.dispose();
-    //   _lifecycleListener = null;
-    // });
+    TimerStateManager.registerLifecycleDisposer(widget.timerKey, () {
+      _lifecycleListener?.dispose();
+      _lifecycleListener = null;
+    });
     cancelSquareNotification();
     cancelCountdownNotification(1);
     TimerStateStorage.clear(1);
@@ -369,10 +369,6 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
     }
     super.dispose();
   }
-//   void disposeLifecycleListener() {
-//     _lifecycleListener?.dispose();
-//     _lifecycleListener = null;
-//   }
 }
 
 class TimerPainter extends CustomPainter {

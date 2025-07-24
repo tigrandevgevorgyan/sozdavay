@@ -14,6 +14,7 @@ import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:level_up/ui/workout/widgets/error_placeholder.dart';
 import 'package:provider/provider.dart';
 
+import '../../../routing/levelup_router.dart';
 import '../../../utils/timer_state_manager.dart';
 
 class WorkoutBaseScreen extends StatefulWidget {
@@ -36,10 +37,6 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
       _didInit = true;
     }
   }
-  //
-  // void _clearAllTimers() {
-  //   TimerStateManager.clearAll();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +64,9 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
                           onLeftArrowClicked: provider.onPreviousClicked,
                           onRightArrowClicked: () => provider.onNextClicked(context),
                           onHomeClicked: () {
-                            GoRouter.of(context).pop();
+                            if (context.mounted) {
+                              GoRouter.of(context).pushReplacement(LevelUpRouter.homePath);
+                            }
                             provider.onHomeClicked();
                           },
                         ),

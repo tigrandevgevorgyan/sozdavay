@@ -49,23 +49,31 @@ Map<String, dynamic> _$WorkoutInfoToJson(WorkoutInfo instance) =>
       'items': instance.items,
     };
 
-ExerciseInfo _$ExerciseInfoFromJson(Map<String, dynamic> json) => ExerciseInfo(
-      (json['item_id'] as num).toInt(),
-      (json['id'] as num).toInt(),
-      json['name'] as String,
-      (json['exercise_count'] as num).toInt(),
-      json['description'] as String?,
-      (json['videos'] as List<dynamic>)
-          .map((e) => VideoInfo.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      (json['sets'] as List<dynamic>)
-          .map((e) => SetInfo.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      (json['rest_seconds'] as num?)?.toInt(),
-      (json['history'] as List<dynamic>)
-          .map((e) => HistoryInfo.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
+ExerciseInfo _$ExerciseInfoFromJson(Map<String, dynamic> json) {
+  $checkKeys(
+    json,
+    disallowNullValues: const ['videos', 'sets'],
+  );
+  return ExerciseInfo(
+    (json['item_id'] as num).toInt(),
+    (json['id'] as num).toInt(),
+    json['name'] as String,
+    (json['exercise_count'] as num).toInt(),
+    json['description'] as String?,
+    (json['videos'] as List<dynamic>?)
+            ?.map((e) => VideoInfo.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [],
+    (json['sets'] as List<dynamic>?)
+            ?.map((e) => SetInfo.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [],
+    (json['rest_seconds'] as num?)?.toInt(),
+    (json['history'] as List<dynamic>)
+        .map((e) => HistoryInfo.fromJson(e as Map<String, dynamic>))
+        .toList(),
+  );
+}
 
 Map<String, dynamic> _$ExerciseInfoToJson(ExerciseInfo instance) =>
     <String, dynamic>{

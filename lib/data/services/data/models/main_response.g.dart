@@ -24,10 +24,10 @@ MainInfo _$MainInfoFromJson(Map<String, dynamic> json) => MainInfo(
       (json['schedule'] as List<dynamic>)
           .map((e) => DayInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
-      (json['rating'] as num).toInt(),
+      (json['rating'] as num?)?.toInt(),
       json['label'] as String,
-      (json['level_rating'] as num).toInt(),
-      (json['season_rating'] as num).toInt(),
+      (json['level_rating'] as num?)?.toInt(),
+      (json['season_rating'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$MainInfoToJson(MainInfo instance) => <String, dynamic>{

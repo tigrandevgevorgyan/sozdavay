@@ -10,12 +10,13 @@ class TimerCompletionService {
 
   final AudioPlayer _audioPlayer = AudioPlayer();
   final Set<int> _playedTimers = {};
+  bool _hasCompleted = false;
 
   void initialize() {
   }
 
   Future<void> onTimerCompleted(String timerKey, int timerId) async {
-    if (_playedTimers.contains(timerId)) return;
+    if (_playedTimers.contains(timerId) || _hasCompleted) return;
 
     final isAppInBackground = SchedulerBinding.instance.lifecycleState != AppLifecycleState.resumed;
 
@@ -41,6 +42,7 @@ class TimerCompletionService {
       });
     }
     _playedTimers.add(timerId);
+    _hasCompleted = true;
     await TimerStateStorage.clear(timerId);
   }
 
@@ -50,6 +52,7 @@ class TimerCompletionService {
   }
 
   Future<void> onStartNewTimer() async {
+    _hasCompleted = false;
     _playedTimers.clear();
   }
   void dispose() {

@@ -1,11 +1,12 @@
 
 import 'dart:async';
+import 'dart:ui';
 
 class TimerStateManager {
   static final Map<String, TimerState> _timers = {};
   static final Map<String, Function()> _completionCallbacks = {};
   static Timer? _globalTimer;
-  // static final Map<String, VoidCallback> _lifecycleDisposers = {};
+  static final Map<String, VoidCallback> _lifecycleDisposers = {};
 
   static void saveTimerState(String key, TimerState state) {
     _timers[key] = state;
@@ -24,15 +25,15 @@ class TimerStateManager {
     return state;
   }
 
-  // static void registerLifecycleDisposer(String key, VoidCallback disposer) {
-  //   _lifecycleDisposers[key] = disposer;
-  // }
-  // static void disposeAllLifecycles() {
-  //   for (final disposer in _lifecycleDisposers.values) {
-  //     disposer();
-  //   }
-  //   _lifecycleDisposers.clear();
-  // }
+  static void registerLifecycleDisposer(String key, VoidCallback disposer) {
+    _lifecycleDisposers[key] = disposer;
+  }
+  static void disposeAllLifecycles() {
+    for (final disposer in _lifecycleDisposers.values) {
+      disposer();
+    }
+    _lifecycleDisposers.clear();
+  }
 
   static void setCompletionCallback(String key, Function() callback) {
     _completionCallbacks[key] = callback;
