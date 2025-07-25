@@ -40,53 +40,58 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<WorkoutViewModel>(
-      create: (BuildContext context) => WorkoutViewModel(context, GetIt.I<IWorkoutRepository>(), dayIndex: dayIndex),
-      child: Consumer<WorkoutViewModel>(builder: (context, provider, __) {
-        return PopScope(
-          canPop: true,
-          onPopInvoked: (didPop) {
-            if (didPop) {
-              provider.onHomeClicked();
-              if (context.mounted) {
-                GoRouter.of(context).pushReplacement(LevelUpRouter.homePath);
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: ChangeNotifierProvider<WorkoutViewModel>(
+        create: (BuildContext context) => WorkoutViewModel(context, GetIt.I<IWorkoutRepository>(), dayIndex: dayIndex),
+        child: Consumer<WorkoutViewModel>(builder: (context, provider, __) {
+          return PopScope(
+            canPop: true,
+            onPopInvoked: (didPop) {
+              if (didPop) {
+                provider.onHomeClicked();
+                if (context.mounted) {
+                  GoRouter.of(context).pushReplacement(LevelUpRouter.homePath);
+                }
               }
-            }
-          },
-            child: Scaffold(
-              appBar: AppBar(backgroundColor: AppColors.backgroundContentColor, toolbarHeight: 0),
-              backgroundColor: AppColors.backgroundColor,
-              body: SafeArea(
-                child: provider.isLoading || provider.isWorkoutEmpty
-                    ? Center(child: LevelUpLoader())
-                    : provider.hasError
-                  ? ErrorPlaceholder(
-                    onTap: (){
-                      provider.init(context);
-                    },
-                )
-                    : Column(
-                        children: [
-                          Expanded(
-                            child: _getScreenByWorkout(provider.currentWorkout),
-                          ),
-                          BottomBar(
-                            onLeftArrowClicked: provider.onPreviousClicked,
-                            onRightArrowClicked: () => provider.onNextClicked(context),
-                            onHomeClicked: () {
-                              if (context.mounted) {
-                                GoRouter.of(context).pushReplacement(LevelUpRouter.homePath);
-                              }
-                              provider.onHomeClicked();
-                            },
-                          ),
-                          SizedBox(height: 10),
-                        ],
-                      ),
+            },
+              child: Scaffold(
+                appBar: AppBar(backgroundColor: AppColors.backgroundContentColor, toolbarHeight: 0),
+                backgroundColor: AppColors.backgroundColor,
+                body: SafeArea(
+                  child: provider.isLoading || provider.isWorkoutEmpty
+                      ? Center(child: LevelUpLoader())
+                      : provider.hasError
+                    ? ErrorPlaceholder(
+                      onTap: (){
+                        provider.init(context);
+                      },
+                  )
+                      : Column(
+                          children: [
+                            Expanded(
+                              child: _getScreenByWorkout(provider.currentWorkout),
+                            ),
+                            BottomBar(
+                              onLeftArrowClicked: provider.onPreviousClicked,
+                              onRightArrowClicked: () => provider.onNextClicked(context),
+                              onHomeClicked: () {
+                                if (context.mounted) {
+                                  GoRouter.of(context).pushReplacement(LevelUpRouter.homePath);
+                                }
+                                provider.onHomeClicked();
+                              },
+                            ),
+                            SizedBox(height: 10),
+                          ],
+                        ),
+                ),
               ),
-            ),
-          );
-      }),
+            );
+        }),
+      ),
     );
   }
 
