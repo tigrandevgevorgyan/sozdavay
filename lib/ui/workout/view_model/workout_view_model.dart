@@ -10,11 +10,14 @@ import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 import '../../../routing/levelup_router.dart';
 import '../../../utils/misc_utils.dart';
+import '../../../utils/timer_state_completion.dart';
 import '../../../utils/timer_state_manager.dart';
 import '../../../utils/timer_state_storage.dart';
 
 class WorkoutViewModel extends ChangeNotifier {
   final int dayIndex;
+
+  final TimerCompletionService _timerService = TimerCompletionService();
 
   WorkoutViewModel(BuildContext context, this.workoutRepository, {required this.dayIndex}) {
     init(context);
@@ -222,11 +225,11 @@ class WorkoutViewModel extends ChangeNotifier {
   }
 
   void onHomeClicked() async {
-    _disposeTimers();
+    await _disposeTimers();
     await workoutRepository.sendOfflineOperations();
   }
 
-  void _disposeTimers() async {
+  Future<void> _disposeTimers() async {
     TimerStateManager.disposeAllLifecycles();
     for (final workout in _workout ?? []) {
       for (final exercise in workout.items) {
@@ -236,6 +239,7 @@ class WorkoutViewModel extends ChangeNotifier {
     TimerStateManager.clearAll();
     await TimerStateStorage.clear(1);
     await TimerStateStorage.clear(2);
+    await _timerService.dispose();
   }
 
   void _finishWorkout(BuildContext context) async {
@@ -246,7 +250,7 @@ class WorkoutViewModel extends ChangeNotifier {
     notifyListeners();
     switch (result) {
       case Ok<void>():
-        _disposeTimers();
+        await _disposeTimers();
         if (context.mounted) {
           GoRouter.of(context).pushReplacement(LevelUpRouter.homePath);
         }

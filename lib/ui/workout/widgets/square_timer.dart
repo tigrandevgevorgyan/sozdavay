@@ -225,6 +225,7 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
   }
 
   void _onTimerCompleted() async {
+    if (_isCompleted) return;
     if (!mounted) return;
 
     setState(() {

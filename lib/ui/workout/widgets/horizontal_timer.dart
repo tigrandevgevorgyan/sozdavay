@@ -223,6 +223,7 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
   }
 
   void _onTimerCompleted() async {
+    if (_isCompleted) return;
     if (!mounted) return;
 
     setState(() {

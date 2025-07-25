@@ -4,9 +4,6 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:level_up/utils/timer_state_storage.dart';
 
 class TimerCompletionService {
-  static final TimerCompletionService _instance = TimerCompletionService._internal();
-  factory TimerCompletionService() => _instance;
-  TimerCompletionService._internal();
 
   final AudioPlayer _audioPlayer = AudioPlayer();
   final Set<int> _playedTimers = {};
@@ -37,9 +34,9 @@ class TimerCompletionService {
       ));
       await _audioPlayer.setVolume(0.6);
       await _audioPlayer.play(AssetSource('sounds/htc_basic.mp3'));
-      Timer(Duration(seconds: 8), () {
-        _audioPlayer.stop();
-      });
+      await Future.delayed(Duration(seconds: 8));
+      await _audioPlayer.stop();
+      await _audioPlayer.release();
     }
     _playedTimers.add(timerId);
     _hasCompleted = true;
@@ -55,7 +52,13 @@ class TimerCompletionService {
     _hasCompleted = false;
     _playedTimers.clear();
   }
-  void dispose() {
-    _audioPlayer.dispose();
+
+  Future<void> dispose() async {
+    try {
+      await _audioPlayer.stop();
+      await _audioPlayer.release();
+      await _audioPlayer.dispose();
+    } catch (e) {
+    }
   }
 }

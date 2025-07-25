@@ -10,7 +10,6 @@ import 'package:level_up/utils/timer_state_completion.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Alarm.init();
-  TimerCompletionService().initialize();
   await Dependencies.registerDependencies();
   await initializeDateFormatting('ru_RU', null);
   SystemChrome.setPreferredOrientations([
