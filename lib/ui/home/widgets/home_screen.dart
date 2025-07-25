@@ -32,6 +32,7 @@ class HomeScreen extends StatelessWidget {
         builder: (context, provider, _) {
           return Scaffold(
             appBar: AppBar(
+              automaticallyImplyLeading: false,
               title: AppBarTitle(
                 onProfileClicked: () => provider.onProfileClicked(context),
                 onLogoutClicked: () => provider.logout(context),

@@ -14,7 +14,7 @@ AlarmSettings createNotification(int id, DateTime alarmTime) {
     volumeSettings: VolumeSettings.fade(
       volume: 0.6,
       fadeDuration: Duration(seconds: 6),
-      volumeEnforced: true,
+      volumeEnforced: false,
     ),
     notificationSettings: const NotificationSettings(
       title: 'Время отдыха вышло',
