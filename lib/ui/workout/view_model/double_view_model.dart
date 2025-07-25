@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/ui/workout/view_model/base_view_model.dart';
 import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
+import 'package:level_up/utils/weight_formatters.dart';
 import 'package:provider/provider.dart';
 import '../../../data/repositories/workout_repository/workout_repository.dart';
 import '../../../utils/timer_state_completion.dart';
@@ -49,10 +50,11 @@ class DoubleViewModel extends BaseViewModel {
     if (repeatsFirstController.text.isEmpty || weightFirstController.text.isEmpty) {
       return;
     }
+    final cleanedWeight = cleanLastDotDelete(weightFirstController.text);
     final now = DateTime.now().toIso8601String();
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     super.addOrUpdateSetResult(
-        context, workout.items.first.id, workout.items.first.itemId, int.parse(repeatsFirstController.text), double.parse(weightFirstController.text), 0, now);
+        context, workout.items.first.id, workout.items.first.itemId, int.parse(repeatsFirstController.text), double.parse(cleanedWeight), 0, now);
     _resetText();
   }
 
@@ -60,10 +62,11 @@ class DoubleViewModel extends BaseViewModel {
     if (repeatsSecondController.text.isEmpty || weightSecondController.text.isEmpty) {
       return;
     }
+    final cleanedWeight = cleanLastDotDelete(weightSecondController.text);
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     final now = DateTime.now().toIso8601String();
     super.addOrUpdateSetResult(
-        context, workout.items.last.id, workout.items.last.itemId, int.parse(repeatsSecondController.text), double.parse(weightSecondController.text), 0, now);
+        context, workout.items.last.id, workout.items.last.itemId, int.parse(repeatsSecondController.text), double.parse(cleanedWeight), 0, now);
     _resetText();
   }
 

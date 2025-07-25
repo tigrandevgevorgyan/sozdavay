@@ -6,6 +6,7 @@ import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
 import 'package:provider/provider.dart';
 import '../../../data/repositories/workout_repository/workout_repository.dart';
 import '../../../utils/timer_state_completion.dart';
+import '../../../utils/weight_formatters.dart';
 
 class SimpleViewModel extends BaseViewModel {
   late TextEditingController weightController;
@@ -33,10 +34,11 @@ class SimpleViewModel extends BaseViewModel {
     if (repeatsController.text.isEmpty || weightController.text.isEmpty) {
       return;
     }
+    final cleanedWeight = cleanLastDotDelete(weightController.text);
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     final now = DateTime.now().toIso8601String();
     try {
-      super.addOrUpdateSetResult(context, workout.items.first.id, workout.items.first.itemId, int.parse(repeatsController.text), double.parse(weightController.text), 0, now);
+      super.addOrUpdateSetResult(context, workout.items.first.id, workout.items.first.itemId, int.parse(repeatsController.text), double.parse(cleanedWeight), 0, now);
     } on Exception {}
     _resetText();
   }
