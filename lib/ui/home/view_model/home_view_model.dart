@@ -76,11 +76,11 @@ class HomeViewModel extends ChangeNotifier {
   late final String chatImage = HomeBannersAssets.getRandomChatImage();
 
 
-  String get level => _mainInfo?.label ?? '';
+  String get seasonLevel => _mainInfo?.seasonLabel ?? '';
 
   int get rating => _mainInfo?.rating ?? 0;
 
-  int get levelRating => _mainInfo?.levelRating ?? 0;
+  int get seasonLevelRating => _mainInfo?.seasonLevelRating ?? 0;
 
   int get seasonRating => _mainInfo?.seasonRating ?? 0;
 
@@ -510,6 +510,6 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   MainInfo _emptyMainInfo() {
-    return MainInfo(WorkoutStats(0, 0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '', 0, 0);
+    return MainInfo(WorkoutStats(0, 0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '', 0, 0, 0, '');
   }
 }
