@@ -79,9 +79,9 @@ class HomeScreen extends StatelessWidget {
                           child: StatisticsTileWidget(
                             monthlyValue: provider.perMonth,
                             yearlyValue: provider.perSeason,
-                            ratingPercent: provider.seasonRating / 3500.0,
+                            ratingPercent: provider.seasonLevelRating / 3500.0,
                             rating: provider.seasonRating,
-                            level: provider.level,
+                            level: provider.seasonLevel,
                             onMonthlyClicked: () {
                               provider.onRatingClicked(context);
                             },
