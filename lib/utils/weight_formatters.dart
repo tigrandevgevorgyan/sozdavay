@@ -11,8 +11,16 @@ class WeightTextInputFormatter extends TextInputFormatter {
 
     if (text.isEmpty) return newValue;
 
+    text = text.replaceAll(',', '.');
+
     final isValid = RegExp(r'^\d{1,3}(\.\d{0,1})?$|^\d{1,3}\.$').hasMatch(text);
-    return isValid ? newValue : oldValue;
+
+    if (!isValid) return oldValue;
+
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
   }
 }
 
