@@ -462,7 +462,9 @@ class HomeViewModel extends ChangeNotifier {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Подписка закончилась', style: Style.ablation18w900.copyWith(color: Colors.white)),
+                      Text('Подписка закончилась',
+                          style: Style.ablation18w900.copyWith(color: Colors.white),
+                          textAlign: TextAlign.center),
                       SizedBox(height: 8),
                       Text(
                           'Но это легко исправить! Напишите тренеру, чтобы вернуть доступ',

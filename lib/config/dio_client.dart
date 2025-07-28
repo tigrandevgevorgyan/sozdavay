@@ -10,7 +10,7 @@ class DioClient {
     headers['X-Requested-With'] = 'XMLHttpRequest';
 
     final client = Dio(BaseOptions(
-      baseUrl: 'http://62.109.31.30/api',
+      baseUrl: 'http://176.123.169.218:8080/api',
       connectTimeout: const Duration(milliseconds: 15000),
       validateStatus: (status) => (status ?? 200) < 500,
       receiveTimeout: const Duration(milliseconds: 15000),
