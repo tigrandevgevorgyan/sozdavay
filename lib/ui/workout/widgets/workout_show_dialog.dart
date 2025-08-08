@@ -8,7 +8,7 @@ class WorkoutShowDialog extends StatelessWidget {
   final String title;
   final String confirmText;
   final VoidCallback onConfirm;
-  final String cancelText;
+  final String? cancelText;
   final VoidCallback? onCancel;
 
   const WorkoutShowDialog({
@@ -16,7 +16,7 @@ class WorkoutShowDialog extends StatelessWidget {
     required this.title,
     required this.confirmText,
     required this.onConfirm,
-    this.cancelText = 'Отмена',
+    this.cancelText,
     this.onCancel,
   });
 
@@ -52,15 +52,15 @@ class WorkoutShowDialog extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 10),
+                if (onCancel != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.of(context).pop();
                       onCancel?.call();
                     },
                     child: Text(
-                      cancelText,
+                      cancelText!,
                       style: Style.ablation14w900.copyWith(color: Colors.white),
                     ),
                   ),

@@ -10,6 +10,7 @@ import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 import '../../../data/repositories/data_repository/data_repositry.dart';
 import '../../../data/services/data/models/main_response.dart';
+import '../../workout/widgets/workout_show_dialog.dart';
 
 class ProfilePreferencesViewModel extends ChangeNotifier {
   final IProfileRepository profileRepository;
@@ -227,6 +228,10 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
         } else {
           _validUntilDate = '';
         }
+        if (profile.value.isHasActiveWorkout == true) {
+          showProfileDialog(context);
+        }
+
       case Error<UserProfileExtendedResponse>():
         if (context.mounted) {
           ErrorUtils.showError(context, profile.error.getErrorMessage());
@@ -253,6 +258,23 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
     if (!allowedIds.contains(_prioritySelection)) {
       _prioritySelection = null;
     }
+  }
+
+  void showProfileDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      useRootNavigator: true,
+      builder: (dialogContext) {
+        return WorkoutShowDialog(
+          title: 'Если изменить настройки, данные в активной тренировке будут удалены',
+          confirmText: 'Ок',
+          onConfirm: () {
+            notifyListeners();
+          },
+        );
+      },
+    );
   }
 
   @override

@@ -69,6 +69,12 @@ class _WorkoutBaseScreenState extends State<WorkoutBaseScreen> {
                         provider.init(context);
                       },
                   )
+                      : provider.finishError
+                      ? ErrorPlaceholder(
+                    onTap: () {
+                      provider.finishWorkout(context);
+                    },
+                  )
                       : Column(
                           children: [
                             Expanded(

@@ -38,6 +38,7 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
 
   WorkoutResponse? _workoutResponse;
   int? _lastDayIndex;
+  bool isLocalId(int id) => id < 0;
 
   WorkoutRepositoryImp(this._localStorage, {required workoutService}) : _workoutService = workoutService;
 
@@ -167,6 +168,11 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   Future<Result<List<HistoryInfo>>> updateSetResult(int id, int itemId, int exerciseId, double weight, int repeats, int difficult, int time, String date) async {
     final offlineSet = WorkoutSets.update(id: id, itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time, date: date);
 
+    if (isLocalId(id)) {
+      await _localStorage.saveOfflineOperation(offlineSet);
+      return Result.ok([]);
+    }
+
     try {
       final response = await _tryWithRetry(
             () => _workoutService.updateSetResult(id, exerciseId, weight, repeats, difficult, time),
@@ -235,6 +241,12 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   @override
   Future<Result<List<HistoryInfo>>> deleteSetResult(int id) async {
     final offlineSet = WorkoutSets.delete(id: id);
+
+    if (isLocalId(id)) {
+      await _localStorage.saveOfflineOperation(offlineSet);
+      return Result.ok([]);
+    }
+
     try {
       final response = await _tryWithRetry(
             () => _workoutService.deleteSetResult(id),
