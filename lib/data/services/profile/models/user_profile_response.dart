@@ -17,7 +17,7 @@ class UserProfileShortResponse extends BaseResponse {
 
 @JsonSerializable()
 class UserProfileExtendedResponse extends BaseResponse {
-  UserProfileExtendedResponse(super.message, this.data, this.experiences, this.goals, this.days, this.priorities, this.categories, this.availablePriority);
+  UserProfileExtendedResponse(super.message, this.data, this.experiences, this.goals, this.days, this.priorities, this.categories, this.availablePriority, this.isHasActiveWorkout);
 
   UserProfile data;
   final List<IdNamePairWithPriority> experiences;
@@ -29,6 +29,8 @@ class UserProfileExtendedResponse extends BaseResponse {
   @JsonKey(name: 'priorites')
   final List<IdNamePairWithPriority> priorities;
   final List<IdNamePairWithPriority> categories;
+  @JsonKey(name: 'is_has_active_workout')
+  final bool? isHasActiveWorkout;
 
   factory UserProfileExtendedResponse.fromJson(Map<String, dynamic> json) => _$UserProfileExtendedResponseFromJson(json);
 

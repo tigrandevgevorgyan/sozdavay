@@ -42,6 +42,7 @@ UserProfileExtendedResponse _$UserProfileExtendedResponseFromJson(
               (e) => IdNamePairWithPriority.fromJson(e as Map<String, dynamic>))
           .toList(),
       json['available_priority'] as bool?,
+      json['is_has_active_workout'] as bool?,
     );
 
 Map<String, dynamic> _$UserProfileExtendedResponseToJson(
@@ -55,6 +56,7 @@ Map<String, dynamic> _$UserProfileExtendedResponseToJson(
       'available_priority': instance.availablePriority,
       'priorites': instance.priorities,
       'categories': instance.categories,
+      'is_has_active_workout': instance.isHasActiveWorkout,
     };
 
 GoalWithPriorities _$GoalWithPrioritiesFromJson(Map<String, dynamic> json) =>

@@ -301,6 +301,7 @@ class HomeViewModel extends ChangeNotifier {
             },
             cancelText: 'Назад',
             onCancel: () {
+              Navigator.of(context).pop();
               startRefreshTimer();
               },
           ),

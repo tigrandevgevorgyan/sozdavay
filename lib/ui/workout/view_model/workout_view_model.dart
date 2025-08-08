@@ -29,6 +29,7 @@ class WorkoutViewModel extends ChangeNotifier {
   int _workoutId = -1;
   bool _isLoading = true;
   bool hasError = false;
+  bool finishError = false;
 
   bool get isLoading => _isLoading;
 
@@ -39,6 +40,7 @@ class WorkoutViewModel extends ChangeNotifier {
   void init(BuildContext context) async {
     _isLoading = true;
     hasError = false;
+    finishError = false;
     notifyListeners();
     final result = await workoutRepository.loadWorkout(dayIndex: dayIndex);
     _isLoading = false;
@@ -80,7 +82,7 @@ class WorkoutViewModel extends ChangeNotifier {
   Future<void> addSetResult(BuildContext context, int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date) async {
     if (_workout == null) return;
 
-    final localId = DateTime.now().millisecondsSinceEpoch;
+    final localId = -DateTime.now().millisecondsSinceEpoch;
     final newResult = ResultValue(localId, weight.toDouble(), repeats, difficult, time, date);
 
     final today = getToday();
@@ -242,11 +244,13 @@ class WorkoutViewModel extends ChangeNotifier {
     await _timerService.dispose();
   }
 
-  void _finishWorkout(BuildContext context) async {
+  void finishWorkout(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
+    await workoutRepository.sendOfflineOperations();
     final result = await workoutRepository.finishWorkout();
     _isLoading = false;
+    finishError = false;
     notifyListeners();
     switch (result) {
       case Ok<void>():
@@ -256,7 +260,7 @@ class WorkoutViewModel extends ChangeNotifier {
         }
       case Error<void>():
         if (context.mounted) {
-          ErrorUtils.showError(context, result.error.getErrorMessage());
+          finishError = true;
         }
     }
   }
@@ -267,8 +271,11 @@ class WorkoutViewModel extends ChangeNotifier {
       builder: (_) => WorkoutShowDialog(
         title: 'Последнее упражнение',
         confirmText: 'Закончить тренировку',
-        onConfirm: () => _finishWorkout(context),
+        onConfirm: () => finishWorkout(context),
         cancelText: 'Продолжить',
+        onCancel: () {
+          Navigator.of(context).pop();
+          },
       ),
     );
   }
