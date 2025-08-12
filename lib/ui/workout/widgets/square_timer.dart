@@ -269,19 +269,33 @@ class _SquareTimerState extends State<SquareTimer> with TickerProviderStateMixin
           ),
           Positioned.fill(
             child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                      onTap: _onPlayTap,
-                      child: SvgPicture.asset(_isRunning ? Assets.stopIcon : Assets.playIcon)
+              child: FractionallySizedBox(
+                widthFactor: 0.7,
+                heightFactor: 0.7,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: _onPlayTap,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SvgPicture.asset(
+                        _isRunning ? Assets.stopIcon : Assets.playIcon,
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        widget.title,
+                        textAlign: TextAlign.center,
+                        style: Style.ablation14w800.copyWith(
+                          color: AppColors.primaryTextColor,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 18),
-                  Text(widget.title, style: Style.ablation14w800.copyWith(color: AppColors.primaryTextColor)),
-                ],
+                ),
               ),
             ),
-          ),
+          )
         ],
       ),
     );
