@@ -31,10 +31,12 @@ class SimpleViewModel extends BaseViewModel {
   }
 
   void onPlusClicked(BuildContext context) {
-    if (repeatsController.text.isEmpty || weightController.text.isEmpty) {
+    if (repeatsController.text.isEmpty) {
       return;
     }
-    final cleanedWeight = cleanLastDotDelete(weightController.text);
+    final cleanedWeight = weightController.text.isEmpty
+        ? '0'
+        : cleanLastDotDelete(weightController.text);
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     final now = DateTime.now().toIso8601String();
     try {

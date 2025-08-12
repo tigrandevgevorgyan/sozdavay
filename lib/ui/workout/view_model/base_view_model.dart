@@ -192,7 +192,7 @@ class BaseViewModel extends ChangeNotifier {
     return result;
   }
 
-  String getRestString(ExerciseInfo exerciseInfo) {
+  String getRestString(ExerciseInfo exerciseInfo, {bool multiline = false}) {
     final restSec = exerciseInfo.restSeconds?.abs();
 
     if (restSec == null) {
@@ -201,13 +201,14 @@ class BaseViewModel extends ChangeNotifier {
 
     final minutes = restSec ~/ 60;
     final seconds = restSec % 60;
+    final separator = multiline ? '\n' : ' ';
 
     if (minutes > 0 && seconds > 0) {
-      return 'Отдых $minutes мин $seconds сек';
+      return 'Отдых$separator$minutes мин $seconds сек';
     } else if (minutes > 0) {
-      return 'Отдых $minutes мин';
+      return 'Отдых$separator$minutes мин';
     } else {
-      return 'Отдых $seconds сек';
+      return 'Отдых$separator$seconds сек';
     }
   }
 

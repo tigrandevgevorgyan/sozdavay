@@ -47,10 +47,12 @@ class DoubleViewModel extends BaseViewModel {
   }
 
   void onFirstPlusClicked(BuildContext context) {
-    if (repeatsFirstController.text.isEmpty || weightFirstController.text.isEmpty) {
+    if (repeatsFirstController.text.isEmpty) {
       return;
     }
-    final cleanedWeight = cleanLastDotDelete(weightFirstController.text);
+    final cleanedWeight = weightFirstController.text.isEmpty
+        ? '0'
+        : cleanLastDotDelete(weightFirstController.text);
     final now = DateTime.now().toIso8601String();
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     super.addOrUpdateSetResult(
@@ -59,10 +61,12 @@ class DoubleViewModel extends BaseViewModel {
   }
 
   void onSecondPlusClicked(BuildContext context) {
-    if (repeatsSecondController.text.isEmpty || weightSecondController.text.isEmpty) {
+    if (repeatsSecondController.text.isEmpty) {
       return;
     }
-    final cleanedWeight = cleanLastDotDelete(weightSecondController.text);
+    final cleanedWeight = weightSecondController.text.isEmpty
+        ? '0'
+        : cleanLastDotDelete(weightSecondController.text);
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     final now = DateTime.now().toIso8601String();
     super.addOrUpdateSetResult(

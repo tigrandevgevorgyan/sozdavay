@@ -275,22 +275,28 @@ class _HorizontalTimerState extends State<HorizontalTimer> with TickerProviderSt
           child: FractionallySizedBox(
             widthFactor: _currentProgress,
             child: LevelUpContainer(
-                color: _isCompleted ? AppColors.timerDoneOrangeColor : AppColors.activeButtonColor
+              color: _isCompleted ? AppColors.timerDoneOrangeColor : AppColors.activeButtonColor,
             ),
           ),
         ),
         Positioned.fill(
           child: Row(
             children: [
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(widget.title, style: Style.ablation14w800),
               ),
-              GestureDetector(
-                onTap: _onPlayTap,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: SvgPicture.asset(_isRunning ? Assets.stopIcon : Assets.playIcon),
+              SizedBox(
+                width: 70,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: _onPlayTap,
+                  child: Container(
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 12),
+                    height: double.infinity,
+                    child: SvgPicture.asset(_isRunning ? Assets.stopIcon : Assets.playIcon),
+                  ),
                 ),
               ),
             ],
