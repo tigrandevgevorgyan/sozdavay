@@ -41,4 +41,37 @@ String cleanLastDotDelete(String value) {
   return value;
 }
 
+class ComplexTimeWithSecondsFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    final normalized = newValue.text.replaceAll(',', '.');
 
+    if (normalized.isEmpty) {
+      return newValue.copyWith(text: normalized);
+    }
+
+    if (!RegExp(r'^\d+(\.\d{0,2})?$').hasMatch(normalized)) {
+      return oldValue;
+    }
+
+    final dot = normalized.indexOf('.');
+    if (dot != -1) {
+      final frac = normalized.substring(dot + 1);
+
+      if (frac.isNotEmpty) {
+        final first = frac.codeUnitAt(0) - 48;
+
+        if (first > 5) return oldValue;
+      }
+    }
+
+    return TextEditingValue(
+      text: normalized,
+      selection: TextSelection.collapsed(offset: normalized.length),
+      composing: TextRange.empty,
+    );
+  }
+}

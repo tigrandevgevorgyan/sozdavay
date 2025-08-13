@@ -136,7 +136,7 @@ class _WorkoutService implements WorkoutService {
     double weight,
     int repeats,
     int difficult,
-    int time,
+    double time,
     String date,
   ) async {
     final _extra = <String, dynamic>{};
@@ -183,7 +183,7 @@ class _WorkoutService implements WorkoutService {
     double weight,
     int repeats,
     int difficult,
-    int time,
+    double time,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{

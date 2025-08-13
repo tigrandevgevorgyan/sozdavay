@@ -13,7 +13,7 @@ import 'package:level_up/ui/workout/widgets/simple_results_widget.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/misc_utils.dart';
 import 'package:level_up/utils/result.dart';
-import 'package:level_up/utils/weight_formatters.dart';
+import 'package:level_up/utils/formatters.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/services/workout/models/workout_comment.dart';
@@ -71,7 +71,7 @@ class BaseViewModel extends ChangeNotifier {
     }
   }
 
-  void addOrUpdateSetResult(BuildContext context, int exerciseId, int itemId, int repeats, double weight, int time, String date) async {
+  void addOrUpdateSetResult(BuildContext context, int exerciseId, int itemId, int repeats, double weight, double time, String date) async {
     FocusManager.instance.primaryFocus?.unfocus();
 
     try {

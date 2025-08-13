@@ -154,7 +154,7 @@ class ResultValue {
   final double weight;
   final int repeats;
   final int difficult;
-  final int time;
+  final double time;
   final String date;
 
   ResultValue(this.id, this.weight, this.repeats, this.difficult, this.time, this.date);
@@ -169,7 +169,7 @@ extension ResultValueCopyWith on ResultValue {
     int? id,
     double? weight,
     int? repeats,
-    int? time,
+    double? time,
   }) {
     return ResultValue(id ?? this.id, weight ?? this.weight, repeats ?? this.repeats, difficult, time ?? this.time, date);
   }

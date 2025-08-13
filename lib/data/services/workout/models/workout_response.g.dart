@@ -138,7 +138,7 @@ ResultValue _$ResultValueFromJson(Map<String, dynamic> json) => ResultValue(
       (json['weight'] as num).toDouble(),
       (json['repeats'] as num).toInt(),
       (json['difficult'] as num).toInt(),
-      (json['time'] as num).toInt(),
+      (json['time'] as num).toDouble(),
       json['date'] as String,
     );
 

@@ -26,7 +26,7 @@ class WorkoutSets {
   final double? weight;
   final int? repeats;
   final int? difficult;
-  final int? time;
+  final double? time;
   final OfflineAction action;
   final String? date;
   final String? comment;
@@ -63,7 +63,7 @@ class WorkoutSets {
     required double weight,
     required int repeats,
     required int difficult,
-    required int time,
+    required double time,
     required String date,
     int? id,
   }) {
@@ -87,7 +87,7 @@ class WorkoutSets {
     required double weight,
     required int repeats,
     required int difficult,
-    required int time,
+    required double time,
     required String date,
   }) {
     return WorkoutSets._(
@@ -164,7 +164,7 @@ extension WorkoutSetsCopyWith on WorkoutSets {
     double? weight,
     int? repeats,
     int? difficult,
-    int? time,
+    double? time,
     String? date,
     String? comment,
     OfflineAction? action,
