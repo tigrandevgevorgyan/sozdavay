@@ -13,7 +13,7 @@ WorkoutSets _$WorkoutSetsFromJson(Map<String, dynamic> json) => WorkoutSets(
       weight: (json['weight'] as num?)?.toDouble(),
       repeats: (json['repeats'] as num?)?.toInt(),
       difficult: (json['difficult'] as num?)?.toInt(),
-      time: (json['time'] as num?)?.toInt(),
+      time: (json['time'] as num?)?.toDouble(),
       date: json['date'] as String?,
       action: $enumDecode(_$OfflineActionEnumMap, json['action']),
       comment: json['comment'] as String?,

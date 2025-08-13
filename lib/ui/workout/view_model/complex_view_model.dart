@@ -7,7 +7,7 @@ import 'package:level_up/ui/workout/widgets/day_measurements_result.dart';
 import 'package:level_up/ui/workout/widgets/simple_results_widget.dart';
 import 'package:level_up/utils/misc_utils.dart';
 import 'package:provider/provider.dart';
-
+import 'package:level_up/utils/formatters.dart';
 import '../../../data/repositories/workout_repository/workout_repository.dart';
 import '../../../data/services/workout/models/workout_response.dart';
 
@@ -40,7 +40,7 @@ class ComplexViewModel extends BaseViewModel {
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     final now = DateTime.now().toIso8601String();
     super.addOrUpdateSetResult(
-        context, workout.items.first.id, workout.items.first.itemId, !isTime ? int.parse(textController.text) : 0, 0, isTime ? double.parse(textController.text).toInt() : 0, now);
+        context, workout.items.first.id, workout.items.first.itemId, !isTime ? int.parse(textController.text) : 0, 0, isTime ? double.parse(textController.text) : 0, now);
     textController.clear();
     notifyListeners();
   }
@@ -76,7 +76,7 @@ class ComplexViewModel extends BaseViewModel {
       for (ResultValue value in history.values.reversed) {
         resultStrings.add(DayResultInfo(
           value.id,
-          isTime ? value.time.toString() : value.repeats.toString(),
+          isTime ? DoubleFormatter(value.time).formatDouble() : value.repeats.toString(),
         ));
         title = value.date.toWeekdayWithDate();
       }

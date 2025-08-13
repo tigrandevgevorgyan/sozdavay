@@ -79,7 +79,7 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addSetResult(BuildContext context, int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date) async {
+  Future<void> addSetResult(BuildContext context, int exerciseId, int itemId, double weight, int repeats, int difficult, double time, String date) async {
     if (_workout == null) return;
 
     final localId = -DateTime.now().millisecondsSinceEpoch;
@@ -143,7 +143,7 @@ class WorkoutViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateSetResult(BuildContext context, int id, int itemId, int exerciseId, double weight, int repeats, int difficult, int time, String date) async {
+  Future<void> updateSetResult(BuildContext context, int id, int itemId, int exerciseId, double weight, int repeats, int difficult, double time, String date) async {
     if (_workout == null) return;
 
     for (final workout in _workout!) {

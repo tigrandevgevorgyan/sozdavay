@@ -15,7 +15,7 @@ import 'package:level_up/ui/workout/widgets/square_timer.dart';
 import 'package:level_up/ui/workout/widgets/video_player_card.dart';
 import 'package:level_up/ui/workout/widgets/workout_top_bar.dart';
 import 'package:provider/provider.dart';
-import '../../../utils/weight_formatters.dart';
+import '../../../utils/formatters.dart';
 
 class SimpleWorkoutScreen extends StatelessWidget {
   const SimpleWorkoutScreen({super.key, required this.workoutInfo});

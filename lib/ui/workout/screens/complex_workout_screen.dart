@@ -15,6 +15,8 @@ import 'package:level_up/ui/workout/widgets/video_player_card.dart';
 import 'package:level_up/ui/workout/widgets/workout_top_bar.dart';
 import 'package:provider/provider.dart';
 
+import '../../../utils/formatters.dart';
+
 class ComplexWorkoutScreen extends StatefulWidget {
   const ComplexWorkoutScreen({super.key, required this.workoutInfo});
 
@@ -107,7 +109,9 @@ class _ComplexWorkoutScreenState extends State<ComplexWorkoutScreen> {
                                 hintText: provider.isTime ? 'время' : 'раунды',
                                 textSize: 15,
                                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
+                                inputFormatters: provider.isTime
+                                    ? [ComplexTimeWithSecondsFormatter()]
+                                    : [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
                               ),
                             ),
                             SizedBox(width: 4),

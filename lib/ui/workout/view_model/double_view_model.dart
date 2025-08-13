@@ -3,7 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/ui/workout/view_model/base_view_model.dart';
 import 'package:level_up/ui/workout/view_model/workout_view_model.dart';
-import 'package:level_up/utils/weight_formatters.dart';
+import 'package:level_up/utils/formatters.dart';
 import 'package:provider/provider.dart';
 import '../../../data/repositories/workout_repository/workout_repository.dart';
 import '../../../utils/timer_state_completion.dart';

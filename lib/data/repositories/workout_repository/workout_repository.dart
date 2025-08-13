@@ -16,13 +16,13 @@ abstract class IWorkoutRepository {
 
   Future<Result<List<WorkoutInfo>>> changeExercise(int index, bool second);
 
-  Future<Result<List<HistoryInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date, {required int localId});
+  Future<Result<List<HistoryInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, double time, String date, {required int localId});
 
   Future<Result<void>> finishWorkout();
 
   Future<Result<IsCompletedResponse>> deleteWorkout(int workoutId);
 
-  Future<Result<List<HistoryInfo>>> updateSetResult(int id, int itemId, int exerciseId, double weight, int repeats, int difficult, int time, String date);
+  Future<Result<List<HistoryInfo>>> updateSetResult(int id, int itemId, int exerciseId, double weight, int repeats, int difficult, double time, String date);
 
   Future<Result<List<HistoryInfo>>> deleteSetResult(int id);
 
@@ -143,7 +143,7 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   }
 
   @override
-  Future<Result<List<HistoryInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, int time, String date, {required int localId}) async {
+  Future<Result<List<HistoryInfo>>> addSetResult(int exerciseId, int itemId, double weight, int repeats, int difficult, double time, String date, {required int localId}) async {
     final offlineSet = WorkoutSets.add(itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time, date: date, id: localId);
 
     try {
@@ -165,7 +165,7 @@ class WorkoutRepositoryImp extends IWorkoutRepository {
   }
 
   @override
-  Future<Result<List<HistoryInfo>>> updateSetResult(int id, int itemId, int exerciseId, double weight, int repeats, int difficult, int time, String date) async {
+  Future<Result<List<HistoryInfo>>> updateSetResult(int id, int itemId, int exerciseId, double weight, int repeats, int difficult, double time, String date) async {
     final offlineSet = WorkoutSets.update(id: id, itemId: itemId, exerciseId: exerciseId, weight: weight, repeats: repeats, difficult: difficult, time: time, date: date);
 
     if (isLocalId(id)) {

@@ -30,7 +30,7 @@ abstract class WorkoutService {
     @Field() double weight,
     @Field() int repeats,
     @Field() int difficult,
-    @Field() int time,
+    @Field() double time,
     @Field() String date,
   );
 
@@ -41,7 +41,7 @@ abstract class WorkoutService {
     @Query('weight') double weight,
     @Query('repeats') int repeats,
     @Query('difficult') int difficult,
-    @Query('time') int time,
+    @Query('time') double time,
   );
 
   @DELETE('/workout/set')

@@ -17,7 +17,7 @@ import 'package:level_up/ui/workout/widgets/video_player_card.dart';
 import 'package:level_up/ui/workout/widgets/workout_top_bar.dart';
 import 'package:level_up/utils/misc_utils.dart';
 import 'package:provider/provider.dart';
-import '../../../utils/weight_formatters.dart';
+import '../../../utils/formatters.dart';
 
 class DoubleWorkoutScreen extends StatefulWidget {
   const DoubleWorkoutScreen({super.key, required this.workoutInfo});
