@@ -1,0 +1,49 @@
+{
+  "appName": "LLLLL",
+  "coachChatUrl": "@nadiklimenko",
+  "apiBaseUrl": "http://62.109.31.30:8080/api",
+  "colors": {
+    "backgroundColor": "#201614",
+    "backgroundContentColor": "#563E39",
+    "inActiveButtonColor": "#2A1E1C",
+    "activeButtonColor": "#5391AC",
+    "inputBackgroundColor": "#2D211E",
+    "inputBorderColor": "#6B5C59",
+    "tertiaryHintColor": "#747474",
+    "disabledTextColor": "#4E4E4E",
+    "primaryTextColor": "#ECECEC",
+    "secondaryTextColor": "#ABABAB",
+    "secondaryDefaultColor": "#5F514F",
+    "timerDoneOrangeColor": "#9A1D07",
+    "overlayColor1": "#42563E39",
+    "overlayColor2": "#80141415",
+    "errorMessagePositive": "#ECECEC"
+  },
+  "strings": {
+    "phoneCallCodeMessage": "Отправим код-пароль на WhatsApp"
+  },
+  "features": {
+    "showRequestCodeButton": false
+  },
+  "banners": {
+    "training": [
+      "training_1.jpg",
+      "training_2.jpg",
+      "training_3.jpg",
+      "training_4.jpg",
+      "training_5.jpg"
+    ],
+    "measurements": [
+      "measurements_1.jpg",
+      "measurements_2.jpg",
+      "measurements_3.jpg",
+      "measurements_4.jpg",
+      "measurements_5.jpg"
+    ],
+    "chat": [
+      "chat_1.jpg",
+      "chat_2.jpg",
+      "chat_3.jpg"
+    ]
+  }
+}

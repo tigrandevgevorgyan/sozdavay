@@ -1,16 +1,28 @@
 import 'dart:ui';
 
+import '../../../brand/brand_config.dart';
+
 class AppColors {
-  static const Color backgroundColor = Color(0xFF010101);
-  static const Color backgroundContentColor = Color(0xFF101011);
-  static const Color inActiveButtonColor = Color(0xFF161616);
-  static const Color activeButtonColor = Color(0xFF2461E8);
-  static const Color inputBackgroundColor = Color(0xFF090909);
-  static const Color inputBorderColor = Color(0x80242425);
-  static const Color tertiaryHintColor = Color(0xFF747474);
-  static const Color disabledTextColor = Color(0xFF4E4E4E);
-  static const Color primaryTextColor = Color(0xFFECECEC);
-  static const Color secondaryTextColor = Color(0xFF989898);
-  static const Color secondaryDefaultColor = Color(0xFF252527);
-  static const Color timerDoneOrangeColor = Color(0xFFFE453D);
+  static late Map<String, Color> _c;
+
+  static void init(BrandConfig cfg) {
+    _c = cfg.colors;
+  }
+
+  static Color get backgroundColor        => _c['backgroundColor']!;
+  static Color get backgroundContentColor => _c['backgroundContentColor']!;
+  static Color get inActiveButtonColor    => _c['inActiveButtonColor']!;
+  static Color get activeButtonColor      => _c['activeButtonColor']!;
+  static Color get inputBackgroundColor   => _c['inputBackgroundColor']!;
+  static Color get inputBorderColor       => _c['inputBorderColor']!;
+  static Color get tertiaryHintColor      => _c['tertiaryHintColor']!;
+  static Color get disabledTextColor      => _c['disabledTextColor']!;
+  static Color get primaryTextColor       => _c['primaryTextColor']!;
+  static Color get secondaryTextColor     => _c['secondaryTextColor']!;
+  static Color get secondaryDefaultColor  => _c['secondaryDefaultColor']!;
+  static Color get timerDoneOrangeColor   => _c['timerDoneOrangeColor']!;
+  static Color get overlayColor1          => _c['overlayColor1']!;
+  static Color get overlayColor2          => _c['overlayColor2']!;
+  static Color get errorMessagePositive   => _c['errorMessagePositive']!;
 }
+

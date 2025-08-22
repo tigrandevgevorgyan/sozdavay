@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:level_up/config/assets.dart';
+import 'package:level_up/assets/assets.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 
 class SubscriptionBanner extends StatelessWidget {

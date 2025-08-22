@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:level_up/config/assets.dart';
+import 'package:level_up/assets/assets.dart';
 import 'package:level_up/data/services/local_storage.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/splash/view_model/splash_view_model.dart';

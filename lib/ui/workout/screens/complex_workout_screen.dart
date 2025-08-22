@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:level_up/config/assets.dart';
+import 'package:level_up/assets/assets.dart';
 import 'package:level_up/data/services/workout/models/workout_response.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_container.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';

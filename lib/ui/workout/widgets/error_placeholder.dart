@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_button.dart';
-import '../../../config/assets.dart';
+import '../../../assets/assets.dart';
 import '../../core/themes/app_colors.dart';
 import '../../core/themes/text_styles.dart';
 

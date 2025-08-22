@@ -1,16 +1,20 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:get_it/get_it.dart';
 import 'package:level_up/data/services/local_storage.dart';
 import 'package:level_up/utils/result.dart';
+
+import '../brand/brand_config.dart';
 
 class DioClient {
   static Future<Dio> getDioClient(ILocalStorage localStorage) async {
     Map<String, String> headers = {};
+    final cfg = GetIt.I<BrandConfig>();
 
     headers['X-Requested-With'] = 'XMLHttpRequest';
 
     final client = Dio(BaseOptions(
-      baseUrl: 'http://176.123.169.218:8080/api',
+      baseUrl: cfg.apiBaseUrl,
       connectTimeout: const Duration(milliseconds: 15000),
       validateStatus: (status) => (status ?? 200) < 500,
       receiveTimeout: const Duration(milliseconds: 15000),

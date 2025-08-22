@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:level_up/config/assets.dart';
+import 'package:level_up/assets/assets.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_container.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:level_up/config/assets.dart';
+import 'package:level_up/assets/assets.dart';
 import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/ui/workout/screens/video_player_screen.dart';
 import 'package:video_player/video_player.dart';

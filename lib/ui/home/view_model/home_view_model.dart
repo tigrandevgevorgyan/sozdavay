@@ -12,12 +12,14 @@ import 'package:level_up/data/repositories/profile_service/profile_repository.da
 import 'package:level_up/data/services/local_storage.dart';
 import 'package:level_up/data/services/profile/models/user_profile_response.dart';
 import 'package:level_up/routing/levelup_router.dart';
+import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/home/widgets/calendar_widget.dart';
 import 'package:level_up/ui/text_editing_screen/text_editing_screen.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../config/home_banners_assets.dart';
+import '../../../assets/home_banners_assets.dart';
+import '../../../brand/brand_config.dart';
 import '../../../data/repositories/workout_repository/workout_repository.dart';
 import '../../../data/services/common_models/is_completed_response.dart';
 import '../../../data/services/data/models/main_response.dart';
@@ -46,6 +48,8 @@ class HomeViewModel extends ChangeNotifier {
   final IProfileRepository profileRepository;
   final IDataRepository dataRepository;
   final IWorkoutRepository workoutRepository;
+
+  final cfg = GetIt.I<BrandConfig>();
 
   bool _isLoading = true;
 
@@ -325,8 +329,12 @@ class HomeViewModel extends ChangeNotifier {
     });
   }
 
-  void onChatClicked() {
-    launchUrl(Uri.parse('http://t.me/Dryk220lbs'));
+  Future<void> onChatClicked() async {
+    final uri = cfg.coachChatUrl;
+    final ok = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
   }
 
   void onProfileClicked(BuildContext context) {
@@ -454,7 +462,7 @@ class HomeViewModel extends ChangeNotifier {
               child: Container(
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Color(0xFF141414),
+                  color: AppColors.backgroundContentColor,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Color(0xFF3C3C3C), width: 0.5),
                 ),

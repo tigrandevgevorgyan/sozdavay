@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:level_up/config/assets.dart';
+import 'package:level_up/assets/assets.dart';
 import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/local_storage.dart';

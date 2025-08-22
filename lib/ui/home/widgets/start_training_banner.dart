@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../../config/assets.dart';
+import '../../../assets/assets.dart';
 import '../../core/themes/app_colors.dart';
 import '../../core/themes/text_styles.dart';
 
@@ -26,7 +26,10 @@ class StartTrainingBanner extends StatelessWidget {
             children: [
               Image.asset(imagePath, fit: BoxFit.cover),
               Container(
-                color: Colors.black.withOpacity(0.6),
+                color: AppColors.overlayColor1,
+              ),
+              Container(
+                color: AppColors.overlayColor2,
               ),
               Padding(
                 padding: const EdgeInsets.all(14.0),

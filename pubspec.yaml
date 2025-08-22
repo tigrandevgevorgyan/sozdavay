@@ -59,14 +59,15 @@ dev_dependencies:
 
 
 flutter:
-
   uses-material-design: true
 
   assets:
-    - assets/images/
-    - assets/images/workout/
-    - assets/images/player/
-    - assets/sounds/
+    - assets/common/images/
+    - assets/brands/level_up/images/
+    - assets/brands/lllll/images/
+    - assets/brands/level_up/config.json
+    - assets/brands/lllll/config.json
+    - assets/sounds/htc_basic.mp3
   fonts:
     - family: Ablation
       fonts:
