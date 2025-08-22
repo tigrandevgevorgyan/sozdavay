@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/config/dio_client.dart';
 import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
@@ -7,6 +8,7 @@ import 'package:level_up/data/services/auth/models/access_token_response.dart';
 import 'package:level_up/data/services/profile/models/user_profile_response.dart';
 import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/utils/result.dart';
+import '../../../brand/brand_config.dart';
 import '../../../utils/error_utils.dart';
 import '../../profile_preferences/view_model/profile_preferences_view_model.dart';
 
@@ -50,6 +52,8 @@ class SignInViewModel extends ChangeNotifier {
     return _planType == 2;
   }
 
+  final cfg = GetIt.I<BrandConfig>();
+
   String get _phoneNumber => '+7${phoneController.text.replaceAll(' ', '').replaceAll('(', '').replaceAll(')', '')}';
 
   void onSignInClick(BuildContext context) {
@@ -79,7 +83,7 @@ class SignInViewModel extends ChangeNotifier {
     final result = await authRepository.requestCode(_phoneNumber);
     switch (result) {
       case Ok<void>():
-        _message = 'В течение минуты позвоним и продиктуем код';
+        _message = cfg.strings['phoneCallCodeMessage']!;
         _isErrorMessage = false;
         break;
       case Error<void>():

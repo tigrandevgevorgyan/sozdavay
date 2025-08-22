@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
-import 'package:level_up/config/assets.dart';
+import 'package:level_up/assets/assets.dart';
 import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/ui/core/common_widgets/error_text_widget.dart';
@@ -14,12 +14,14 @@ import 'package:level_up/ui/signin/view_model/signin_view_model.dart';
 import 'package:level_up/utils/phone_formatter.dart';
 import 'package:level_up/utils/phone_mask_formatter.dart';
 import 'package:provider/provider.dart';
+import '../../../brand/brand_config.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final cfg = GetIt.I<BrandConfig>();
     return ChangeNotifierProvider<SignInViewModel>(
       create: (BuildContext context) => SignInViewModel(
         authRepository: GetIt.I<IAuthRepository>(),
@@ -70,11 +72,15 @@ class SignInScreen extends StatelessWidget {
                             onClick: () => provider.isScreenReady ? provider.onSignInClick(context) : null,
                           ),
                     SizedBox(height: 20),
-                    GestureDetector(
-                      onTap: provider.requestCode,
-                      child: Text('получить код пароль', style: Style.ablation14w900),
-                    )
-                  ],
+                    if ((cfg.features['showRequestCodeButton'] as bool? ?? false))
+                      GestureDetector(
+                        onTap: provider.requestCode,
+                        child: Text(
+                          cfg.strings['requestCodeText'] ?? 'получить код пароль',
+                          style: Style.ablation14w900,
+                        ),
+                      ),
+              ],
                 ),
               ),
             ),

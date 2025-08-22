@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_button.dart';
 
@@ -31,7 +32,7 @@ class WorkoutShowDialog extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF141414),
+              color: AppColors.backgroundContentColor,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: const Color(0xFF3C3C3C), width: 0.5),
             ),

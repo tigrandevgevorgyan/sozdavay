@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 
 class InfoAndErrorTextWidget extends StatelessWidget {
@@ -19,7 +20,7 @@ class InfoAndErrorTextWidget extends StatelessWidget {
           style: Style.outfit16w400.copyWith(
               color: isError
             ? Colors.red
-            : Colors.green,
+            : AppColors.errorMessagePositive,
           )),
     );
   }

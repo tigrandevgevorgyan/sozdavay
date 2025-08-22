@@ -1,0 +1,47 @@
+
+{
+  "appName": "220LBS",
+  "coachChatUrl": "http://t.me/Dryk220lbs",
+  "apiBaseUrl": "http://176.123.169.218:8080/api",
+  "colors": {
+    "backgroundColor": "#010101",
+    "backgroundContentColor": "#101011",
+    "inActiveButtonColor": "#161616",
+    "activeButtonColor": "#2461E8",
+    "inputBackgroundColor": "#090909",
+    "inputBorderColor": "#80242425",
+    "tertiaryHintColor": "#747474",
+    "disabledTextColor": "#4E4E4E",
+    "primaryTextColor": "#ECECEC",
+    "secondaryTextColor": "#989898",
+    "secondaryDefaultColor": "#252527",
+    "timerDoneOrangeColor": "#FE453D",
+    "overlayColor1": "#99000000",
+    "overlayColor2": "#00000000",
+    "errorMessagePositive": "#FF4CAF50"
+  },
+  "strings": {
+    "phoneCallCodeMessage": "В течение минуты позвоним и продиктуем код"
+  },
+  "features": {
+    "showRequestCodeButton": true
+  },
+  "banners": {
+    "training": [
+      "training_1.jpg",
+      "training_2.jpg",
+      "training_3.jpg",
+      "training_4.jpg"
+    ],
+    "measurements": [
+      "measurements_1.jpg",
+      "measurements_2.jpg",
+      "measurements_3.jpg"
+    ],
+    "chat": [
+      "chat_1.jpg",
+      "chat_2.jpg",
+      "chat_3.jpg"
+    ]
+  }
+}

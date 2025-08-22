@@ -41,6 +41,7 @@ class _TextEditingScreenState extends State<TextEditingScreen> {
             bottom: Radius.circular(12),
           ),
         ),
+        backgroundColor: AppColors.backgroundContentColor,
       ),
       backgroundColor: AppColors.backgroundColor,
       body: Padding(
