@@ -1,6 +1,6 @@
 {
-  "appName": "LLLLL",
-  "coachChatUrl": "@nadiklimenko",
+  "appName": "W1",
+  "coachChatUrl": "http://t.me/nadiklimenko",
   "apiBaseUrl": "http://62.109.31.30:8080/api",
   "colors": {
     "backgroundColor": "#201614",
