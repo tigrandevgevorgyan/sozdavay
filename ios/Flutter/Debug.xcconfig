@@ -1,5 +1,7 @@
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
 #include? "$(PODS_ROOT)/Target Support Files/Pods-Runner/Pods-Runner.debug-w1.xcconfig"
 #include "Generated.xcconfig"
 PRODUCT_BUNDLE_IDENTIFIER = ru.quantum.levelup.level_up
 PRODUCT_NAME = level_up
 APP_DISPLAY_NAME = 220LBS
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
