@@ -1,4 +1,4 @@
-package ru.quantum.levelup.level_up
+package ru.example.app
 import android.os.Bundle
 import android.content.Context
 import android.media.AudioManager

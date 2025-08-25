@@ -15,7 +15,23 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "ru.quantum.levelup.level_up"
+    namespace "ru.example.app"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    flavorDimensions "brand"
+    productFlavors {
+        level_up {
+            dimension "brand"
+            applicationId "ru.quantum.levelup.level_up"
+            resValue "string", "app_name", "Level Up"
+        }
+        w1 {
+            dimension "brand"
+            applicationId "ru.quantum.w1"
+            resValue "string", "app_name", "W1"
+        }
+    }
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

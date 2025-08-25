@@ -1,5 +1,5 @@
 #include? "$(PODS_ROOT)/Target Support Files/Pods-Runner/Pods-Runner.debug-w1.xcconfig"
 #include "Generated.xcconfig"
-PRODUCT_BUNDLE_IDENTIFIER = ru.quantum.levelup.level_up
-PRODUCT_NAME = level_up
-APP_DISPLAY_NAME = 220LBS
+PRODUCT_BUNDLE_IDENTIFIER = ru.quantum.w1
+PRODUCT_NAME = w1
+APP_DISPLAY_NAME = W1
