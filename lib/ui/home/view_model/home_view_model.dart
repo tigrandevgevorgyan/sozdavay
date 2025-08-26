@@ -252,7 +252,7 @@ class HomeViewModel extends ChangeNotifier {
             : 'тренировка';
         if (result.value.day != dayIndex) {
           if (context.mounted) {
-            _wrongTrainingDialog(context, workoutId, dayIndex, currentWorkoutName);
+            deleteWorkoutAndStartNew(context, workoutId, dayIndex);
           }
         } else {
           if (context.mounted) {
@@ -293,24 +293,24 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  void _wrongTrainingDialog(BuildContext context, int workoutId, int dayIndex, String workoutName) {
-    showDialog(
-      context: context,
-      builder: (_) =>
-          WorkoutShowDialog(
-            title: 'Тренировка "$workoutName" не завершена. Если в ней были записи - они не сохранятся.',
-            confirmText: 'Продолжить',
-            onConfirm: () {
-              deleteWorkoutAndStartNew(context, workoutId, dayIndex);
-            },
-            cancelText: 'Назад',
-            onCancel: () {
-              Navigator.of(context).pop();
-              startRefreshTimer();
-              },
-          ),
-    );
-  }
+  // void _wrongTrainingDialog(BuildContext context, int workoutId, int dayIndex, String workoutName) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (_) =>
+  //         WorkoutShowDialog(
+  //           title: 'Тренировка "$workoutName" не завершена. Если в ней были записи - они не сохранятся.',
+  //           confirmText: 'Продолжить',
+  //           onConfirm: () {
+  //             deleteWorkoutAndStartNew(context, workoutId, dayIndex);
+  //           },
+  //           cancelText: 'Назад',
+  //           onCancel: () {
+  //             Navigator.of(context).pop();
+  //             startRefreshTimer();
+  //             },
+  //         ),
+  //   );
+  // }
 
   void onRatingClicked(BuildContext context) {
     stopRefreshTimer();
