@@ -28,8 +28,8 @@ android {
         }
         w1 {
             dimension "brand"
-            applicationId "ru.quantum.w1"
-            resValue "string", "app_name", "W1"
+            applicationId "ru.quantum.w1app"
+            resValue "string", "app_name", "WOD1"
         }
     }
     compileSdk = flutter.compileSdkVersion
