@@ -47,30 +47,36 @@ class DoubleViewModel extends BaseViewModel {
   }
 
   void onFirstPlusClicked(BuildContext context) {
-    if (repeatsFirstController.text.isEmpty) {
+    if (repeatsFirstController.text.isEmpty && weightFirstController.text.isEmpty) {
       return;
     }
     final cleanedWeight = weightFirstController.text.isEmpty
         ? '0'
         : cleanLastDotDelete(weightFirstController.text);
+    final repeats = repeatsFirstController.text.isEmpty
+        ? '0'
+        : repeatsFirstController.text;
     final now = DateTime.now().toIso8601String();
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     super.addOrUpdateSetResult(
-        context, workout.items.first.id, workout.items.first.itemId, int.parse(repeatsFirstController.text), double.parse(cleanedWeight), 0, now);
+        context, workout.items.first.id, workout.items.first.itemId, int.parse(repeats), double.parse(cleanedWeight), 0, now);
     _resetText();
   }
 
   void onSecondPlusClicked(BuildContext context) {
-    if (repeatsSecondController.text.isEmpty) {
+    if (repeatsSecondController.text.isEmpty && weightSecondController.text.isEmpty) {
       return;
     }
     final cleanedWeight = weightSecondController.text.isEmpty
         ? '0'
         : cleanLastDotDelete(weightSecondController.text);
+    final repeats = repeatsSecondController.text.isEmpty
+        ? '0'
+        : repeatsSecondController.text;
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     final now = DateTime.now().toIso8601String();
     super.addOrUpdateSetResult(
-        context, workout.items.last.id, workout.items.last.itemId, int.parse(repeatsSecondController.text), double.parse(cleanedWeight), 0, now);
+        context, workout.items.last.id, workout.items.last.itemId, int.parse(repeats), double.parse(cleanedWeight), 0, now);
     _resetText();
   }
 

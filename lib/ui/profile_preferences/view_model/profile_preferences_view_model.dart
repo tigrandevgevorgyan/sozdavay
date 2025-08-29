@@ -172,8 +172,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
           _categorySelection == null ||
           _trainingWeeklySelection == null ||
           _levelSelection == null ||
-          _goalSelection == null ||
-          (isPriorityAvailable && _prioritySelection == null)) {
+          _goalSelection == null) {
         _error = 'Не все поля заполнены';
         notifyListeners();
         return;

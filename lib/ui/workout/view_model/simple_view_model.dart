@@ -31,16 +31,19 @@ class SimpleViewModel extends BaseViewModel {
   }
 
   void onPlusClicked(BuildContext context) {
-    if (repeatsController.text.isEmpty) {
+    if (repeatsController.text.isEmpty && weightController.text.isEmpty) {
       return;
     }
     final cleanedWeight = weightController.text.isEmpty
         ? '0'
         : cleanLastDotDelete(weightController.text);
+    final repeats = repeatsController.text.isEmpty
+        ? '0'
+        : repeatsController.text;
     final workout = Provider.of<WorkoutViewModel>(context, listen: false).currentWorkout;
     final now = DateTime.now().toIso8601String();
     try {
-      super.addOrUpdateSetResult(context, workout.items.first.id, workout.items.first.itemId, int.parse(repeatsController.text), double.parse(cleanedWeight), 0, now);
+      super.addOrUpdateSetResult(context, workout.items.first.id, workout.items.first.itemId, int.parse(repeats), double.parse(cleanedWeight), 0, now);
     } on Exception {}
     _resetText();
   }
