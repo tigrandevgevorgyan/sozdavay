@@ -24,7 +24,7 @@ android {
         level_up {
             dimension "brand"
             applicationId "ru.quantum.levelup.level_up"
-            resValue "string", "app_name", "Level Up"
+            resValue "string", "app_name", "220LBS"
         }
         w1 {
             dimension "brand"

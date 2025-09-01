@@ -106,6 +106,7 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void _init(BuildContext context) async {
+    // localStorage.clearSharedPreferences();
     final isSuccess = await _loadProfile(context);
     if (_isExpiredDate) {
       _showFinalDialog(context);
