@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -8,11 +11,29 @@ final Map<int, bool> _isTimerActive = {};
 
 Future<void> initNotifications() async {
   const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-  const initSettings = InitializationSettings(android: androidSettings);
+  const iosSettings = DarwinInitializationSettings(
+    requestAlertPermission: false,
+    requestBadgePermission: false,
+    requestSoundPermission: false,
+  );
+  const initSettings = InitializationSettings(android: androidSettings, iOS: iosSettings);
   await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+  if (Platform.isIOS) {
+    tz.initializeTimeZones();
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
+  }
 }
 
 void showCountdownNotification(Duration duration, int id) {
+
+  if (Platform.isIOS) {
+    final endTime = DateTime.now().add(duration);
+    scheduleFinishPushIOS(flutterLocalNotificationsPlugin, endTime, id);
+    return;
+  }
 
   cancelCountdownNotification(id);
 
@@ -90,4 +111,38 @@ Future<void> _updateCountdownNotification(DateTime endTime, int id) async {
     body,
     platformDetails,
   );
+}
+
+Future<void> scheduleFinishPushIOS(
+    FlutterLocalNotificationsPlugin fln,
+    DateTime when,
+    int id,
+    ) async {
+  if (!Platform.isIOS) return;
+
+  final scheduled = tz.TZDateTime.from(when, tz.local);
+
+  final ios = DarwinNotificationDetails(
+    presentAlert: true,
+    presentSound: false,
+    presentBadge: false,
+    interruptionLevel: InterruptionLevel.timeSensitive,
+  );
+
+  await fln.zonedSchedule(
+    id,
+    'Время отдыха вышло',
+    'Продолжить тренировку',
+    scheduled,
+    NotificationDetails(iOS: ios),
+    androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+  );
+}
+
+Future<void> cancelFinishPushIOS(
+    FlutterLocalNotificationsPlugin fln,
+    int id,
+    ) async {
+  if (!Platform.isIOS) return;
+  await fln.cancel(id);
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:alarm/alarm.dart';
 
+import 'notifications.dart';
 AlarmSettings createNotification(int id, DateTime alarmTime) {
   return AlarmSettings(
     id: id,
@@ -16,26 +17,36 @@ AlarmSettings createNotification(int id, DateTime alarmTime) {
       fadeDuration: Duration(seconds: 6),
       volumeEnforced: false,
     ),
-    notificationSettings: const NotificationSettings(
+    notificationSettings: Platform.isIOS
+        ? const NotificationSettings(
+      title: '',
+      body: '',
+    )
+        : const NotificationSettings(
       title: 'Время отдыха вышло',
       body: 'Продолжить тренировку',
-      //iconColor: Colors.red,
     ),
+
   );
+
 }
 
 Future<void> scheduleHorizontalNotification(DateTime alarmTime) async {
   await Alarm.set(alarmSettings: createNotification(2, alarmTime));
+  await scheduleFinishPushIOS(flutterLocalNotificationsPlugin, alarmTime, 2);
 }
 
 void cancelHorizontalNotification() async {
   await Alarm.stop(2);
+  await cancelFinishPushIOS(flutterLocalNotificationsPlugin, 2);
 }
 
 Future<void> scheduleSquareNotification(DateTime alarmTime) async {
   await Alarm.set(alarmSettings: createNotification(1, alarmTime));
+  await scheduleFinishPushIOS(flutterLocalNotificationsPlugin, alarmTime, 1);
 }
 
 void cancelSquareNotification() async {
   await Alarm.stop(1);
+  await cancelFinishPushIOS(flutterLocalNotificationsPlugin, 1);
 }
