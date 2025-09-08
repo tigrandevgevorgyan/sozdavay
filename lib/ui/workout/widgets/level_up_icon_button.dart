@@ -14,7 +14,7 @@ class LevelUpIconButton extends StatelessWidget {
     return GestureDetector(
       onTap: onClick,
       child: SizedBox(
-        width: 64,
+        width: 60,
         height: 46,
         child: LevelUpContainer(
           color: AppColors.secondaryDefaultColor,
