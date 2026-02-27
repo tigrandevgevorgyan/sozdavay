@@ -24,11 +24,22 @@ class DioClient {
     final interceptors = client.interceptors;
 
     interceptors.add(InterceptorsWrapper(onRequest: (options, handler) async {
-      final Result<String?> tokenResult = await localStorage.getAccessToken();
+      print('INTERCEPTOR HIT → ${options.uri}');
 
-      if (tokenResult is Ok<String?> && tokenResult.value != null) {
-        options.headers['Authorization'] = 'Bearer ${tokenResult.value}';
+      final tokenResult = await localStorage.getAccessToken();
+      print('TOKEN RESULT TYPE = ${tokenResult.runtimeType}');
+      if (tokenResult is Ok<String?>) {
+        print('TOKEN VALUE = "${tokenResult.value}"');
+      } else if (tokenResult is Error<String?>) {
+        print('TOKEN ERROR = ${tokenResult.error}');
       }
+
+      if (tokenResult is Ok<String?> && tokenResult.value != null && tokenResult.value!.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer ${tokenResult.value}';
+      } else {
+        options.headers.remove('Authorization');
+      }
+
       return handler.next(options);
     }));
     if (!kReleaseMode) {interceptors.add(LogInterceptor(request: false, requestBody: true, requestHeader: true, responseBody: true, responseHeader: false));}

@@ -9,6 +9,7 @@ import 'package:level_up/ui/text_editing_screen/text_editing_screen.dart';
 import 'package:level_up/ui/workout/screens/video_player_screen.dart';
 import 'package:level_up/ui/workout/screens/workout_base_screen.dart';
 import '../ui/profile_preferences/view_model/profile_preferences_view_model.dart';
+import 'package:level_up/ui/register/widgets/register_screen.dart';
 
 class LevelUpRouter {
   static final LevelUpRouter _instance = LevelUpRouter._internal();
@@ -25,6 +26,7 @@ class LevelUpRouter {
   static const String ratingPath = '/rating';
   static const String textEditingPath = '/text_editing';
   static const String videoPlayerPath = '/video_player';
+  static const String registerPath = '/register';
 
   late GlobalKey<NavigatorState> navigatorKey;
 
@@ -72,6 +74,15 @@ class LevelUpRouter {
                     isFirstLogin: params.isFirstLogin,
                     isAfterLogin: params.isAfterLogin,
                   ),
+                  state: state,
+                );
+              },
+            ),
+            GoRoute(
+              path: 'register',
+              pageBuilder: (context, state) {
+                return getPage(
+                  child: RegisterScreen(),
                   state: state,
                 );
               },

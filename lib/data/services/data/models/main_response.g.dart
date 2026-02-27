@@ -30,6 +30,7 @@ MainInfo _$MainInfoFromJson(Map<String, dynamic> json) => MainInfo(
       (json['season_rating'] as num?)?.toInt(),
       (json['season_level_rating'] as num?)?.toInt(),
       json['season_label'] as String?,
+      (json['can_edit_settings'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$MainInfoToJson(MainInfo instance) => <String, dynamic>{
@@ -41,6 +42,7 @@ Map<String, dynamic> _$MainInfoToJson(MainInfo instance) => <String, dynamic>{
       'season_level_rating': instance.seasonLevelRating,
       'label': instance.label,
       'season_label': instance.seasonLabel,
+      'can_edit_settings': instance.canEditSettings,
     };
 
 DayInfo _$DayInfoFromJson(Map<String, dynamic> json) => DayInfo(

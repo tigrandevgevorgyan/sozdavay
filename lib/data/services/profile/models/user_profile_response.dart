@@ -17,9 +17,11 @@ class UserProfileShortResponse extends BaseResponse {
 
 @JsonSerializable()
 class UserProfileExtendedResponse extends BaseResponse {
-  UserProfileExtendedResponse(super.message, this.data, this.experiences, this.goals, this.days, this.priorities, this.categories, this.availablePriority, this.isHasActiveWorkout);
+  UserProfileExtendedResponse(super.message, this.data, this.sex, this.experiences, this.goals, this.days, this.priorities, this.categories, this.availablePriority, this.isHasActiveWorkout);
 
   UserProfile data;
+  @JsonKey(name: 'sex')
+  final int? sex;
   final List<IdNamePairWithPriority> experiences;
   final List<GoalWithPriorities> goals;
   @DaysConverter()

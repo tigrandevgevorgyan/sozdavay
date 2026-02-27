@@ -84,16 +84,36 @@ class SmallStatisticsTile extends StatelessWidget {
           color: AppColors.backgroundContentColor,
           borderRadius: BorderRadius.circular(4),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              number.toString(),
-              style: Style.ablation32w900.copyWith(color: AppColors.primaryTextColor),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  number.toString(),
+                  textAlign: TextAlign.center,
+                  softWrap: false,
+                  overflow: TextOverflow.visible,
+                  style: Style.ablation32w900.copyWith(color: AppColors.primaryTextColor),
+                ),
+                // slightly smaller vertical shift to avoid clipping on tight heights
+                Transform.translate(
+                  offset: const Offset(0, -4),
+                  child: Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                    style: Style.outfit16w400.copyWith(color: AppColors.secondaryTextColor),
+                  ),
+                ),
+              ],
             ),
-            Transform.translate(offset: Offset(0, -6), child: Text(label, style: Style.outfit16w400.copyWith(color: AppColors.secondaryTextColor))),
-          ],
+          ),
         ),
       ),
     );
@@ -123,10 +143,42 @@ class RatingTile extends StatelessWidget {
                 Stack(
                   alignment: Alignment.center,
                   children: [
-                    CustomPaint(
-                      size: Size(120, 120),
-                      painter: RatingPainter(
-                          arcBackgroundColor: AppColors.secondaryDefaultColor, arcForegroundColor: AppColors.activeButtonColor, strokeWidth: 10, percent: ratingPercent),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        // compute maximum square that fits; clamp to sane bounds
+                        final shortest = constraints.biggest.shortestSide;
+                        //   final side = shortest.isFinite ? shortest - 24 : 120; // leave some padding
+                        //                         // If there is not enough space (small tile), use smaller radius (80), otherwise use 120
+                        //                         final clamped = (side < 120 ? 80.0 : 120.0);
+                        final side = shortest.isFinite ? shortest - 24 : 120; // leave some padding
+                        // iPhone 8 logical size ~ 375x667. If the screen is smaller, reduce max chart size.
+                        final screenSize = MediaQuery.of(context).size;
+                        final isSmallScreen = screenSize.width < 375 || screenSize.height < 732;
+
+                        final maxCap = isSmallScreen ? 80.0 : 120.0;
+                        final clamped = side.clamp(72.0, maxCap).toDouble();   // 72..maxCap
+
+                        debugPrint('[RatingTile] constraints: ${constraints.biggest}');
+                        debugPrint('[RatingTile] screenSizewidth: ${screenSize.width}');
+                        debugPrint('[RatingTile]  screenSize.height: ${screenSize.height}');
+                        debugPrint('[RatingTile] clamped size: $clamped');
+                        // debugPrint('[RatingTile] strokeWidth: $dynamicStroke');
+
+                        final dynamicStroke = max(4.0, clamped * 0.083);      // ~10 when 120
+
+                        return SizedBox(
+                          width: clamped,
+                          height: clamped,
+                          child: CustomPaint(
+                            painter: RatingPainter(
+                              arcBackgroundColor: AppColors.secondaryDefaultColor,
+                              arcForegroundColor: AppColors.activeButtonColor,
+                              strokeWidth: dynamicStroke,
+                              percent: ratingPercent,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     Text(rating.toString(), style: Style.ablation22w700.copyWith(color: AppColors.primaryTextColor)),
                   ],
@@ -166,7 +218,7 @@ class RatingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width - 10) / 2;
+    final radius = (size.width - strokeWidth) / 2;
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius), 0, 2 * pi, false, backgroundArcPaint);
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius), -pi / 2, (2 * pi) * percent, false, foregroundArcPaint);
   }

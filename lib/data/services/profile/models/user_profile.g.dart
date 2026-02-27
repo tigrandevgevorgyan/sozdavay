@@ -12,6 +12,7 @@ UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => UserProfile(
       json['paid_until'] as String?,
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
+      sex: (json['sex'] as num?)?.toInt(),
       phone: json['phone'] as String,
       category: json['category'] == null
           ? null
@@ -41,6 +42,7 @@ Map<String, dynamic> _$UserProfileToJson(UserProfile instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
+      'sex': instance.sex,
       'phone': instance.phone,
       'days': instance.days,
       'category': instance.category,

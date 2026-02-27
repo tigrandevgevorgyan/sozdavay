@@ -34,8 +34,11 @@ class HomeScreen extends StatelessWidget {
             appBar: AppBar(
               automaticallyImplyLeading: false,
               title: AppBarTitle(
-                onProfileClicked: () => provider.onProfileClicked(context),
+                onProfileClicked: () async {
+                  await provider.openProfileIfUnlocked(context);
+                },
                 onLogoutClicked: () => provider.logout(context),
+                showSettings: provider.canEditSettings,
               ),
               centerTitle: true,
               backgroundColor: AppColors.backgroundColor,
@@ -123,23 +126,30 @@ class HomeScreen extends StatelessWidget {
 }
 
 class AppBarTitle extends StatelessWidget {
-  const AppBarTitle({super.key, required this.onLogoutClicked, required this.onProfileClicked});
+  const AppBarTitle({super.key, required this.onLogoutClicked, required this.onProfileClicked, required this.showSettings});
 
   final Function() onProfileClicked;
   final Function() onLogoutClicked;
+  final bool showSettings;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: onProfileClicked,
-          child: Image.asset(Assets.settingsIcon, height: 24),
-        ),
-        Image.asset(Assets.logo, height: 40),
-        GestureDetector(
+        showSettings
+            ? GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: onProfileClicked,
+                child: Image.asset(Assets.settingsIcon, height: 24),
+              )
+            : const SizedBox(width: 24, height: 24),
+        Image.asset(
+          Assets.logo,
+           height: 40, // или 32–36
+           width: 57, // или 32–36
+           fit: BoxFit.contain,
+        ),        GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTap: onLogoutClicked,
           child: Padding(

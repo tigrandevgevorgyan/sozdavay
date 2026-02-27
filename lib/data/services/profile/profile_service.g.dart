@@ -6,7 +6,7 @@ part of 'profile_service.dart';
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
 
 class _ProfileService implements ProfileService {
   _ProfileService(this._dio, {this.baseUrl, this.errorLogger});
@@ -101,20 +101,22 @@ class _ProfileService implements ProfileService {
   }
 
   @override
-  Future<UserProfileShortResponse> updateProfile(
-    String name,
-    int category,
-    int days,
-    int experience,
-    int goal, [
+  Future<UserProfileShortResponse> updateProfile({
+    required String name,
+    required int sex,
+    int category = 1,
+    required int days,
+    required int experience,
+    required int goal,
     int? priority,
-  ]) async {
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = {
       'name': name,
+      'sex': sex,
       'category': category,
       'days': days,
       'experience': experience,

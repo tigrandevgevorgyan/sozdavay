@@ -18,12 +18,13 @@ abstract class ProfileService {
   Future<UserProfileShortResponse> updateRecords(@Field() String records);
 
   @POST('/profile')
-  Future<UserProfileShortResponse> updateProfile(
-    @Field() String name,
-    @Field() int category,
-    @Field() int days,
-    @Field() int experience,
-    @Field() int goal, [
+  Future<UserProfileShortResponse> updateProfile({
+    @Field() required String name,
+    @Field() required int sex,
+    @Field() int category = 1,
+    @Field() required int days,
+    @Field() required int experience,
+    @Field() required int goal,
     @Field() int? priority,
-  ]);
+  });
 }

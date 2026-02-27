@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:level_up/assets/assets.dart';
 import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
@@ -25,114 +26,142 @@ class ProfilePreferencesScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (BuildContext context) => ProfilePreferencesViewModel(context, dataRepository: GetIt.I<IDataRepository>(), profileRepository: GetIt.I<IProfileRepository>(), hasWorkoutPlan: hasWorkoutPlan, isFirstLogin: isFirstLogin, isAfterLogin: isAfterLogin),
       child: Consumer<ProfilePreferencesViewModel>(builder: (context, provider, _) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: AppColors.backgroundColor,
-            title: SizedBox(
-              height: 40,
-              child: Image.asset(Assets.logo),
+        return WillPopScope(
+          onWillPop: () async {
+            // Pass current lock state back to caller when using system back
+            GoRouter.of(context).pop();
+            return false; // prevent default pop since we already popped with result
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: AppColors.backgroundColor,
+              title: Image.asset(
+                Assets.logo,
+                height: 40, // или 32–36
+                width: 57, // или 32–36
+                fit: BoxFit.contain,
+              ),
+              centerTitle: true,
+              automaticallyImplyLeading: false,
+              // Custom back to pass result when pressing the AppBar back button
+              leading: (isFirstLogin || isAfterLogin)
+                  ? null
+                  : IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new),
+                      onPressed: () {
+                        GoRouter.of(context).pop();
+                      },
+                    ),
             ),
-            centerTitle: true,
-            automaticallyImplyLeading: isFirstLogin || isAfterLogin
-            ? false
-            : true,
-          ),
-          backgroundColor: AppColors.backgroundColor,
-          body: GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
-            },
-            child: provider.isLoading
-                ? Center(
-                    child: LevelUpLoader(),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                // SubscriptionBanner(
-                                //   title: provider.isSubscriptionExpired
-                                //       ? "Продлить в чате с тренером"
-                                //       : "Активна до ${provider.validUntilDate}",
-                                //   subtitle: provider.isSubscriptionExpired
-                                //       ? "Подписка закончилась"
-                                //       : "Подписка",
-                                // ),
-                                SizedBox(height: 12),
-                                Consumer<ProfilePreferencesViewModel>(
-                                  builder: (context, provider, _) {
-                                    return Focus(
-                                      onFocusChange: (hasFocus) {
-                                        if (hasFocus && provider.shouldBlockFocus) {
-                                          FocusScope.of(context).unfocus();
-                                        }
-                                      },
-                                      child: LevelUpTextField(
-                                        controller: provider.nameController,
-                                        focusNode: provider.nameFocusNode,
-                                        hintText: 'Имя',
-                                      ),
-                                    );
-                                  },
-                                ),
-                                SizedBox(height: 14),
-                                OptionsBlocWidget(
-                                  title: 'Выберите ваш пол и вес',
-                                  value: provider.categorySelection,
-                                  onClick: () => provider.onGenderWeightClicked(context),
-                                ),
-                                SizedBox(height: 12),
-                                if (!hasWorkoutPlan)
-                                Column(
-                                  children: [
-                                    OptionsBlocWidget(
-                                      title: 'Выберите сложность',
-                                      value: provider.levelSelection,
-                                      onClick: () => provider.onLevelClicked(context),
-                                    ),
-                                    SizedBox(height: 12),
-                                    OptionsBlocWidget(
-                                      title: 'Выберите свою цель',
-                                      value: provider.goalSelection,
-                                      onClick: () => provider.onGoalClicked(context),
-                                    ),
-                                    SizedBox(height: 12),
-                                    if (provider.isPriorityAvailable)
+            backgroundColor: AppColors.backgroundColor,
+            body: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).unfocus();
+              },
+              child: provider.isLoading
+                  ? Center(
+                      child: LevelUpLoader(),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  // SubscriptionBanner(
+                                  //   title: provider.isSubscriptionExpired
+                                  //       ? "Продлить в чате с тренером"
+                                  //       : "Активна до ${provider.validUntilDate}",
+                                  //   subtitle: provider.isSubscriptionExpired
+                                  //       ? "Подписка закончилась"
+                                  //       : "Подписка",
+                                  // ),
+                                  SizedBox(height: 12),
+                                  Consumer<ProfilePreferencesViewModel>(
+                                    builder: (context, provider, _) {
+                                      return Focus(
+                                        onFocusChange: (hasFocus) {
+                                          if (hasFocus && provider.shouldBlockFocus) {
+                                            FocusScope.of(context).unfocus();
+                                          }
+                                        },
+                                        child: LevelUpTextField(
+                                          controller: provider.nameController,
+                                          focusNode: provider.nameFocusNode,
+                                          hintText: 'Имя',
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  SizedBox(height: 14),
+                                  OptionsBlocWidget(
+                                    title: 'Выберите ваш пол',
+                                    value: provider.categorySelection,
+                                    onClick: () => provider.onGenderWeightClicked(context),
+                                  ),
+                                  SizedBox(height: 12),
+                                  if (!hasWorkoutPlan)
+                                  Column(
+                                    children: [
+                                      // OptionsBlocWidget(
+                                      //   title: 'Выберите сложность',
+                                      //   value: provider.levelSelection,
+                                      //   onClick: () => provider.onLevelClicked(context),
+                                      // ),
+                                      // SizedBox(height: 12),
                                       OptionsBlocWidget(
-                                        title: 'Выберите приоритет',
-                                        value: provider.prioritySelection,
-                                        onClick: () => provider.onPriorityClicked(context),
+                                        title: 'Выберите свою цель',
+                                        value: provider.goalSelection,
+                                        onClick: () => provider.onGoalClicked(context),
                                       ),
-                                    if (provider.isPriorityAvailable) SizedBox(height: 12),
-                                    OptionsBlocWidget(
-                                      title: 'Выберите кол-во тренировок в неделю',
-                                      value: provider.trainingWeeklySelection,
-                                      onClick: () => provider.onTrainingWeeklyClicked(context),
-                                    ),
-                                    SizedBox(height: 12),
-                                  ],
-                                ),
-                              ],
+                                      SizedBox(height: 12),
+                                      if (provider.isPriorityAvailable)
+                                        OptionsBlocWidget(
+                                          title: 'Выберите место тренировки',
+                                          value: provider.prioritySelection,
+                                          onClick: () => provider.onPriorityClicked(context),
+                                        ),
+                                      if (provider.isPriorityAvailable) SizedBox(height: 12),
+                                      OptionsBlocWidget(
+                                        title: 'Выберите кол-во тренировок в неделю',
+                                        value: provider.trainingWeeklySelection,
+                                        onClick: () => provider.onTrainingWeeklyClicked(context),
+                                      ),
+                                      SizedBox(height: 12),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 12),
-                        if (provider.error != null) InfoAndErrorTextWidget(text: provider.error, isError: true),
-                        provider.isUpdating
-                            ? LevelUpLoader()
-                            : LevelUpButton(
-                                text: 'Сохранить и продолжить',
-                                buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.tall),
-                          onClick: () => provider.onSaveClicked(context),
-                              ),
-                        SizedBox(height: 16),
-                      ],
+                          SizedBox(height: 12),
+                          // CheckboxListTile(
+                          //   title: Text("Запретить изменения",
+                          //       style: Style.outfit14w400.copyWith(color: AppColors.primaryTextColor)),
+                          //   value: provider.lockChanges,
+                          //   onChanged: (val) {
+                          //     if (val != null) {
+                          //     //  provider.setLockChanges(val);
+                          //     }
+                          //   },
+                          //   controlAffinity: ListTileControlAffinity.leading,
+                          // ),
+                          // SizedBox(height: 12),
+                          if (provider.error != null) InfoAndErrorTextWidget(text: provider.error, isError: true),
+                          provider.isUpdating
+                              ? LevelUpLoader()
+                              : LevelUpButton(
+                                  text: 'Сохранить и продолжить',
+                                  buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.tall),
+                            onClick: () => provider.onSaveClicked(context),
+                                ),
+                          SizedBox(height: 16),
+                        ],
+                      ),
                     ),
-                  ),
+            ),
           ),
         );
       }),

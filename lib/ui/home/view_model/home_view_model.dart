@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:level_up/config/dio_client.dart';
 import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
 import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
@@ -20,6 +21,7 @@ import 'package:level_up/utils/result.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../assets/home_banners_assets.dart';
 import '../../../brand/brand_config.dart';
+import '../../../data/app_preferences.dart';
 import '../../../data/repositories/workout_repository/workout_repository.dart';
 import '../../../data/services/common_models/is_completed_response.dart';
 import '../../../data/services/data/models/main_response.dart';
@@ -42,6 +44,7 @@ class HomeViewModel extends ChangeNotifier {
     required this.localStorage,
   }) {
     _init(context);
+    _loadLockChanges();
   }
 
   final ILocalStorage localStorage;
@@ -61,7 +64,10 @@ class HomeViewModel extends ChangeNotifier {
   Timer? _refreshTimer;
   bool _isTimerActive = false;
 
-  late int _planType;
+  bool _canEditSettings = true;
+  bool get canEditSettings => _canEditSettings;
+
+  int _planType = 0;
 
   int get planType => _planType;
 
@@ -69,7 +75,7 @@ class HomeViewModel extends ChangeNotifier {
 
   DateTime? get paidUntil => _paidUntil;
 
-  late bool _isExpiredDate;
+  bool _isExpiredDate = false;
 
   bool get isExpiredDate => _isExpiredDate;
 
@@ -106,7 +112,6 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void _init(BuildContext context) async {
-    // localStorage.clearSharedPreferences();
     final isSuccess = await _loadProfile(context);
     if (_isExpiredDate) {
       _showFinalDialog(context);
@@ -348,11 +353,16 @@ class HomeViewModel extends ChangeNotifier {
         isFirstLogin: false,
         isAfterLogin: false,
       ),
-    ).then((result) {
+    ).then((result) async {
+      // Re-read the lock flag set in ProfilePreferences (it is saved in SharedPreferences)
+      await _loadLockChanges();
+
       if (result == true) {
-        _loadMainInfo(context);
+        await _loadMainInfo(context);
       }
+
       startRefreshTimer();
+      notifyListeners();
     });
   }
 
@@ -510,18 +520,48 @@ class HomeViewModel extends ChangeNotifier {
 
     if (result != null) {
       _mainInfo = result.data;
+      // Populate _canEditSettings based on _mainInfo?.canEditSettings
+      _canEditSettings = (_mainInfo?.canEditSettings ?? 0) == 1;
       startRefreshTimer();
+      notifyListeners();
     } else {
       _mainInfo = _emptyMainInfo();
       if (context != null && context.mounted) {
         ErrorUtils.showError(context, 'Не удалось загрузить данные');
       }
+      notifyListeners();
     }
     initSelectedDayIndex();
-    notifyListeners();
   }
 
+
   MainInfo _emptyMainInfo() {
-    return MainInfo(WorkoutStats(0, 0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '', 0, 0, 0, '');
+    return MainInfo(WorkoutStats(0, 0, 0), List.generate(7, (i) => DayInfo(weekDays[i], '', false)), 0, '', 0, 0, 0, '',0);
+  }
+
+  /// Checks the lock flag in SharedPreferences and returns the current value.
+  /// Also syncs the in-memory `_lockChanges` field.
+  // Future<bool> checkLockChanges() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final locked = prefs.getBool(_lockKey) ?? true;
+  //   _lockChanges = locked;
+  //   return locked;
+  // }
+
+  Future<void> _loadLockChanges() async {
+    final prefs = await SharedPreferences.getInstance();
+    //_lockChanges = prefs.getBool(_lockKey) ?? true;
+    //notifyListeners();
+  }
+  Future<void> openProfileIfUnlocked(BuildContext context) async {
+    if (!_canEditSettings) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Изменения запрещены')),
+        );
+      }
+      return;
+    }
+    onProfileClicked(context);
   }
 }

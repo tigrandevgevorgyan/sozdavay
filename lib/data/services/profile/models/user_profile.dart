@@ -7,6 +7,9 @@ part 'user_profile.g.dart';
 class UserProfile {
   final int id;
   final String name;
+  @JsonKey(name: 'sex')
+  final int? sex;
+
   final String phone;
   final int? days;
   final IdNamePairWithPriority? category;
@@ -27,6 +30,7 @@ class UserProfile {
     this.paidUntil, {
     required this.id,
     required this.name,
+    this.sex,
     required this.phone,
     required this.category,
     required this.days,

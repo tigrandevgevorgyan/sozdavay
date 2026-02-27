@@ -7,9 +7,12 @@ import 'package:level_up/config/dependencies.dart';
 import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/ui/core/themes/themes.dart';
 
+import 'data/di.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Alarm.init();
+  await setupDependencies(); // <— теперь так
   await Dependencies.registerDependencies();
   await initializeDateFormatting('ru_RU', null);
   SystemChrome.setPreferredOrientations([

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:level_up/assets/assets.dart';
 import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
@@ -15,6 +16,7 @@ import 'package:level_up/utils/phone_formatter.dart';
 import 'package:level_up/utils/phone_mask_formatter.dart';
 import 'package:provider/provider.dart';
 import '../../../brand/brand_config.dart';
+import 'package:level_up/routing/levelup_router.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -37,7 +39,11 @@ class SignInScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Image.asset(Assets.logo),
+                    Image.asset(
+                      'assets/brands/level_up/images/logo_auth_main.jpeg',
+                      height: 215,
+                      // fit: BoxFit.contain,
+                    ),
                     SizedBox(height: 12),
                     LevelUpTextField(
                       controller: provider.phoneController,
@@ -64,22 +70,35 @@ class SignInScreen extends StatelessWidget {
                     SizedBox(height: 16),
                     InfoAndErrorTextWidget(text: provider.message, isError: provider.isErrorMessage),
                     provider.isActionInProgress
-                        ? LevelUpLoader()
-                        : LevelUpButton(
-                            isEnabled: provider.isScreenReady,
-                            text: 'войти',
-                            buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.tall),
-                            onClick: () => provider.isScreenReady ? provider.onSignInClick(context) : null,
-                          ),
-                    SizedBox(height: 20),
-                    if ((cfg.features['showRequestCodeButton'] as bool? ?? false))
-                      GestureDetector(
-                        onTap: provider.requestCode,
-                        child: Text(
-                          cfg.strings['requestCodeText'] ?? 'получить код пароль',
-                          style: Style.ablation14w900,
+                      ? LevelUpLoader()
+                      : Column(
+                          children: [
+                            LevelUpButton(
+                              isEnabled: provider.isScreenReady,
+                              text: 'войти',
+                              buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.tall),
+                              onClick: () =>
+                                  provider.isScreenReady ? provider.onSignInClick(context) : null,
+                            ),
+                            const SizedBox(height: 12),
+                            LevelUpButton(
+                              text: 'регистрация',
+                              buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.tall),
+                              onClick: () {
+                                LevelUpRouter.router.go('/signin/register');
+                              },
+                            ),
+                          ],
                         ),
-                      ),
+                    // SizedBox(height: 20),
+                    // if ((cfg.features['showRequestCodeButton'] as bool? ?? false))
+                    //   GestureDetector(
+                    //     onTap: provider.requestCode,
+                    //     child: Text(
+                    //       cfg.strings['requestCodeText'] ?? 'получить код пароль',
+                    //       style: Style.ablation14w900,
+                    //     ),
+                    //   ),
               ],
                 ),
               ),

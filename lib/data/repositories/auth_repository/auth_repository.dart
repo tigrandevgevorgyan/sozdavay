@@ -4,6 +4,8 @@ import 'package:level_up/data/services/auth/models/access_token_response.dart';
 import 'package:level_up/data/services/local_storage.dart';
 import 'package:level_up/utils/result.dart';
 import '../../../config/dio_client.dart';
+import 'package:level_up/data/services/auth/models/register_options_response.dart';
+import 'package:get_it/get_it.dart';
 
 abstract class IAuthRepository {
   String? get accessToken;
@@ -19,6 +21,20 @@ abstract class IAuthRepository {
   Future<Result<bool>> isFirstLogin();
 
   Future<Result<void>> markFirstLoginShown();
+
+  Future<Result<RegisterOptionsResponse>> getRegisterOptions();
+
+  Future<Result<AccessTokenResponse>> register({
+    required String phone,
+    required String nickname,
+    required String password,
+    required String trainingPlace,
+    required String trainingGoal,
+    required String trainingPerWeek,
+    required String gender,
+    required String osType,
+    required String appVersion,
+  });
 }
 
 class AuthRepository extends IAuthRepository {
@@ -45,12 +61,19 @@ class AuthRepository extends IAuthRepository {
   @override
   Future<Result<AccessTokenResponse>> signIn(String phoneNumber, String code) async {
     try {
-      final result = await _authService.authConfirm(phoneNumber, code, 'android', '1.0');
+      final result = await _authService.authConfirm(phoneNumber, code, 'iOS', '1.0');
       _token = result.accessToken;
       if (_token == null) {
         return Result.error(Exception(result.message ?? ' Неизвестная ошибка'));
       }
       await _localStorage.saveAccessToken(_token!);
+       try {
+        final dio = GetIt.I<Dio>();
+        dio.options.headers['Authorization'] = 'Bearer $_token';
+        print('AFTER REGISTER header = ${dio.options.headers['Authorization']}');
+      } catch (_) {
+        // If Dio isn't registered in GetIt, ignore
+      }
       return Result.ok(result);
     } on UserNotFoundError catch (e) {
       return Result.error(e);
@@ -90,5 +113,59 @@ class AuthRepository extends IAuthRepository {
   @override
   Future<Result<void>> markFirstLoginShown() {
     return _localStorage.setFirstLoginShown();
+  }
+
+  @override
+  Future<Result<RegisterOptionsResponse>> getRegisterOptions() async {
+    try {
+      final result = await _authService.registerOptions();
+      return Result.ok(result);
+    } on DioException catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<AccessTokenResponse>> register({
+    required String phone,
+    required String nickname,
+    required String password,
+    required String trainingPlace,
+    required String trainingGoal,
+    required String trainingPerWeek,
+    required String gender,
+    required String osType,
+    required String appVersion,
+  }) async {
+    try {
+      final result = await _authService.register(
+        phone,
+        nickname,
+        password,
+        trainingPlace,
+        trainingGoal,
+        trainingPerWeek,
+        gender,
+        osType,
+        appVersion,
+      );
+
+      _token = result.accessToken;
+      if (_token == null) {
+        return Result.error(Exception(result.message ?? 'Неизвестная ошибка'));
+      }
+      await _localStorage.saveAccessToken(_token!);
+
+      try {
+        final dio = GetIt.I<Dio>();
+        dio.options.headers['Authorization'] = 'Bearer $_token';
+      } catch (_) {
+        // If Dio isn't registered in GetIt, ignore
+      }
+
+      return Result.ok(result);
+    } on DioException catch (e) {
+      return Result.error(e);
+    }
   }
 }

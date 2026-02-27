@@ -35,7 +35,8 @@ class Assets {
   static String get ratingThirdIcon => "${_commonBase}rating_3rd_icon.png";
 
   /// БРЕНДОВЫЕ
-  static String get logo => "${_brandBase}logo.png";
+  static String get logo => "${_brandBase}logo.jpeg";
+  //static String get logoAuth => "${_brandBase}logo_auth_main.png";
   static String get subscriptionBanner => "${_brandBase}subscription_banner.png";
   static String get startTrainingBanner => "${_brandBase}start_training_banner.png";
   static String get measurementsBanner => "${_brandBase}measurements_banner.png";

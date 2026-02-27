@@ -49,4 +49,5 @@ abstract class WorkoutService {
 
   @POST('/workout/comment/{item_id}')
   Future<void> updateWorkoutComment(@Path('item_id') int itemId,  @Body() WorkoutComment body);
+
 }

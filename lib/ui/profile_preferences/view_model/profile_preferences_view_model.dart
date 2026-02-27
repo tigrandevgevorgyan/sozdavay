@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:get_it/get_it.dart';
 import 'package:level_up/config/dio_client.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/profile/models/user_profile_response.dart';
@@ -8,6 +9,7 @@ import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/ui/core/common_widgets/options_dialog.dart';
 import 'package:level_up/utils/error_utils.dart';
 import 'package:level_up/utils/result.dart';
+import '../../../data/app_preferences.dart';
 import '../../../data/repositories/data_repository/data_repositry.dart';
 import '../../../data/services/data/models/main_response.dart';
 import '../../workout/widgets/workout_show_dialog.dart';
@@ -19,15 +21,20 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
   final bool isFirstLogin;
   final bool isAfterLogin;
 
+  static const String _lockKey = 'lock_changes';
+  // bool _lockChanges = false;
+  // bool get lockChanges => _lockChanges;
+  // bool get isEditingLocked => _lockChanges;
+
   final levelDialogContent = PreferencesOptionsDialogContent('Ваш Уровень сложности');
 
   final goalDialogContent = PreferencesOptionsDialogContent('ЦЕль');
 
-  final priorityDialogContent = PreferencesOptionsDialogContent('Приоритет в тренировках');
+  final priorityDialogContent = PreferencesOptionsDialogContent('Место тренировки');
 
   final trainingWeeklyDialogContent = PreferencesOptionsDialogContent('кол-во тренировок в неделю');
 
-  final categoriesDialogContent = PreferencesOptionsDialogContent('Выберите ваш пол и вес');
+  final categoriesDialogContent = PreferencesOptionsDialogContent('Выберите ваш пол');
 
   final FocusNode nameFocusNode = FocusNode();
 
@@ -88,6 +95,18 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   DateTime? get paidUntil => _paidUntil;
 
+ //  Future<void> _loadLockPreference() async {
+ // //   final appPrefs = GetIt.I<AppPreferences>();
+ //    //_lockChanges =false ;
+ //    // do not notify here eagerly to avoid rebuild during constructor; UI will rebuild on next notify
+ //  }
+
+  // Future<void> setLockChanges(bool value) async {
+  //   _lockChanges = value;
+  //   await GetIt.I<AppPreferences>().setEditingLocked(value);
+  //   notifyListeners();
+  // }
+
   void blockFocus() {
     _shouldBlockFocus = true;
   }
@@ -106,6 +125,8 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
     final result = await OptionsDialog.showDialog(context, categorySelection != null ? [categorySelection!] : [], categoriesDialogContent.title, categoriesDialogContent.optionsValues);
     if (result != null) {
       _categorySelection = categoriesDialogContent.getIdByValue(result.first);
+      debugPrint('================= [onGenderWeightClicked] selected sex = $_categorySelection (${result.first}) =================');
+
       notifyListeners();
     }
     await Future.delayed(Duration(milliseconds: 100));
@@ -160,6 +181,11 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   void onSaveClicked(BuildContext context) async {
     _error = null;
+    // if (_lockChanges) {
+    //   _error = 'Изменения запрещены';
+    //   notifyListeners();
+    //   return;
+    // }
     notifyListeners();
     if (hasWorkoutPlan) {
       if (_nameController.text.trim().isEmpty || _categorySelection == null) {
@@ -180,7 +206,15 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
     }
     _isUpdating = true;
     notifyListeners();
-    final result = await profileRepository.updateProfile(_nameController.text, _categorySelection ?? 0, _trainingWeeklySelection ?? 0, _levelSelection ?? 0, _goalSelection ?? 0, _prioritySelection ?? 0);
+    debugPrint('[onSaveClicked] sending: name=${_nameController.text}, sex=${_categorySelection ?? 1}, days=${_trainingWeeklySelection ?? 0}, experience=${_levelSelection ?? 0}, goal=${_goalSelection ?? 0}, priority=${_prioritySelection}');
+    final result = await profileRepository.updateProfile(
+      _nameController.text,
+      _categorySelection ?? 1,
+      _trainingWeeklySelection ?? 0,
+      _levelSelection ?? 0,
+      _goalSelection ?? 0,
+      _prioritySelection,
+    );
     switch (result) {
       case Ok<UserProfileShortResponse>():
         if (isAfterLogin) {
@@ -208,10 +242,34 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
         _allPriorities = profile.value.priorities;
 
         goalDialogContent.setOptions(_allGoals.map((g) => IdNamePairWithPriority(g.id, g.name, isPriorityAvailable: g.isPriorityAvailable)).toList());
-        categoriesDialogContent.setOptions(profile.value.categories);
+        final _sexSelection = profile.value.data.sex ?? 1;
+        debugPrint('[_loadProfileAndOptions] sex from profile = $_sexSelection');
+
+        final _originalCategories = [
+          IdNamePairWithPriority(1, 'Мужской', isPriorityAvailable: _sexSelection == 1),
+          IdNamePairWithPriority(2, 'Женский', isPriorityAvailable: _sexSelection == 2),
+        ];
+        final _condensedCategories = _originalCategories;
+        categoriesDialogContent.setOptions(_condensedCategories);
+        // _categorySelection = profile.value.data.category?.id;
+        _categorySelection = _sexSelection;
+        // Map detailed category (с весом) к двум вариантам: Мужской/Женский
+        if (_categorySelection != null) {
+          final selectedOriginal = _originalCategories.firstWhere(
+            (c) => c.id == _categorySelection,
+            orElse: () => IdNamePairWithPriority(-1, ''),
+          );
+          final base = selectedOriginal.name.trim().split(' ').first.toLowerCase();
+          final mapped = _condensedCategories.firstWhere(
+            (c) => c.name.toLowerCase() == (base == 'мужской' ? 'мужской' : base == 'женский' ? 'женский' : ''),
+            orElse: () => IdNamePairWithPriority(-1, ''),
+          );
+          if (mapped.id != -1) {
+            _categorySelection = mapped.id;
+          }
+        }
         levelDialogContent.setOptions(profile.value.experiences);
         trainingWeeklyDialogContent.setOptions(profile.value.days);
-        _categorySelection = profile.value.data.category?.id;
         _levelSelection = profile.value.data.experience?.id;
         _goalSelection = profile.value.data.goal?.id;
         _prioritySelection = profile.value.data.priority?.id;
@@ -276,6 +334,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
     );
   }
 
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -290,6 +349,12 @@ class PreferencesOptionsDialogContent {
 
   PreferencesOptionsDialogContent(this.title);
 
+  String _optionsDebug() {
+    return _options
+        .map((o) => '${o.id}:${o.name}${(o.isPriorityAvailable ?? false) ? "[P]" : ""}')
+        .join(', ');
+  }
+
   List<String> get optionsValues => _options.map((option) => option.name).toList();
 
   bool hasPriorityById(int? id) {
@@ -298,10 +363,12 @@ class PreferencesOptionsDialogContent {
 
   void prependAllOption({required String name, int id = -1}) {
     _options.insert(0, IdNamePairWithPriority(id, name));
+    debugPrint('[PreferencesOptionsDialogContent][$title] prependAllOption(name="$name", id=$id) -> count=${_options.length}; items=${_optionsDebug()}');
   }
 
   void setOptions(List<IdNamePairWithPriority> options) {
     _options = options;
+    debugPrint('[PreferencesOptionsDialogContent][$title] setOptions(count=${_options.length}) -> items=${_optionsDebug()}');
   }
 
   String? getOptionById(int? id) {
@@ -331,4 +398,3 @@ class ProfilePreferencesParams {
 
   ProfilePreferencesParams({required this.isAfterLogin, required this.hasWorkoutPlan, required this.isFirstLogin});
 }
-

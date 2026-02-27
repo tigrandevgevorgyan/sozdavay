@@ -46,3 +46,16 @@ app.*.map.json
 .cxx
 
 android/key.properties
+
+# iOS build cache
+ios/build/
+**/PIFCache/
+
+# Android build reports
+android/build/
+
+# Backup files
+*.bak
+*.backup
+**/project.pbxproj.bak
+

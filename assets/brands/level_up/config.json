@@ -1,13 +1,13 @@
 
 {
-  "appName": "220LBS",
-  "coachChatUrl": "http://t.me/Dryk220lbs",
-  "apiBaseUrl": "http://176.123.169.218:8080/api",
+  "appName": "Создавай",
+  "coachChatUrl": "https://t.me/+4zreD6nZr4cyZjIy",
+  "apiBaseUrl": "http://155.212.164.165/api",
   "colors": {
     "backgroundColor": "#010101",
     "backgroundContentColor": "#101011",
     "inActiveButtonColor": "#161616",
-    "activeButtonColor": "#2461E8",
+    "activeButtonColor": "#0a4d2e",
     "inputBackgroundColor": "#090909",
     "inputBorderColor": "#80242425",
     "tertiaryHintColor": "#747474",

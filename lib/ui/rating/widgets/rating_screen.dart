@@ -41,12 +41,12 @@ class RatingScreen extends StatelessWidget {
                         SizedBox(height: 10),
                         Text('Рейтинг по', style: Style.outfit14w400.copyWith(color: AppColors.primaryTextColor)),
                         SizedBox(height: 8),
-                        OptionsInputField(
-                          hint: 'Категория',
-                          value: provider.categoriesDisplayText,
-                          onClick: () => provider.onCategoryClicked(context),
-                        ),
-                        SizedBox(height: 10),
+                        // OptionsInputField(
+                        //   hint: 'Категория',
+                        //   value: provider.categoriesDisplayText,
+                        //   onClick: () => provider.onCategoryClicked(context),
+                        // ),
+                        // SizedBox(height: 10),
                         OptionsInputField(
                           hint: 'Период',
                           value: provider.periodSelection,

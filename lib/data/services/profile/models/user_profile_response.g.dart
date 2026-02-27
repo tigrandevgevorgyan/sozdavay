@@ -25,6 +25,7 @@ UserProfileExtendedResponse _$UserProfileExtendedResponseFromJson(
     UserProfileExtendedResponse(
       json['message'] as String?,
       UserProfile.fromJson(json['data'] as Map<String, dynamic>),
+      (json['sex'] as num?)?.toInt(),
       (json['experiences'] as List<dynamic>)
           .map(
               (e) => IdNamePairWithPriority.fromJson(e as Map<String, dynamic>))
@@ -50,6 +51,7 @@ Map<String, dynamic> _$UserProfileExtendedResponseToJson(
     <String, dynamic>{
       'message': instance.message,
       'data': instance.data,
+      'sex': instance.sex,
       'experiences': instance.experiences,
       'goals': instance.goals,
       'days': const DaysConverter().toJson(instance.days),

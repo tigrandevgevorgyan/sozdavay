@@ -48,9 +48,22 @@ class ProfileRepositoryImpl extends IProfileRepository {
     try {
       UserProfileShortResponse result;
       if (priority == null) {
-        result = await _profileService.updateProfile(name, category, days, experience, goals);
+        result = await _profileService.updateProfile(
+          name: name,
+          sex: category, // временно используем category как sex
+          days: days,
+          experience: experience,
+          goal: goals,
+        );
       } else {
-        result = await _profileService.updateProfile(name, category, days, experience, goals, priority);
+        result = await _profileService.updateProfile(
+          name: name,
+          sex: category,
+          days: days,
+          experience: experience,
+          goal: goals,
+          priority: priority,
+        );
       }
       if (_profileResponse != null) {
         _profileResponse!.data = result.data;
