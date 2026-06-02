@@ -10,6 +10,7 @@ import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/ui/home/view_model/home_view_model.dart';
 import 'package:level_up/ui/home/widgets/banner_button.dart';
 import 'package:level_up/ui/home/widgets/calendar_widget.dart';
+import 'package:level_up/ui/home/widgets/level_progress_bar.dart';
 import 'package:level_up/ui/home/widgets/start_training_banner.dart';
 import 'package:level_up/ui/home/widgets/statistics_tile_widget.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +53,8 @@ class HomeScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        SizedBox(height: 16),
+                        LevelProgressBar(level: provider.ratingLevel),
                         SizedBox(height: 20),
                         CalendarWidget(
                           height: 55,

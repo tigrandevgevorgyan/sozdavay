@@ -11,6 +11,7 @@ import 'package:level_up/data/repositories/auth_repository/auth_repository.dart'
 import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/local_storage.dart';
+import 'package:level_up/data/services/gamification/models/rating_level_summary.dart';
 import 'package:level_up/data/services/profile/models/user_profile_response.dart';
 import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
@@ -85,6 +86,11 @@ class HomeViewModel extends ChangeNotifier {
 
   late final String chatImage = HomeBannersAssets.getRandomChatImage();
 
+
+  /// Gamification: rating level summary attached to the profile response by
+  /// the backend's extended /profile endpoint (mobile-api(1)). Null until
+  /// profile has loaded, or when running against a pre-gamification backend.
+  RatingLevelSummary? get ratingLevel => _profile?.data.ratingLevel;
 
   String get seasonLevel => _mainInfo?.seasonLabel ?? '';
 
