@@ -25,20 +25,25 @@ This doc tracks the Flutter side (Stream B).
 - [x] `dart run build_runner build` ran clean — 38 outputs.
 - [x] `flutter analyze` on touched files — no issues.
 
-### mobile-ui(2) — home screen rebuild — IN PROGRESS
-- [ ] New widgets: LevelProgressBar, DayStreakStrip (already exists as CalendarWidget — reuse), StatCard, CircularRatingRing, MiniLeaderboard
-- [ ] Rebuild `home_screen.dart` matching Gohar's layout
-- [ ] Wire to `GamificationRepository`
+### mobile-ui(2) — Home: level progress bar
+- [x] New widget `LevelProgressBar` — header strip with "Уровень N из 34 · {label}" + linear progress + "До «next»: N" subtitle. Returns SizedBox.shrink when profile hasn't loaded.
+- [x] `HomeViewModel.ratingLevel` getter exposes the gamification block.
+- [x] Inserted into `home_screen.dart` between AppBar and CalendarWidget (Gohar's layout order).
+- [x] flutter analyze on touched files — clean.
+- [~] Other Home design additions (circular rating ring, 4-stat "Ваш прогресс" row, mini leaderboard) — deferred. Existing widgets (StatisticsTileWidget, top3_rating_widget) cover most of these patterns; will iterate after Nikita reviews this slice.
 
-### mobile-ui(3+) — Profile, Clans, Shop, etc.
+### mobile-ui(3+) — Profile, Clans, Shop, etc. — BLOCKED on Figma seat upgrade
 
-Pending Figma calls (need Dev seat — 22 screens left, 2 calls remaining this month):
-- [ ] Profile screen (`1:1573`)
-- [ ] Clan screens (13 variants — pick a few representative)
-- [ ] Shop screens (5 variants — pick 2)
-- [ ] Achievements
-- [ ] Notifications
-- [ ] Edit profile / Edit notifications
+Pending Figma pulls (need Dev seat — 22 screens left, **3 calls remaining this month** on View seat):
+- [ ] Profile (`1:1573`)
+- [ ] Achievements wall (`1:1719`)
+- [ ] Edit profile (`1:1894`)
+- [ ] Edit Notifications (`1:1955`)
+- [ ] Clan screens — 13 variants (`1:1985` → `1:3532`)
+- [ ] Shop screens — 5 variants (`1:3672` → `1:4524`)
+- [ ] Notifications inbox (`1:4779`)
+
+**Not in Figma** (descope or later iteration): battle pass, season progress, leaderboards full screen, referrals page. Welcome/Onboarding confirmed dropped by Nikita.
 
 ## Open questions for Nikita
 
