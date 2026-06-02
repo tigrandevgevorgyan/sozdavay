@@ -2,9 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
 import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
+import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/repositories/workout_repository/workout_repository.dart';
 import 'package:level_up/data/services/auth/auth_service.dart';
+import 'package:level_up/data/services/gamification/gamification_service.dart';
 import 'package:level_up/data/services/local_storage.dart';
 import 'package:level_up/data/services/profile/profile_service.dart';
 import 'package:level_up/data/services/workout/workout_service.dart';
@@ -48,6 +50,12 @@ class Dependencies {
 
     GetIt.I.registerSingleton<IWorkoutRepository>(
       WorkoutRepositoryImp(workoutService: WorkoutService(dio), localStorage),
+    );
+
+    // Gamification (mobile-ui(1)) — uses the same Dio client so it picks up
+    // the bearer auth + base URL configured elsewhere.
+    GetIt.I.registerSingleton<IGamificationRepository>(
+      GamificationRepository(GamificationService(dio)),
     );
   }
 }

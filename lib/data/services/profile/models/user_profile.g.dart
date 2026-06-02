@@ -36,6 +36,19 @@ UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => UserProfile(
           : IdNamePairWithPriority.fromJson(
               json['priority'] as Map<String, dynamic>),
       planType: (json['plan_type'] as num).toInt(),
+      nickname: json['nickname'] as String?,
+      avatarUrl: json['avatar_url'] as String?,
+      equippedAvatarFrameId:
+          (json['equipped_avatar_frame_id'] as num?)?.toInt(),
+      creatorPoints: (json['creator_points'] as num?)?.toInt(),
+      accountLevel: (json['account_level'] as num?)?.toInt(),
+      shopDiscountPercent: (json['shop_discount_percent'] as num?)?.toInt(),
+      ratingBalance: (json['rating_balance'] as num?)?.toInt(),
+      ratingLevel: json['rating_level'] == null
+          ? null
+          : RatingLevelSummary.fromJson(
+              json['rating_level'] as Map<String, dynamic>),
+      referralCode: json['referral_code'] as String?,
     );
 
 Map<String, dynamic> _$UserProfileToJson(UserProfile instance) =>
@@ -54,4 +67,13 @@ Map<String, dynamic> _$UserProfileToJson(UserProfile instance) =>
       'measurements': instance.measurements,
       'paid_until': instance.paidUntil,
       'plan_type': instance.planType,
+      'nickname': instance.nickname,
+      'avatar_url': instance.avatarUrl,
+      'equipped_avatar_frame_id': instance.equippedAvatarFrameId,
+      'creator_points': instance.creatorPoints,
+      'account_level': instance.accountLevel,
+      'shop_discount_percent': instance.shopDiscountPercent,
+      'rating_balance': instance.ratingBalance,
+      'rating_level': instance.ratingLevel,
+      'referral_code': instance.referralCode,
     };
