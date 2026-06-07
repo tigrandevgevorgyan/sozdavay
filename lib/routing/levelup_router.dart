@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/ui/home/widgets/home_screen.dart';
 import 'package:level_up/ui/achievements/widgets/achievements_screen.dart';
+import 'package:level_up/ui/notifications/widgets/notification_prefs_screen.dart';
+import 'package:level_up/ui/notifications/widgets/notifications_screen.dart';
 import 'package:level_up/ui/profile/widgets/profile_screen.dart';
 import 'package:level_up/ui/profile_preferences/widgets/profile_preferences_screen.dart';
 import 'package:level_up/ui/rating/widgets/rating_screen.dart';
@@ -149,6 +151,20 @@ class LevelUpRouter {
               path: achievementsPath,
               pageBuilder: (context, state) => getPage(
                 child: const AchievementsScreen(),
+                state: state,
+              ),
+            ),
+            GoRoute(
+              path: notificationsPath,
+              pageBuilder: (context, state) => getPage(
+                child: const NotificationsScreen(),
+                state: state,
+              ),
+            ),
+            GoRoute(
+              path: notificationPrefsPath,
+              pageBuilder: (context, state) => getPage(
+                child: const NotificationPrefsScreen(),
                 state: state,
               ),
             ),
