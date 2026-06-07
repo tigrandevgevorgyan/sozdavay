@@ -10,6 +10,9 @@ import 'package:level_up/ui/notifications/widgets/notifications_screen.dart';
 import 'package:level_up/ui/profile/widgets/profile_screen.dart';
 import 'package:level_up/ui/profile_preferences/widgets/profile_preferences_screen.dart';
 import 'package:level_up/ui/rating/widgets/rating_screen.dart';
+import 'package:level_up/ui/shop/widgets/battle_pass_screen.dart';
+import 'package:level_up/ui/shop/widgets/frames_screen.dart';
+import 'package:level_up/ui/shop/widgets/shop_screen.dart';
 import 'package:level_up/ui/signin/widgets/signin_screen.dart';
 import 'package:level_up/ui/splash/widgets/splash_screen.dart';
 import 'package:level_up/ui/text_editing_screen/text_editing_screen.dart';
@@ -192,6 +195,27 @@ class LevelUpRouter {
               path: createClanPath,
               pageBuilder: (context, state) => getPage(
                 child: const CreateClanScreen(),
+                state: state,
+              ),
+            ),
+            GoRoute(
+              path: shopPath,
+              pageBuilder: (context, state) => getPage(
+                child: const ShopScreen(),
+                state: state,
+              ),
+            ),
+            GoRoute(
+              path: framesPath,
+              pageBuilder: (context, state) => getPage(
+                child: const FramesScreen(),
+                state: state,
+              ),
+            ),
+            GoRoute(
+              path: battlePassPath,
+              pageBuilder: (context, state) => getPage(
+                child: const BattlePassScreen(),
                 state: state,
               ),
             ),
