@@ -10,6 +10,8 @@ import 'package:level_up/ui/notifications/widgets/notifications_screen.dart';
 import 'package:level_up/ui/profile/widgets/profile_screen.dart';
 import 'package:level_up/ui/profile_preferences/widgets/profile_preferences_screen.dart';
 import 'package:level_up/ui/rating/widgets/rating_screen.dart';
+import 'package:level_up/ui/referrals/widgets/referrals_screen.dart';
+import 'package:level_up/ui/season/widgets/season_screen.dart';
 import 'package:level_up/ui/shop/widgets/battle_pass_screen.dart';
 import 'package:level_up/ui/shop/widgets/frames_screen.dart';
 import 'package:level_up/ui/shop/widgets/shop_screen.dart';
@@ -216,6 +218,20 @@ class LevelUpRouter {
               path: battlePassPath,
               pageBuilder: (context, state) => getPage(
                 child: const BattlePassScreen(),
+                state: state,
+              ),
+            ),
+            GoRoute(
+              path: referralsPath,
+              pageBuilder: (context, state) => getPage(
+                child: const ReferralsScreen(),
+                state: state,
+              ),
+            ),
+            GoRoute(
+              path: seasonPath,
+              pageBuilder: (context, state) => getPage(
+                child: const SeasonScreen(),
                 state: state,
               ),
             ),

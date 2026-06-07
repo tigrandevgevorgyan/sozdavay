@@ -47,15 +47,45 @@ This doc tracks the Flutter side (Stream B).
   - Мои Бустеры (3 cards) — needs shop integration + active-booster query.
   - Notifications inbox row — needs `/notifications` UI built.
 
-### mobile-ui(4+) — Profile expansion + remaining screens
+### mobile-ui(4) — full GamificationService surface
+- [x] Retrofit interface + Repository wrapper for every Stream A endpoint
+- [x] 8 new model clusters: achievement, clan, shop_product, avatar_frame, battle_pass, notification, season_current, referral
+- [x] build_runner ran clean — 18 outputs
 
-Pending Figma pulls (**2 calls remaining this month** on View seat):
-- [ ] Achievements wall (`1:1719`)
-- [ ] Edit profile (`1:1894`)
-- [ ] Edit Notifications (`1:1955`)
-- [ ] Clan screens — 13 variants (`1:1985` → `1:3532`)
-- [ ] Shop screens — 5 variants (`1:3672` → `1:4524`)
-- [ ] Notifications inbox (`1:4779`)
+### mobile-ui(5) — Achievements wall
+- [x] Pulled Figma `1:1719` skipped — extrapolated from Profile preview card pattern. Saves call for clans/shop later.
+- [x] AchievementsScreen with summary header, filter row (Все / Получены / Доступны), 2-column grid of cards
+- [x] Card shape: rounded icon, name, short description, creator-points reward badge; locked state fades icon + swaps to lock glyph
+- [x] Wired from Profile → `/home/achievements`
+
+### mobile-ui(6) — Notifications inbox + prefs
+- [x] NotificationsScreen — inbox list, unread = green dot + active border, optimistic mark-read on tap, "Прочитать всё" bulk action
+- [x] NotificationPrefsScreen — channel × type grid with switches, fires POST optimistically and reverts on failure
+- [x] Russian labels for channels (push / in_app) and 6 notification types
+- [x] Routes `/home/notifications` and `/home/notification_prefs`
+
+### mobile-ui(7) — Clans (list + detail + create)
+- [x] ClansListScreen — search bar (300ms debounce), 2-column tile, "Мой" badge on my clan, FAB '+' only when not in a clan
+- [x] ClanDetailScreen — header, treasury card (with "Пополнить" for members, min 50 dialog), members list with leader badge + contribution, active boosters, available boosters (leader-only "Купить"), join/leave action
+- [x] CreateClanScreen — name + description + 3-option join policy radio; pops on success and pushes the new clan
+- [x] Three view models with optimistic state where useful
+
+### mobile-ui(8) — Shop + frames + battle pass
+- [x] ShopScreen — grid with VIP badge, discount badge, struck-through original price + green discounted price; confirm dialog on purchase
+- [x] FramesScreen — owned frames grid with equip toggle (one-equipped invariant enforced server-side)
+- [x] BattlePassScreen — VIP header, tier rows with free + VIP slots (claimed / claimable / locked / empty states), claim flow
+
+### mobile-ui(9) — Referrals + Season
+- [x] ReferralsScreen — code card with copy action, referrer block if any, invitee list with joined date; feature-disabled fallback panel
+- [x] SeasonScreen — season header, my-progress card (rating / level / draw eligibility), reward list with rank badges; null-state when no active season
+
+### Deferred — Profile final polish
+- [~] 4-stat row (Time / Workouts / Calories / Streak) — Workouts is available via MainInfo, but streak + calories are not yet exposed by the backend. Will add when those fields land.
+- [~] Achievements preview row on Profile — easy to add (uses `/achievements/mine`), but ProfileViewModel currently only reads cached UserProfile. Add when next iterating Profile.
+- [~] Boosters preview row on Profile — needs active-clan-boosters query at the customer level (not just per-clan); revisit.
+- [~] Notification bell with unread badge on Profile header — easy add, depends on a notifications "summary" call we haven't introduced yet.
+
+These are visual additions, not blockers — the screens themselves are reachable via the explicit links in Profile's ИГРОФИКАЦИЯ + СЧЕТ sections.
 
 **Not in Figma** (descope or later iteration): battle pass, season progress, leaderboards full screen, referrals page. Welcome/Onboarding confirmed dropped by Nikita.
 
