@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/ui/home/widgets/home_screen.dart';
+import 'package:level_up/ui/achievements/widgets/achievements_screen.dart';
 import 'package:level_up/ui/profile/widgets/profile_screen.dart';
 import 'package:level_up/ui/profile_preferences/widgets/profile_preferences_screen.dart';
 import 'package:level_up/ui/rating/widgets/rating_screen.dart';
@@ -29,6 +30,17 @@ class LevelUpRouter {
   static const String textEditingPath = '/text_editing';
   static const String videoPlayerPath = '/video_player';
   static const String registerPath = '/register';
+  static const String achievementsPath = '/achievements';
+  static const String notificationsPath = '/notifications';
+  static const String notificationPrefsPath = '/notification_prefs';
+  static const String clansPath = '/clans';
+  static const String clanDetailPath = '/clan_detail';
+  static const String createClanPath = '/create_clan';
+  static const String shopPath = '/shop';
+  static const String framesPath = '/frames';
+  static const String battlePassPath = '/battle_pass';
+  static const String referralsPath = '/referrals';
+  static const String seasonPath = '/season';
 
   late GlobalKey<NavigatorState> navigatorKey;
 
@@ -132,6 +144,13 @@ class LevelUpRouter {
                   state: state,
                 );
               },
+            ),
+            GoRoute(
+              path: achievementsPath,
+              pageBuilder: (context, state) => getPage(
+                child: const AchievementsScreen(),
+                state: state,
+              ),
             ),
             GoRoute(
               path: workoutPath,

@@ -56,11 +56,58 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 24),
                         _LevelCard(level: vm.ratingLevel),
                         const SizedBox(height: 24),
+                        _SectionHeader(title: 'ИГРОФИКАЦИЯ'),
+                        _AccountLinkRow(
+                          icon: Icons.emoji_events_outlined,
+                          label: 'Достижения',
+                          onTap: () => vm.onAchievementsTap(context),
+                        ),
+                        _AccountLinkRow(
+                          icon: Icons.groups_outlined,
+                          label: 'Кланы',
+                          onTap: () => vm.onClansTap(context),
+                        ),
+                        _AccountLinkRow(
+                          icon: Icons.storefront_outlined,
+                          label: 'Магазин',
+                          onTap: () => vm.onShopTap(context),
+                        ),
+                        _AccountLinkRow(
+                          icon: Icons.collections_bookmark_outlined,
+                          label: 'Мои рамки',
+                          onTap: () => vm.onFramesTap(context),
+                        ),
+                        _AccountLinkRow(
+                          icon: Icons.military_tech_outlined,
+                          label: 'Боевой пропуск',
+                          onTap: () => vm.onBattlePassTap(context),
+                        ),
+                        _AccountLinkRow(
+                          icon: Icons.event_outlined,
+                          label: 'Сезон',
+                          onTap: () => vm.onSeasonTap(context),
+                        ),
+                        _AccountLinkRow(
+                          icon: Icons.share_outlined,
+                          label: 'Рефералы',
+                          onTap: () => vm.onReferralsTap(context),
+                        ),
+                        const SizedBox(height: 24),
                         _SectionHeader(title: 'СЧЕТ'),
                         _AccountLinkRow(
                           icon: Icons.person_outline,
                           label: 'Редактировать профиль',
                           onTap: () => vm.onEditProfileTap(context),
+                        ),
+                        _AccountLinkRow(
+                          icon: Icons.notifications_none_outlined,
+                          label: 'Уведомления',
+                          onTap: () => vm.onNotificationsInboxTap(context),
+                        ),
+                        _AccountLinkRow(
+                          icon: Icons.tune_outlined,
+                          label: 'Настройка уведомлений',
+                          onTap: () => vm.onNotificationPrefsTap(context),
                         ),
                         const SizedBox(height: 24),
                         _SectionHeader(title: 'ОБЩИЙ'),

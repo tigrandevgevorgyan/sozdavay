@@ -61,6 +61,33 @@ class ProfileViewModel extends ChangeNotifier {
     ).then((_) => _load());
   }
 
+  void onAchievementsTap(BuildContext context) =>
+      GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.achievementsPath);
+
+  void onClansTap(BuildContext context) =>
+      GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.clansPath);
+
+  void onShopTap(BuildContext context) =>
+      GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.shopPath);
+
+  void onFramesTap(BuildContext context) =>
+      GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.framesPath);
+
+  void onBattlePassTap(BuildContext context) =>
+      GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.battlePassPath);
+
+  void onReferralsTap(BuildContext context) =>
+      GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.referralsPath);
+
+  void onSeasonTap(BuildContext context) =>
+      GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.seasonPath);
+
+  void onNotificationsInboxTap(BuildContext context) =>
+      GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.notificationsPath);
+
+  void onNotificationPrefsTap(BuildContext context) =>
+      GoRouter.of(context).push(LevelUpRouter.homePath + LevelUpRouter.notificationPrefsPath);
+
   Future<void> onSupportTap() async {
     final uri = GetIt.I<BrandConfig>().coachChatUrl;
     await launchUrl(uri, mode: LaunchMode.externalApplication);
