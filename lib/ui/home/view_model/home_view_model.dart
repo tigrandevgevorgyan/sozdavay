@@ -351,16 +351,12 @@ class HomeViewModel extends ChangeNotifier {
 
   void onProfileClicked(BuildContext context) {
     stopRefreshTimer();
-    final hasPlan = hasWorkoutPlan;
     GoRouter.of(context).push(
-      LevelUpRouter.homePath + LevelUpRouter.profilePreferencesPath,
-      extra: ProfilePreferencesParams(
-        hasWorkoutPlan: hasPlan,
-        isFirstLogin: false,
-        isAfterLogin: false,
-      ),
+      LevelUpRouter.homePath + LevelUpRouter.profilePath,
+      extra: hasWorkoutPlan,
     ).then((result) async {
-      // Re-read the lock flag set in ProfilePreferences (it is saved in SharedPreferences)
+      // Re-read the lock flag — ProfilePreferences (reached from inside
+      // ProfileScreen) may have changed it.
       await _loadLockChanges();
 
       if (result == true) {

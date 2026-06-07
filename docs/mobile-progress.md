@@ -32,10 +32,24 @@ This doc tracks the Flutter side (Stream B).
 - [x] flutter analyze on touched files — clean.
 - [~] Other Home design additions (circular rating ring, 4-stat "Ваш прогресс" row, mini leaderboard) — deferred. Existing widgets (StatisticsTileWidget, top3_rating_widget) cover most of these patterns; will iterate after Nikita reviews this slice.
 
-### mobile-ui(3+) — Profile, Clans, Shop, etc. — BLOCKED on Figma seat upgrade
+### mobile-ui(3) — Profile hub
+- [x] Pulled Profile design from Figma (`1:1573`) via `get_design_context` — used 1 of 3 remaining View-seat calls.
+- [x] New `ProfileScreen` + `ProfileViewModel` under `lib/ui/profile/`. Layout matches Gohar's structure (header / avatar+name / level card / account links) but renders with app tokens (Ablation, Outfit, AppColors).
+- [x] `_AvatarAndName`: 89px circular avatar with subtle border, network-image fallback to placeholder icon, displayName uppercase, creator-points pill with formatted thousand-separator.
+- [x] `_LevelCard`: "УРОВЕНЬ N ИЗ 34 · {label}" header + "{points} баллов до следующего уровня" subtitle + level badges (current vs next) flanking the progress bar + "{in} / {total}" indicator. Max-level state collapses to a single line.
+- [x] `_AccountLinkRow` with chevron — pattern Gohar uses for "Редактировать профиль", "Уведомление", "Поддерживать".
+- [x] Wired entry point: changed Home gear icon → ProfileScreen (was → ProfilePreferences directly). ProfileScreen has "Редактировать профиль" link that opens ProfilePreferences (preserves the legacy edit form).
+- [x] Route registered as `/home/profile` (extra: `bool hasWorkoutPlan`).
+- [x] flutter analyze on touched files — clean. 9 pre-existing HomeViewModel warnings unrelated.
+- [~] Deferred to later commits (in-scope per Gohar but bigger surface):
+  - 4-stat row (Time / Workouts / Calories / Streak) — needs new backend fields (streak, calories). Workouts-per-month is already in MainInfo; rest would need server-side additions or design simplification.
+  - Achievements wall preview (3 cards) — needs `/achievements/mine` call + asset/icon mapping.
+  - Мои Бустеры (3 cards) — needs shop integration + active-booster query.
+  - Notifications inbox row — needs `/notifications` UI built.
 
-Pending Figma pulls (need Dev seat — 22 screens left, **3 calls remaining this month** on View seat):
-- [ ] Profile (`1:1573`)
+### mobile-ui(4+) — Profile expansion + remaining screens
+
+Pending Figma pulls (**2 calls remaining this month** on View seat):
 - [ ] Achievements wall (`1:1719`)
 - [ ] Edit profile (`1:1894`)
 - [ ] Edit Notifications (`1:1955`)

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/ui/home/widgets/home_screen.dart';
+import 'package:level_up/ui/profile/widgets/profile_screen.dart';
 import 'package:level_up/ui/profile_preferences/widgets/profile_preferences_screen.dart';
 import 'package:level_up/ui/rating/widgets/rating_screen.dart';
 import 'package:level_up/ui/signin/widgets/signin_screen.dart';
@@ -20,6 +21,7 @@ class LevelUpRouter {
 
   static const String splashPath = '/';
   static const String signInPath = '/signin';
+  static const String profilePath = '/profile';
   static const String profilePreferencesPath = '/profile_preferences';
   static const String homePath = '/home';
   static const String workoutPath = '/workout';
@@ -117,6 +119,16 @@ class LevelUpRouter {
               pageBuilder: (context, state) {
                 return getPage(
                   child: const RatingScreen(),
+                  state: state,
+                );
+              },
+            ),
+            GoRoute(
+              path: profilePath,
+              pageBuilder: (context, state) {
+                final hasWorkoutPlan = (state.extra as bool?) ?? false;
+                return getPage(
+                  child: ProfileScreen(hasWorkoutPlan: hasWorkoutPlan),
                   state: state,
                 );
               },
