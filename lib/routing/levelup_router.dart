@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/ui/home/widgets/home_screen.dart';
 import 'package:level_up/ui/achievements/widgets/achievements_screen.dart';
+import 'package:level_up/ui/clans/widgets/clan_detail_screen.dart';
+import 'package:level_up/ui/clans/widgets/clans_list_screen.dart';
+import 'package:level_up/ui/clans/widgets/create_clan_screen.dart';
 import 'package:level_up/ui/notifications/widgets/notification_prefs_screen.dart';
 import 'package:level_up/ui/notifications/widgets/notifications_screen.dart';
 import 'package:level_up/ui/profile/widgets/profile_screen.dart';
@@ -165,6 +168,30 @@ class LevelUpRouter {
               path: notificationPrefsPath,
               pageBuilder: (context, state) => getPage(
                 child: const NotificationPrefsScreen(),
+                state: state,
+              ),
+            ),
+            GoRoute(
+              path: clansPath,
+              pageBuilder: (context, state) => getPage(
+                child: const ClansListScreen(),
+                state: state,
+              ),
+            ),
+            GoRoute(
+              path: clanDetailPath,
+              pageBuilder: (context, state) {
+                final clanId = state.extra as int;
+                return getPage(
+                  child: ClanDetailScreen(clanId: clanId),
+                  state: state,
+                );
+              },
+            ),
+            GoRoute(
+              path: createClanPath,
+              pageBuilder: (context, state) => getPage(
+                child: const CreateClanScreen(),
                 state: state,
               ),
             ),
