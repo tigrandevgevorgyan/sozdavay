@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
+import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/gamification/models/shop_product.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_button.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
@@ -16,7 +17,10 @@ class ShopScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ShopViewModel>(
-      create: (_) => ShopViewModel(repo: GetIt.I<IGamificationRepository>()),
+      create: (_) => ShopViewModel(
+        repo: GetIt.I<IGamificationRepository>(),
+        profileRepository: GetIt.I<IProfileRepository>(),
+      ),
       child: Consumer<ShopViewModel>(
         builder: (context, vm, _) {
           return Scaffold(
@@ -33,47 +37,129 @@ class ShopScreen extends StatelessWidget {
                 'Магазин',
                 style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor),
               ),
+              actions: [
+                // Creator-points pill in the AppBar per Gohar's Shop design
+                // (Figma 55:472 — top-right "5 456" label).
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.backgroundContentColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.inputBorderColor, width: 1),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.workspace_premium,
+                            size: 14, color: AppColors.errorMessagePositive),
+                        const SizedBox(width: 4),
+                        Text(
+                          _formatNumber(vm.creatorPoints),
+                          style: Style.ablation13w700.copyWith(color: AppColors.primaryTextColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
             body: vm.isLoading
                 ? const Center(child: LevelUpLoader())
                 : RefreshIndicator(
                     color: AppColors.activeButtonColor,
                     onRefresh: vm.refresh,
-                    child: vm.items.isEmpty
-                        ? ListView(
+                    child: Column(
+                      children: [
+                        // Category chips ("Все" / "Аватары" / "Бустеры") per
+                        // Figma. "Все" is added so the user can still see the
+                        // full catalog without picking a tab first.
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                          child: Row(
                             children: [
-                              const SizedBox(height: 120),
-                              Center(
-                                child: Text(
-                                  'Товары пока недоступны',
-                                  style: Style.outfit15w400.copyWith(color: AppColors.secondaryTextColor),
-                                ),
-                              ),
+                              _categoryChip('Все', ShopCategory.all, vm),
+                              const SizedBox(width: 8),
+                              _categoryChip('Аватары', ShopCategory.avatars, vm),
+                              const SizedBox(width: 8),
+                              _categoryChip('Бустеры', ShopCategory.boosters, vm),
                             ],
-                          )
-                        : GridView.builder(
-                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
-                              childAspectRatio: 0.66,
-                            ),
-                            itemCount: vm.items.length,
-                            itemBuilder: (context, i) {
-                              final p = vm.items[i];
-                              return _ProductCard(
-                                product: p,
-                                busy: vm.busy,
-                                onBuy: () => _confirmPurchase(context, vm, p),
-                              );
-                            },
                           ),
+                        ),
+                        Expanded(
+                          child: vm.filtered.isEmpty
+                              ? ListView(
+                                  children: [
+                                    const SizedBox(height: 120),
+                                    Center(
+                                      child: Text(
+                                        'В этой категории пока пусто',
+                                        style: Style.outfit15w400.copyWith(color: AppColors.secondaryTextColor),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : GridView.builder(
+                                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    childAspectRatio: 0.66,
+                                  ),
+                                  itemCount: vm.filtered.length,
+                                  itemBuilder: (context, i) {
+                                    final p = vm.filtered[i];
+                                    return _ProductCard(
+                                      product: p,
+                                      busy: vm.busy,
+                                      onBuy: () => _confirmPurchase(context, vm, p),
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
+                    ),
                   ),
           );
         },
       ),
     );
+  }
+
+  Widget _categoryChip(String label, ShopCategory value, ShopViewModel vm) {
+    final active = vm.category == value;
+    return Expanded(
+      child: InkWell(
+        onTap: () => vm.setCategory(value),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: active ? AppColors.activeButtonColor : AppColors.inActiveButtonColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            label,
+            style: Style.outfit14w400.copyWith(
+              color: active ? AppColors.primaryTextColor : AppColors.secondaryTextColor,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatNumber(int n) {
+    final s = n.toString();
+    final buf = StringBuffer();
+    for (var i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) buf.write(' ');
+      buf.write(s[i]);
+    }
+    return buf.toString();
   }
 
   void _confirmPurchase(BuildContext context, ShopViewModel vm, ShopProduct p) {
