@@ -40,6 +40,9 @@ abstract class GamificationService {
   @POST('/achievements/expedition/{id}/abandon')
   Future<dynamic> abandonExpedition(@Path('id') int achievementId);
 
+  @GET('/achievements/{id}/share-payload')
+  Future<dynamic> getAchievementSharePayload(@Path('id') int achievementId);
+
   // ------ Clans ------
   @GET('/clans')
   Future<ClansListResponse> getClans(@Query('q') String? search);

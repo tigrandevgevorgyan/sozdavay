@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
 import 'package:level_up/data/services/gamification/models/achievement.dart';
 import 'package:level_up/ui/achievements/view_model/achievements_view_model.dart';
+import 'package:level_up/ui/core/common_widgets/level_up_button.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
@@ -196,6 +198,29 @@ class _Card extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final granted = achievement.isGranted;
+    // Only granted achievements open the detail dialog — locked ones don't
+    // have share data on the backend, so opening would just show empty state.
+    return InkWell(
+      onTap: granted
+          ? () => showDialog<void>(
+                context: context,
+                barrierColor: Colors.black87,
+                builder: (_) => _AchievementDetailDialog(achievement: achievement),
+              )
+          : null,
+      borderRadius: BorderRadius.circular(10),
+      child: _CardBody(achievement: achievement, granted: granted),
+    );
+  }
+}
+
+class _CardBody extends StatelessWidget {
+  const _CardBody({required this.achievement, required this.granted});
+  final Achievement achievement;
+  final bool granted;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -270,6 +295,164 @@ class _Card extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// Achievement detail modal per Gohar's Achievements design (Figma 47:243).
+/// Opens when the user taps a granted achievement card. Fetches the share
+/// payload from `/achievements/{id}/share-payload` and lets them copy a
+/// pre-composed brag text to the clipboard.
+class _AchievementDetailDialog extends StatefulWidget {
+  const _AchievementDetailDialog({required this.achievement});
+
+  final Achievement achievement;
+
+  @override
+  State<_AchievementDetailDialog> createState() => _AchievementDetailDialogState();
+}
+
+class _AchievementDetailDialogState extends State<_AchievementDetailDialog> {
+  Map<String, dynamic>? _payload;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final repo = GetIt.I<IGamificationRepository>();
+      _payload = await repo.getAchievementSharePayload(widget.achievement.id);
+    } catch (_) {
+      // Soft-fail: dialog still renders with the data from the card itself.
+    }
+    if (mounted) setState(() => _loading = false);
+  }
+
+  String _composeShareText() {
+    final p = _payload;
+    final name = (p?['title'] as String?) ?? widget.achievement.name;
+    final points = (p?['creator_points_reward'] as int?) ?? widget.achievement.creatorPointsReward;
+    final nickname = p?['customer_nickname'] as String?;
+    final pointsLine = points > 0 ? ' +$points баллов' : '';
+    final nickPart = (nickname != null && nickname.isNotEmpty) ? '$nickname получил' : 'Я получил';
+    return '$nickPart достижение «$name» в Создавай!$pointsLine';
+  }
+
+  String? _grantedDate() {
+    final iso = (_payload?['granted_at'] as String?) ?? widget.achievement.grantedAt;
+    if (iso == null) return null;
+    final dt = DateTime.tryParse(iso);
+    if (dt == null) return null;
+    final l = dt.toLocal();
+    const months = [
+      'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+      'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря',
+    ];
+    return '${l.day} ${months[l.month - 1]} ${l.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final a = widget.achievement;
+    return Dialog(
+      backgroundColor: AppColors.backgroundColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                icon: Icon(Icons.close, color: AppColors.primaryTextColor),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+            Text(
+              a.name.toUpperCase(),
+              style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor),
+              textAlign: TextAlign.center,
+            ),
+            if (_grantedDate() != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                _grantedDate()!,
+                style: Style.outfit14w400.copyWith(color: AppColors.secondaryTextColor),
+              ),
+            ],
+            const SizedBox(height: 24),
+            Container(
+              width: 160,
+              height: 160,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.inputBackgroundColor,
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: a.iconUrl != null && a.iconUrl!.isNotEmpty
+                  ? Image.network(
+                      a.iconUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.emoji_events,
+                        color: AppColors.activeButtonColor,
+                        size: 64,
+                      ),
+                    )
+                  : Icon(Icons.emoji_events, color: AppColors.activeButtonColor, size: 64),
+            ),
+            if (a.description != null && a.description!.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Text(
+                a.description!,
+                style: Style.outfit14w400.copyWith(color: AppColors.primaryTextColor),
+                textAlign: TextAlign.center,
+              ),
+            ],
+            if (a.creatorPointsReward > 0) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.activeButtonColor.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '+${a.creatorPointsReward} баллов',
+                  style: Style.ablation14w900.copyWith(color: AppColors.errorMessagePositive),
+                ),
+              ),
+            ],
+            const SizedBox(height: 24),
+            LevelUpButton(
+              text: _loading ? 'Загрузка...' : 'Поделиться',
+              buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.medium),
+              onClick: _loading
+                  ? () {}
+                  : () async {
+                      await Clipboard.setData(ClipboardData(text: _composeShareText()));
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Текст скопирован — поделитесь с друзьями',
+                              style: Style.outfit14w400.copyWith(color: AppColors.primaryTextColor),
+                            ),
+                            backgroundColor: AppColors.backgroundContentColor,
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                    },
+            ),
+          ],
+        ),
       ),
     );
   }

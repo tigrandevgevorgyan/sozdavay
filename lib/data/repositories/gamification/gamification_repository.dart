@@ -17,6 +17,7 @@ abstract class IGamificationRepository {
   Future<List<CustomerAchievement>> getMyAchievements();
   Future<void> joinExpedition(int achievementId);
   Future<void> abandonExpedition(int achievementId);
+  Future<Map<String, dynamic>?> getAchievementSharePayload(int achievementId);
 
   // clans
   Future<List<Clan>> getClans({String? search});
@@ -83,6 +84,16 @@ class GamificationRepository implements IGamificationRepository {
   @override
   Future<void> abandonExpedition(int achievementId) =>
       _service.abandonExpedition(achievementId);
+
+  @override
+  Future<Map<String, dynamic>?> getAchievementSharePayload(int achievementId) async {
+    final raw = await _service.getAchievementSharePayload(achievementId);
+    if (raw is Map<String, dynamic>) {
+      final data = raw['data'];
+      if (data is Map<String, dynamic>) return data;
+    }
+    return null;
+  }
 
   @override
   Future<List<Clan>> getClans({String? search}) async {
