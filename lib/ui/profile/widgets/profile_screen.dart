@@ -8,7 +8,6 @@ import 'package:level_up/data/services/gamification/models/rating_level_summary.
 import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
-import 'package:level_up/ui/home/widgets/your_progress_row.dart';
 import 'package:level_up/ui/profile/view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -67,12 +66,7 @@ class ProfileScreen extends StatelessWidget {
                           displayName: vm.displayName,
                           creatorPoints: vm.creatorPoints,
                         ),
-                        const SizedBox(height: 20),
-                        // 4-stat row per Gohar's Profile design (Figma 42:1420).
-                        // Same widget used on Home — placeholders for fields
-                        // backend doesn't yet expose.
-                        YourProgressRow(workoutsCount: 0),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
                         _LevelCard(level: vm.ratingLevel),
                         const SizedBox(height: 24),
                         _AchievementsPreview(

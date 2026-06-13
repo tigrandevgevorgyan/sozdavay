@@ -15,7 +15,6 @@ import 'package:level_up/ui/home/widgets/calendar_widget.dart';
 import 'package:level_up/ui/home/widgets/level_progress_bar.dart';
 import 'package:level_up/ui/home/widgets/start_training_banner.dart';
 import 'package:level_up/ui/home/widgets/statistics_tile_widget.dart';
-import 'package:level_up/ui/home/widgets/your_progress_row.dart';
 import 'package:provider/provider.dart';
 import '../../../data/repositories/workout_repository/workout_repository.dart';
 
@@ -121,12 +120,6 @@ class HomeScreen extends StatelessWidget {
                             onClick: provider.onChatClicked,
                           ),
                         ),
-                        SizedBox(height: 8),
-                        // "Ваш прогресс" row from Gohar's design.
-                        // Workouts count is live (MainInfo.season); time /
-                        // calories / streak render as "—" until backend
-                        // adds those aggregations.
-                        YourProgressRow(workoutsCount: provider.perSeason),
                         SizedBox(height: 4),
                       ],
                     ),
