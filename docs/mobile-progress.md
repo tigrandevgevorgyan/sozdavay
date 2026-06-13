@@ -131,6 +131,94 @@ This doc tracks the Flutter side (Stream B).
 
 That's ~16 more screen pulls + targeted updates. Realistically 1-2 days of focused work.
 
+### mobile-ui(12) — Scope cleanup (revert YourProgressRow)
+
+After confirming with Tigran that streak/calories/time are **not part of
+gamification scope** (Gohar designed them but they belong to general
+fitness tracking, not the rebuild we're shipping), reverted the row from
+both Home and Profile. Kept gamification-legit additions:
+- Notification bell on Home + Profile AppBars
+- Achievements top-3 preview on Profile
+- Logout moved to Profile ОБЩИЙ section
+
+Deleted `lib/ui/home/widgets/your_progress_row.dart`.
+
+### mobile-ui(13) — Booster purchase URL fix
+
+Caught during Phase B5 wiring verification: mobile retrofit was POSTing
+to `/clans/{id}/boosters/buy-card` but backend exposes the endpoint at
+`/clans/{clan}/boosters/purchase`. Without this fix, tapping "Купить"
+on a clan's available-booster list would 404. Field name
+(`booster_definition_id`) was already correct.
+
+### Phase-by-phase verification (all clean)
+
+Walked every gamification cluster page-by-page to confirm wiring + zero
+regressions in existing non-gamification flows:
+
+- **B1 — Home**: LevelProgressBar ← /profile.ratingLevel, bell →
+  /home/notifications, existing handlers (workout, measurements, chat,
+  rating) intact. ✅
+- **B2 — Profile**: 9 link rows all map to registered routes, edit
+  preferences reachable, logout fires IAuthRepository. ✅
+- **B3 — Achievements**: /achievements + /achievements/mine wired.
+  Expedition opt-in endpoints exist on backend but no UI yet — out of
+  MVP scope, follow-up. ✅
+- **B4 — Notifications**: 5 endpoints (list / read / read-all / prefs
+  GET+POST) all wired with matching field names. ✅
+- **B5 — Clans**: 16 backend endpoints; mobile uses the core subset
+  (list / mine / show / create / join / leave / treasury / booster
+  buy+activate). Advanced (join-request, kick, transfer-leader, level-
+  up, accept-invite) are out of MVP scope. Fixed the booster purchase
+  URL mismatch (see mobile-ui(13)). ✅
+- **B6 — Shop / Frames / BP**: 6 endpoints all match URL + field
+  names. ✅
+- **B7 — Referrals + Season**: 2 endpoints match. ✅
+
+### Phase C — Regression sweep
+
+`git diff master..feat/gamification` over `lib/` — only **3 files**
+outside gamification namespaces were touched, all additive or
+semantically-preserved:
+
+- `lib/config/dependencies.dart` — `IGamificationRepository` registered.
+- `lib/routing/levelup_router.dart` — new routes + path constants
+  added; no existing route modified or removed.
+- `lib/ui/home/view_model/home_view_model.dart` — added `ratingLevel`
+  getter (additive); `onProfileClicked` now navigates to ProfileScreen
+  instead of ProfilePreferences directly (ProfilePreferences still
+  reachable via Profile → "Редактировать профиль"). The incomplete-
+  profile auto-redirect path (`signInPath + profilePreferencesPath`)
+  is unchanged.
+- `lib/ui/home/widgets/home_screen.dart` — logout icon swapped for
+  notification bell (logout relocated to Profile).
+
+Verified-unchanged: signin / register / splash / workout /
+text_editing / profile_preferences / rating screens. All non-
+gamification flows preserved.
+
+### Phase D — Backend state
+
+- Backend branch `sozdavay/feat/gamification` has 5 mobile-api commits
+  + 11 admin phases all committed.
+- 31 migrations for gamification tables.
+- 8 feature flags (`feature_*_enabled`) wired with idempotent seeder
+  (`GamificationSettingsSeeder`).
+- Deploy procedure already in `backend/docs/DEV.md` — `php artisan
+  migrate --force` then `php artisan db:seed --class=GamificationSettingsSeeder
+  --force`.
+
+### Final state
+
+- **Zero compile errors** across the mobile project.
+- 65 pre-existing warnings/info in non-gamification code (signin /
+  splash / workout / register) — unchanged from master.
+- All 13 mobile-ui commits compile, lint clean on touched files.
+- All endpoint wirings match between mobile retrofit and backend routes.
+- Existing app functionality preserved.
+
+Ready for end-to-end testing on device + backend deploy.
+
 **Not in Figma** (descope or later iteration): battle pass, season progress, leaderboards full screen, referrals page. Welcome/Onboarding confirmed dropped by Nikita.
 
 ## Open questions for Nikita
