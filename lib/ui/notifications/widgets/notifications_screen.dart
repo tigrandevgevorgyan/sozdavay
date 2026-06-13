@@ -60,21 +60,92 @@ class NotificationsScreen extends StatelessWidget {
                               ),
                             ],
                           )
-                        : ListView.separated(
-                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                            itemCount: vm.items.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 8),
-                            itemBuilder: (context, i) => _NotificationTile(
-                              notification: vm.items[i],
-                              onTap: () => vm.markRead(vm.items[i]),
-                            ),
-                          ),
+                        : _GroupedList(items: vm.items, onTap: vm.markRead),
                   ),
           );
         },
       ),
     );
   }
+}
+
+/// Groups notifications by day with Russian section headers (Сегодня /
+/// Вчера / dd.MM.yyyy) per Gohar's Notifications design (Figma 33:866).
+class _GroupedList extends StatelessWidget {
+  const _GroupedList({required this.items, required this.onTap});
+
+  final List<AppNotification> items;
+  final void Function(AppNotification) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final groups = _groupByDay(items);
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+      itemCount: groups.length,
+      itemBuilder: (context, gIdx) {
+        final g = groups[gIdx];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  g.label,
+                  style: Style.outfit15w400.copyWith(color: AppColors.primaryTextColor),
+                ),
+              ),
+              for (var i = 0; i < g.items.length; i++) ...[
+                _NotificationTile(
+                  notification: g.items[i],
+                  onTap: () => onTap(g.items[i]),
+                ),
+                if (i < g.items.length - 1) const SizedBox(height: 10),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  List<_DayGroup> _groupByDay(List<AppNotification> items) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    final Map<DateTime, List<AppNotification>> bucket = {};
+    for (final n in items) {
+      final created = DateTime.tryParse(n.createdAt ?? '');
+      if (created == null) continue;
+      final local = created.toLocal();
+      final dayKey = DateTime(local.year, local.month, local.day);
+      bucket.putIfAbsent(dayKey, () => []).add(n);
+    }
+
+    final sortedKeys = bucket.keys.toList()..sort((a, b) => b.compareTo(a));
+    return [
+      for (final key in sortedKeys)
+        _DayGroup(
+          label: _labelFor(key, today, yesterday),
+          items: bucket[key]!,
+        ),
+    ];
+  }
+
+  String _labelFor(DateTime day, DateTime today, DateTime yesterday) {
+    if (day == today) return 'Сегодня';
+    if (day == yesterday) return 'Вчера';
+    return '${day.day.toString().padLeft(2, '0')}.${day.month.toString().padLeft(2, '0')}.${day.year}';
+  }
+}
+
+class _DayGroup {
+  _DayGroup({required this.label, required this.items});
+  final String label;
+  final List<AppNotification> items;
 }
 
 class _NotificationTile extends StatelessWidget {
@@ -101,16 +172,22 @@ class _NotificationTile extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (unread)
-              Container(
-                margin: const EdgeInsets.only(top: 6, right: 10),
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.errorMessagePositive,
-                ),
+            // 48x48 square icon container per Figma — solid darker bg + glyph
+            // matched to the notification template_key.
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.backgroundColor,
+                borderRadius: BorderRadius.circular(10),
               ),
+              child: Icon(
+                _iconFor(notification.templateKey),
+                color: AppColors.primaryTextColor,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,26 +195,41 @@ class _NotificationTile extends StatelessWidget {
                   if (notification.title != null && notification.title!.isNotEmpty)
                     Text(
                       notification.title!,
-                      style: Style.ablation14w900.copyWith(
-                        color: AppColors.primaryTextColor,
-                      ),
+                      style: Style.outfit15w400.copyWith(color: AppColors.primaryTextColor),
                     ),
                   if (notification.body != null && notification.body!.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
                       notification.body!,
-                      style: Style.outfit14w300.copyWith(color: AppColors.primaryTextColor),
-                    ),
-                  ],
-                  if (notification.createdAt != null) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      _formatDate(notification.createdAt!),
                       style: Style.outfit11w300.copyWith(color: AppColors.secondaryTextColor),
                     ),
                   ],
                 ],
               ),
+            ),
+            const SizedBox(width: 8),
+            // Right column: unread dot + compact time per Figma.
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (unread)
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.errorMessagePositive,
+                    ),
+                  )
+                else
+                  const SizedBox(height: 8),
+                const SizedBox(height: 4),
+                if (notification.createdAt != null)
+                  Text(
+                    _formatTime(notification.createdAt!),
+                    style: Style.outfit11w300.copyWith(color: AppColors.secondaryTextColor),
+                  ),
+              ],
             ),
           ],
         ),
@@ -145,13 +237,21 @@ class _NotificationTile extends StatelessWidget {
     );
   }
 
-  String _formatDate(String iso) {
-    final dt = DateTime.tryParse(iso);
-    if (dt == null) return iso;
-    final local = dt.toLocal();
-    return '${_two(local.day)}.${_two(local.month)}.${local.year} '
-        '${_two(local.hour)}:${_two(local.minute)}';
+  IconData _iconFor(String? templateKey) {
+    if (templateKey == null) return Icons.notifications_none_rounded;
+    if (templateKey.contains('achievement')) return Icons.emoji_events_outlined;
+    if (templateKey.contains('clan')) return Icons.groups_outlined;
+    if (templateKey.contains('subscription')) return Icons.workspace_premium_outlined;
+    if (templateKey.contains('level')) return Icons.trending_up;
+    if (templateKey.contains('retention') || templateKey.contains('workout')) return Icons.lightbulb_outline;
+    if (templateKey.contains('challenge')) return Icons.flag_outlined;
+    return Icons.notifications_none_rounded;
   }
 
-  String _two(int n) => n.toString().padLeft(2, '0');
+  String _formatTime(String iso) {
+    final dt = DateTime.tryParse(iso);
+    if (dt == null) return iso;
+    final l = dt.toLocal();
+    return '${l.hour.toString().padLeft(2, '0')}:${l.minute.toString().padLeft(2, '0')}';
+  }
 }
