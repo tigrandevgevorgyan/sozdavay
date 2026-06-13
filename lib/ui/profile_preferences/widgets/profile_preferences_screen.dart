@@ -96,6 +96,18 @@ class ProfilePreferencesScreen extends StatelessWidget {
                                     },
                                   ),
                                   SizedBox(height: 14),
+                                  // Nickname field per Gohar's Edit profile design
+                                  // (Figma 53:313). Optional — backend accepts
+                                  // empty / null; validates regex if non-empty.
+                                  Consumer<ProfilePreferencesViewModel>(
+                                    builder: (context, provider, _) {
+                                      return LevelUpTextField(
+                                        controller: provider.nicknameController,
+                                        hintText: 'Прозвище (необязательно)',
+                                      );
+                                    },
+                                  ),
+                                  SizedBox(height: 14),
                                   OptionsBlocWidget(
                                     title: 'Выберите ваш пол',
                                     value: provider.categorySelection,

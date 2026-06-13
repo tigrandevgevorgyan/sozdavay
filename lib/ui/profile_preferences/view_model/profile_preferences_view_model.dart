@@ -44,6 +44,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
 
   ProfilePreferencesViewModel(BuildContext context, {required this.isAfterLogin, required this.profileRepository, required this.hasWorkoutPlan, required this.dataRepository, required this.isFirstLogin}) {
     _nameController = TextEditingController();
+    _nicknameController = TextEditingController();
     _loadProfileAndOptions(context);
   }
 
@@ -58,6 +59,13 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
   late TextEditingController _nameController;
 
   TextEditingController get nameController => _nameController;
+
+  /// Nickname field — gamification (Figma 53:313). Optional on save; the
+  /// backend's POST /profile accepts a `nickname` field only if non-empty
+  /// and matches /^[a-z0-9_]{3,30}$/.
+  late TextEditingController _nicknameController;
+
+  TextEditingController get nicknameController => _nicknameController;
 
   int? _categorySelection;
 
@@ -207,6 +215,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
     _isUpdating = true;
     notifyListeners();
     debugPrint('[onSaveClicked] sending: name=${_nameController.text}, sex=${_categorySelection ?? 1}, days=${_trainingWeeklySelection ?? 0}, experience=${_levelSelection ?? 0}, goal=${_goalSelection ?? 0}, priority=${_prioritySelection}');
+    final nickname = _nicknameController.text.trim();
     final result = await profileRepository.updateProfile(
       _nameController.text,
       _categorySelection ?? 1,
@@ -214,6 +223,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
       _levelSelection ?? 0,
       _goalSelection ?? 0,
       _prioritySelection,
+      nickname: nickname.isEmpty ? null : nickname,
     );
     switch (result) {
       case Ok<UserProfileShortResponse>():
@@ -275,6 +285,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
         _prioritySelection = profile.value.data.priority?.id;
         _trainingWeeklySelection = profile.value.data.days;
         _nameController.text = profile.value.data.name;
+        _nicknameController.text = profile.value.data.nickname ?? '';
 
         _setPriorityOptions();
 
@@ -338,6 +349,7 @@ class ProfilePreferencesViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _nameController.dispose();
+    _nicknameController.dispose();
     nameFocusNode.dispose();
     super.dispose();
   }

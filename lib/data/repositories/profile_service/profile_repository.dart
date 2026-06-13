@@ -8,7 +8,15 @@ abstract class IProfileRepository {
 
   Future<Result<UserProfileExtendedResponse>> reloadProfile();
 
-  Future<Result<UserProfileShortResponse>> updateProfile(String name, int category, int days, int experience, int goals, int? priority);
+  Future<Result<UserProfileShortResponse>> updateProfile(
+    String name,
+    int category,
+    int days,
+    int experience,
+    int goals,
+    int? priority, {
+    String? nickname,
+  });
 
   Future<Result<UserProfileShortResponse>> updateMeasurements(String measurements);
 
@@ -44,27 +52,25 @@ class ProfileRepositoryImpl extends IProfileRepository {
   }
 
   @override
-  Future<Result<UserProfileShortResponse>> updateProfile(String name, int category, int days, int experience, int goals, int? priority) async {
+  Future<Result<UserProfileShortResponse>> updateProfile(
+    String name,
+    int category,
+    int days,
+    int experience,
+    int goals,
+    int? priority, {
+    String? nickname,
+  }) async {
     try {
-      UserProfileShortResponse result;
-      if (priority == null) {
-        result = await _profileService.updateProfile(
-          name: name,
-          sex: category, // временно используем category как sex
-          days: days,
-          experience: experience,
-          goal: goals,
-        );
-      } else {
-        result = await _profileService.updateProfile(
-          name: name,
-          sex: category,
-          days: days,
-          experience: experience,
-          goal: goals,
-          priority: priority,
-        );
-      }
+      final result = await _profileService.updateProfile(
+        name: name,
+        nickname: nickname,
+        sex: category, // временно используем category как sex
+        days: days,
+        experience: experience,
+        goal: goals,
+        priority: priority,
+      );
       if (_profileResponse != null) {
         _profileResponse!.data = result.data;
       }

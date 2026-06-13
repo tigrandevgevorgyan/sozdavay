@@ -103,6 +103,7 @@ class _ProfileService implements ProfileService {
   @override
   Future<UserProfileShortResponse> updateProfile({
     required String name,
+    String? nickname,
     required int sex,
     int category = 1,
     required int days,
@@ -116,6 +117,7 @@ class _ProfileService implements ProfileService {
     final _headers = <String, dynamic>{};
     final _data = {
       'name': name,
+      'nickname': nickname,
       'sex': sex,
       'category': category,
       'days': days,
