@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:level_up/assets/assets.dart';
 import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/local_storage.dart';
+import 'package:level_up/routing/levelup_router.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
@@ -13,6 +15,7 @@ import 'package:level_up/ui/home/widgets/calendar_widget.dart';
 import 'package:level_up/ui/home/widgets/level_progress_bar.dart';
 import 'package:level_up/ui/home/widgets/start_training_banner.dart';
 import 'package:level_up/ui/home/widgets/statistics_tile_widget.dart';
+import 'package:level_up/ui/home/widgets/your_progress_row.dart';
 import 'package:provider/provider.dart';
 import '../../../data/repositories/workout_repository/workout_repository.dart';
 
@@ -38,7 +41,8 @@ class HomeScreen extends StatelessWidget {
                 onProfileClicked: () async {
                   await provider.openProfileIfUnlocked(context);
                 },
-                onLogoutClicked: () => provider.logout(context),
+                onNotificationsClicked: () => GoRouter.of(context)
+                    .push(LevelUpRouter.homePath + LevelUpRouter.notificationsPath),
                 showSettings: provider.canEditSettings,
               ),
               centerTitle: true,
@@ -117,6 +121,12 @@ class HomeScreen extends StatelessWidget {
                             onClick: provider.onChatClicked,
                           ),
                         ),
+                        SizedBox(height: 8),
+                        // "Ваш прогресс" row from Gohar's design.
+                        // Workouts count is live (MainInfo.season); time /
+                        // calories / streak render as "—" until backend
+                        // adds those aggregations.
+                        YourProgressRow(workoutsCount: provider.perSeason),
                         SizedBox(height: 4),
                       ],
                     ),
@@ -129,10 +139,15 @@ class HomeScreen extends StatelessWidget {
 }
 
 class AppBarTitle extends StatelessWidget {
-  const AppBarTitle({super.key, required this.onLogoutClicked, required this.onProfileClicked, required this.showSettings});
+  const AppBarTitle({
+    super.key,
+    required this.onNotificationsClicked,
+    required this.onProfileClicked,
+    required this.showSettings,
+  });
 
   final Function() onProfileClicked;
-  final Function() onLogoutClicked;
+  final Function() onNotificationsClicked;
   final bool showSettings;
 
   @override
@@ -149,15 +164,22 @@ class AppBarTitle extends StatelessWidget {
             : const SizedBox(width: 24, height: 24),
         Image.asset(
           Assets.logo,
-           height: 40, // или 32–36
-           width: 57, // или 32–36
-           fit: BoxFit.contain,
-        ),        GestureDetector(
+          height: 40,
+          width: 57,
+          fit: BoxFit.contain,
+        ),
+        // Logout icon replaced with notification bell per Gohar's Home design
+        // (Figma 16:183). Logout itself lives in Profile screen now.
+        GestureDetector(
           behavior: HitTestBehavior.translucent,
-          onTap: onLogoutClicked,
+          onTap: onNotificationsClicked,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Image.asset(Assets.logoutIcon, height: 24),
+            child: Icon(
+              Icons.notifications_none_rounded,
+              color: AppColors.primaryTextColor,
+              size: 24,
+            ),
           ),
         ),
       ],

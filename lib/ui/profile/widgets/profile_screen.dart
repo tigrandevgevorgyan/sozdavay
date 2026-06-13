@@ -116,6 +116,12 @@ class ProfileScreen extends StatelessWidget {
                           label: 'Поддержка',
                           onTap: vm.onSupportTap,
                         ),
+                        _AccountLinkRow(
+                          icon: Icons.logout,
+                          label: 'Выйти',
+                          color: AppColors.timerDoneOrangeColor,
+                          onTap: () => vm.onLogoutTap(context),
+                        ),
                       ],
                     ),
                   ),
@@ -316,26 +322,33 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _AccountLinkRow extends StatelessWidget {
-  const _AccountLinkRow({required this.icon, required this.label, required this.onTap});
+  const _AccountLinkRow({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color,
+  });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
+    final tint = color ?? AppColors.primaryTextColor;
     return InkWell(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            Icon(icon, size: 24, color: AppColors.primaryTextColor),
+            Icon(icon, size: 24, color: tint),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 label,
-                style: Style.outfit15w400.copyWith(color: AppColors.primaryTextColor),
+                style: Style.outfit15w400.copyWith(color: tint),
               ),
             ),
             Icon(Icons.chevron_right, size: 20, color: AppColors.secondaryTextColor),
