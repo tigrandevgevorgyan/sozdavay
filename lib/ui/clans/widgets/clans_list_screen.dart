@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
 import 'package:level_up/data/services/gamification/models/clan.dart';
 import 'package:level_up/ui/clans/view_model/clans_view_model.dart';
+import 'package:level_up/ui/core/common_widgets/level_up_button.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
@@ -76,13 +77,30 @@ class ClansListScreen extends StatelessWidget {
                           onRefresh: vm.refresh,
                           child: vm.items.isEmpty
                               ? ListView(
+                                  padding: const EdgeInsets.fromLTRB(16, 80, 16, 24),
                                   children: [
-                                    const SizedBox(height: 120),
+                                    // Empty-state buttons per Gohar's Clan
+                                    // design (Figma 83:2262) — explicit
+                                    // "Create" + "Join" CTAs when the user
+                                    // has no clan yet.
                                     Center(
                                       child: Text(
-                                        'Кланы не найдены',
-                                        style: Style.outfit15w400.copyWith(color: AppColors.secondaryTextColor),
+                                        'У вас пока нет кланов',
+                                        style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor),
+                                        textAlign: TextAlign.center,
                                       ),
+                                    ),
+                                    const SizedBox(height: 32),
+                                    LevelUpButton(
+                                      text: 'Создать клан',
+                                      buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.medium),
+                                      onClick: () => vm.onCreateClanTap(context),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      'Или поищите клан в списке выше — используйте поиск.',
+                                      style: Style.outfit11w300.copyWith(color: AppColors.secondaryTextColor),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ],
                                 )
