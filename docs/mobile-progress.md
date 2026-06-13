@@ -79,13 +79,57 @@ This doc tracks the Flutter side (Stream B).
 - [x] ReferralsScreen — code card with copy action, referrer block if any, invitee list with joined date; feature-disabled fallback panel
 - [x] SeasonScreen — season header, my-progress card (rating / level / draw eligibility), reward list with rank badges; null-state when no active season
 
-### Deferred — Profile final polish
-- [~] 4-stat row (Time / Workouts / Calories / Streak) — Workouts is available via MainInfo, but streak + calories are not yet exposed by the backend. Will add when those fields land.
-- [~] Achievements preview row on Profile — easy to add (uses `/achievements/mine`), but ProfileViewModel currently only reads cached UserProfile. Add when next iterating Profile.
-- [~] Boosters preview row on Profile — needs active-clan-boosters query at the customer level (not just per-clan); revisit.
-- [~] Notification bell with unread badge on Profile header — easy add, depends on a notifications "summary" call we haven't introduced yet.
+### mobile-ui(10) — Home + Profile Figma alignment (round 1)
+- [x] Figma seat: upgraded `tigrandevgevorgyan@gmail.com` to Pro/Dev. File duplicated to personal team as `CgYC1ko04ppqEvNhE3aEx5`.
+- [x] Home: logout icon → notification bell (taps push `/home/notifications`).
+- [x] Home: new `YourProgressRow` widget — four stats (Время / Тренировок / Калории / Дни Подряд). Workouts live from MainInfo.season; rest show "—" until backend exposes time/calories/streak.
+- [x] Profile: logout moved to ОБЩИЙ section, rendered in `timerDoneOrangeColor` as destructive.
+- [x] `_AccountLinkRow` accepts optional `color` tint.
 
-These are visual additions, not blockers — the screens themselves are reachable via the explicit links in Profile's ИГРОФИКАЦИЯ + СЧЕТ sections.
+### mobile-ui(11) — Profile expansion
+- [x] Notification bell in AppBar actions (same destination as Home).
+- [x] 4-stat row reused on Profile (`YourProgressRow`).
+- [x] "ДОСТИЖЕНИЯ" preview — top-3 granted from `/achievements/mine`, "Просмотреть все" links to AchievementsScreen. Hides when no grants.
+- [x] ProfileViewModel.\_load parallelised (profile + achievements).
+
+### Discovered during Figma polish (not yet implemented)
+
+**Bottom tab bar** — Figma includes a 5-tab bottom navigation visible on Achievements (`45:12758`) and likely other screens:
+- Магазин / Клан / Главный (larger center) / Профиль / Телеграм
+- My app currently has no bottom nav; everything routes via push from Home / Profile menus.
+- Adding it = wrapping Home/Shop/Clan/Profile in a shell scaffold with `BottomNavigationBar` + reorganising push targets to switch tabs instead of pushing new screens.
+- **Significant refactor.** Deferred — needs a focused session.
+
+**Figma "Achievements" screen (`45:12758`)** actually shows "Личные записи" (5 badge cards in a 3+2 grid) + "Приглашённые друзья" (referral invitees list). It's a hybrid screen — not a classic achievements wall.
+- My `AchievementsScreen` is closer to a classic "all achievements with filter" wall. Different concept.
+- Variant `47:243` (also named Achievements) not yet pulled — may be the wall I built.
+- TBD which model to follow — pixel-match Figma (mash records + invitees) or keep my classic-wall pattern.
+
+**Мои Бустеры preview on Profile** — needs customer-level active-boosters endpoint. Backend currently only exposes per-clan booster activations via `ClanResource`. Skip until backend extension.
+
+**Backend gaps surfaced**:
+- Workout time aggregation (hours/minutes per period) — to fill "Время" stat
+- Calories tracking — to fill "Калории" stat
+- Workout streak (consecutive days) — to fill "Дни Подряд" stat
+- Customer-level active-boosters endpoint
+
+### Pending Figma screens (need pulls + polish)
+
+- Achievements variant (`47:243`)
+- Edit profile (`53:313`) — verify vs existing ProfilePreferencesScreen
+- Edit Notifications (`53:5116`) — verify vs my NotificationPrefsScreen
+- Notifications inbox (`33:866`) — verify vs my NotificationsScreen
+- Shop home + 5 variants (`55:472`, `73:962`, `74:1591`, `74:1916`, `91:792`, `91:1044`) — likely product detail / purchase confirm / variants
+- Clan list (`83:2262`, `111:1060`, `120:739`) — three list variants
+- find a clan (`167:1579`) — search state
+- create a clan (`125:861`) — verify vs my CreateClanScreen
+- notification of joining a clan (`167:1432`) — confirmation modal
+- Abilities (`163:868`) — likely battle pass or boosters
+- Clan boosters (`167:1214`) — separate boosters screen
+- Clan page for owner — 3 variants (`151:924`, `151:1117`, `151:1646`)
+- Clan page for member — 2 variants (`151:1319`, `151:1482`)
+
+That's ~16 more screen pulls + targeted updates. Realistically 1-2 days of focused work.
 
 **Not in Figma** (descope or later iteration): battle pass, season progress, leaderboards full screen, referrals page. Welcome/Onboarding confirmed dropped by Nikita.
 
