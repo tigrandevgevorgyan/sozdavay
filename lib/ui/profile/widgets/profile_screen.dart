@@ -3,10 +3,12 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/assets/assets.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
+import 'package:level_up/data/services/gamification/models/achievement.dart';
 import 'package:level_up/data/services/gamification/models/rating_level_summary.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
+import 'package:level_up/ui/home/widgets/your_progress_row.dart';
 import 'package:level_up/ui/profile/view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -40,6 +42,18 @@ class ProfileScreen extends StatelessWidget {
                 icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
                 onPressed: () => GoRouter.of(context).pop(),
               ),
+              actions: [
+                // Notification bell on the right per Gohar's Profile design
+                // (Figma 32:638). Matches the bell on Home — same destination.
+                IconButton(
+                  icon: Icon(
+                    Icons.notifications_none_rounded,
+                    color: AppColors.primaryTextColor,
+                    size: 24,
+                  ),
+                  onPressed: () => vm.onNotificationsInboxTap(context),
+                ),
+              ],
             ),
             body: vm.isLoading
                 ? const Center(child: LevelUpLoader())
@@ -53,8 +67,18 @@ class ProfileScreen extends StatelessWidget {
                           displayName: vm.displayName,
                           creatorPoints: vm.creatorPoints,
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
+                        // 4-stat row per Gohar's Profile design (Figma 42:1420).
+                        // Same widget used on Home — placeholders for fields
+                        // backend doesn't yet expose.
+                        YourProgressRow(workoutsCount: 0),
+                        const SizedBox(height: 20),
                         _LevelCard(level: vm.ratingLevel),
+                        const SizedBox(height: 24),
+                        _AchievementsPreview(
+                          items: vm.topAchievements,
+                          onSeeAll: () => vm.onAchievementsTap(context),
+                        ),
                         const SizedBox(height: 24),
                         _SectionHeader(title: 'ИГРОФИКАЦИЯ'),
                         _AccountLinkRow(
@@ -318,6 +342,118 @@ class _SectionHeader extends StatelessWidget {
         style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor),
       ),
     );
+  }
+}
+
+class _AchievementsPreview extends StatelessWidget {
+  const _AchievementsPreview({required this.items, required this.onSeeAll});
+
+  final List<CustomerAchievement> items;
+  final VoidCallback onSeeAll;
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'ДОСТИЖЕНИЯ',
+                style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor),
+              ),
+            ),
+            InkWell(
+              onTap: onSeeAll,
+              child: Text(
+                'Просмотреть все',
+                style: Style.outfit11w300.copyWith(color: AppColors.primaryTextColor),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            for (var i = 0; i < items.length; i++) ...[
+              Expanded(child: _AchievementCard(grant: items[i])),
+              if (i < items.length - 1) const SizedBox(width: 10),
+            ],
+            // Pad row to a consistent 3-column shape even when < 3 granted.
+            for (var i = items.length; i < 3; i++) ...[
+              const Expanded(child: SizedBox()),
+              if (i < 2) const SizedBox(width: 10),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _AchievementCard extends StatelessWidget {
+  const _AchievementCard({required this.grant});
+
+  final CustomerAchievement grant;
+
+  @override
+  Widget build(BuildContext context) {
+    final a = grant.achievement;
+    return Container(
+      height: 118,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundContentColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.inputBorderColor, width: 1),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.inputBackgroundColor,
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: a?.iconUrl != null && a!.iconUrl!.isNotEmpty
+                ? Image.network(
+                    a.iconUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        Icon(Icons.emoji_events, color: AppColors.activeButtonColor, size: 22),
+                  )
+                : Icon(Icons.emoji_events, color: AppColors.activeButtonColor, size: 22),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            a?.name ?? '—',
+            style: Style.outfit11w300.copyWith(color: AppColors.primaryTextColor),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          if (grant.grantedAt != null)
+            Text(
+              _shortDate(grant.grantedAt!),
+              style: Style.outfit11w300.copyWith(color: AppColors.secondaryTextColor),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+        ],
+      ),
+    );
+  }
+
+  String _shortDate(String iso) {
+    final dt = DateTime.tryParse(iso);
+    if (dt == null) return iso;
+    final l = dt.toLocal();
+    return '${l.day.toString().padLeft(2, '0')}.${l.month.toString().padLeft(2, '0')}.${l.year}';
   }
 }
 

@@ -4,7 +4,9 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:level_up/brand/brand_config.dart';
 import 'package:level_up/data/repositories/auth_repository/auth_repository.dart';
+import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
+import 'package:level_up/data/services/gamification/models/achievement.dart';
 import 'package:level_up/data/services/gamification/models/rating_level_summary.dart';
 import 'package:level_up/data/services/local_storage.dart';
 import 'package:level_up/data/services/profile/models/user_profile.dart';
@@ -40,18 +42,37 @@ class ProfileViewModel extends ChangeNotifier {
 
   int get creatorPoints => _profile?.creatorPoints ?? 0;
 
+  /// Top-3 most-recently granted achievements — used for the preview row
+  /// on Profile (Figma 42:1369). Loaded in parallel with the profile body.
+  List<CustomerAchievement> _topAchievements = [];
+  List<CustomerAchievement> get topAchievements => _topAchievements;
+
   Future<void> _load() async {
-    final result = await profileRepository.getProfile();
-    switch (result) {
+    // Profile (cached) + my achievements run in parallel — both are cheap
+    // and the screen doesn't depend on the order they resolve.
+    final results = await Future.wait([
+      profileRepository.getProfile(),
+      _safeLoadAchievements(),
+    ]);
+    final profileResult = results[0] as Result<UserProfileExtendedResponse>;
+    switch (profileResult) {
       case Ok<UserProfileExtendedResponse>():
-        _profile = result.value.data;
+        _profile = profileResult.value.data;
       case Error<UserProfileExtendedResponse>():
-        // Soft-fail: keep the screen mounted with empty state.
-        // Home guards profile loading itself; Profile is reached from Home.
         break;
     }
+    _topAchievements = results[1] as List<CustomerAchievement>;
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<List<CustomerAchievement>> _safeLoadAchievements() async {
+    try {
+      final list = await GetIt.I<IGamificationRepository>().getMyAchievements();
+      return list.take(3).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   void onEditProfileTap(BuildContext context) {
