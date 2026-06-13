@@ -69,7 +69,7 @@ abstract class GamificationService {
     @Field('amount') int amount,
   );
 
-  @POST('/clans/{id}/boosters/buy-card')
+  @POST('/clans/{id}/boosters/purchase')
   Future<dynamic> buyBoosterCard(
     @Path('id') int clanId,
     @Field('booster_definition_id') int definitionId,

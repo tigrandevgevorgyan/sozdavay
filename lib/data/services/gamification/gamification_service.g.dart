@@ -332,7 +332,7 @@ class _GamificationService implements GamificationService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/clans/${clanId}/boosters/buy-card',
+            '/clans/${clanId}/boosters/purchase',
             queryParameters: queryParameters,
             data: _data,
           )
