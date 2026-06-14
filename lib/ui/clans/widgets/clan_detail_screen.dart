@@ -609,7 +609,7 @@ class _ActionButtons extends StatelessWidget {
       return LevelUpButton(
         text: vm.busy ? '...' : 'Покинуть клан',
         buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.medium),
-        onClick: () => vm.leave(),
+        onClick: () => _confirmLeave(context, vm),
       );
     }
     return LevelUpButton(
@@ -617,5 +617,38 @@ class _ActionButtons extends StatelessWidget {
       buttonStyle: LevelUpButtonStyle.defaultStyle(ButtonHeight.medium),
       onClick: () => vm.join(),
     );
+  }
+
+  /// Confirmation dialog per Figma 151:1482 — "Вы уверены, что хотите
+  /// покинуть клан?" Prevents accidental leave taps.
+  void _confirmLeave(BuildContext context, ClanDetailViewModel vm) {
+    showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.backgroundContentColor,
+        title: Text(
+          'Покинуть клан?',
+          style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor),
+        ),
+        content: Text(
+          'Вы уверены, что хотите покинуть клан?',
+          style: Style.outfit14w400.copyWith(color: AppColors.primaryTextColor),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Отмена',
+                style: Style.outfit14w400.copyWith(color: AppColors.secondaryTextColor)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('Покинуть',
+                style: Style.outfit14w400.copyWith(color: AppColors.timerDoneOrangeColor)),
+          ),
+        ],
+      ),
+    ).then((confirmed) {
+      if (confirmed == true) vm.leave();
+    });
   }
 }
