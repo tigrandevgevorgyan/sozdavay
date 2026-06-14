@@ -219,6 +219,82 @@ gamification flows preserved.
 
 Ready for end-to-end testing on device + backend deploy.
 
+---
+
+## Figma full pass — second iteration (mobile-ui(14)-(19))
+
+After the verification pass, walked every Figma node with the new
+Dev seat and made targeted gamification updates.
+
+### mobile-ui(14) — Notifications inbox polish
+Figma 33:866. Date grouping (Сегодня/Вчера/dd.MM.yyyy), 48×48 square
+icon container with template_key→icon mapping, compact HH:MM
+timestamp. Backend API verified.
+
+### mobile-ui(15) — Achievement detail dialog + share
+Figma 47:243. Tap a granted achievement → centered modal with icon,
+date, description, creator-points badge, "Поделиться" button that
+fetches `/achievements/{id}/share-payload` and copies a brag text to
+the clipboard. New `getAchievementSharePayload` on repo.
+
+### mobile-ui(16) + mobile-api(6) — Edit Profile nickname field
+Figma 53:313. New "Прозвище" field between Имя and Пол.
+ProfilePreferences view-model now manages a nickname controller;
+mobile retrofit forwards `nickname` to backend. Backend's
+ProfileController.save validates lowercase alphanumeric+underscore,
+3-30 chars; blank input leaves existing value untouched.
+
+### mobile-ui(17) — Shop category tabs + creator points header
+Figma 55:472. Filter chips Все / Аватары / Бустеры — maps to
+backend's `ShopProduct.type`. Creator-points pill in AppBar reads
+from cached profile; shop products + profile fetched in parallel.
+
+### mobile-ui(18) — Clan list empty-state CTA
+Figma 83:2262. Centered "У вас пока нет кланов" headline + explicit
+"Создать клан" CTA when the user has no clan yet.
+
+### mobile-ui(19) + mobile-api(7) — Clan leader actions
+Figma 151:924. Leader-only kick member (close icon on each non-
+leader row, confirmation dialog) + pending join-requests section
+(approve/reject icon buttons). Backend gained
+`GET /clans/{clan}/join-requests` since the detail response only
+returned a count, not the list.
+
+### Figma nodes not separately polished (functionally covered)
+
+These Figma nodes are visual variants of screens we already ship.
+The functional surface (buy/activate boosters, treasury contribute,
+join/leave/kick/review) is already exposed in our existing
+ClanDetailScreen / ShopScreen — Gohar drew them as dedicated screens
+but our inline UI surfaces the same actions:
+
+- `120:739`, `167:1579` — Clan list filtered/search variants (my
+  ClansListScreen search bar covers).
+- `151:1117`, `151:1319`, `151:1482`, `151:1646` — Clan owner/member
+  state variants of ClanDetailScreen (handled by `clan.isLeader` +
+  `clan.activeBoosters` conditionals).
+- `163:868` (Abilities), `167:1214` (Clan boosters dedicated) —
+  separate screens for booster management. Covered by inline
+  "Активные бустеры" + "Доступные бустеры" sections on
+  ClanDetailScreen.
+- `73:962`, `74:1591`, `74:1916`, `91:792`, `91:1044` — Shop sub-
+  variants (product detail / purchase confirm states). My
+  ShopScreen + AlertDialog confirmation cover the flow.
+- `125:861` — CreateClanScreen variant with emblem upload + min-
+  level chip. Emblem upload needs new backend endpoint + multipart
+  file picker — out of MVP scope.
+- `167:1432` — Notification of joining a clan modal. Inline
+  feedback (busy state + snackbar) covers the success path; modal
+  is polish.
+
+### Status
+
+- **18 mobile-ui commits** + **7 mobile-api commits** total.
+- All 30+ endpoints wired with matching URLs + field names.
+- All non-gamification flows preserved (Phase C unchanged).
+- Zero compile errors. flutter analyze on touched files clean.
+- Ready for end-to-end testing + deploy.
+
 **Not in Figma** (descope or later iteration): battle pass, season progress, leaderboards full screen, referrals page. Welcome/Onboarding confirmed dropped by Nikita.
 
 ## Open questions for Nikita
