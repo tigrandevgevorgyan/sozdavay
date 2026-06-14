@@ -77,9 +77,34 @@ class _Body extends StatelessWidget {
           const SizedBox(height: 16),
           _Section(title: 'УЧАСТНИКИ (${clan.members?.length ?? 0}/${clan.slotsTotal})'),
           if (clan.members != null)
-            ...clan.members!.map((m) => _MemberTile(member: m)),
+            ...clan.members!.map(
+              (m) => _MemberTile(
+                member: m,
+                // Leader sees kick-icon on every other member; leader can't
+                // kick themselves (backend rejects).
+                canKick: clan.isLeader && m.role != 'leader',
+                onKick: () => _confirmKick(context, vm, m),
+              ),
+            ),
           if (clan.members == null || clan.members!.isEmpty)
             _emptyPanel('Участники не загружены'),
+          // Pending join-requests section — leader-only, per Figma 151:924.
+          // Empty list still renders a placeholder so the leader knows the
+          // queue is clear.
+          if (clan.isLeader) ...[
+            const SizedBox(height: 16),
+            _Section(title: 'ЗАЯВКИ НА ПРИСОЕДИНЕНИЕ (${vm.pendingRequests.length})'),
+            if (vm.pendingRequests.isEmpty)
+              _emptyPanel('Нет новых заявок')
+            else
+              ...vm.pendingRequests.map(
+                (r) => _JoinRequestTile(
+                  request: r,
+                  onApprove: () => vm.reviewJoinRequest(r.id, true),
+                  onReject: () => vm.reviewJoinRequest(r.id, false),
+                ),
+              ),
+          ],
           const SizedBox(height: 16),
           _Section(title: 'АКТИВНЫЕ БУСТЕРЫ'),
           if (clan.activeBoosters != null && clan.activeBoosters!.isNotEmpty)
@@ -125,6 +150,38 @@ class _Body extends StatelessWidget {
           style: Style.outfit14w300.copyWith(color: AppColors.secondaryTextColor),
         ),
       );
+
+  void _confirmKick(BuildContext context, ClanDetailViewModel vm, ClanMember m) {
+    final name = m.customer?.displayName ?? 'участника #${m.customerId}';
+    showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.backgroundContentColor,
+        title: Text(
+          'Исключить?',
+          style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor),
+        ),
+        content: Text(
+          'Исключить $name из клана?',
+          style: Style.outfit14w400.copyWith(color: AppColors.primaryTextColor),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Отмена',
+                style: Style.outfit14w400.copyWith(color: AppColors.secondaryTextColor)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('Исключить',
+                style: Style.outfit14w400.copyWith(color: AppColors.timerDoneOrangeColor)),
+          ),
+        ],
+      ),
+    ).then((confirmed) {
+      if (confirmed == true) vm.kickMember(m.customerId);
+    });
+  }
 
   void _showContributeDialog(BuildContext context, ClanDetailViewModel vm) {
     final controller = TextEditingController();
@@ -296,8 +353,14 @@ class _Section extends StatelessWidget {
 }
 
 class _MemberTile extends StatelessWidget {
-  const _MemberTile({required this.member});
+  const _MemberTile({
+    required this.member,
+    this.canKick = false,
+    this.onKick,
+  });
   final ClanMember member;
+  final bool canKick;
+  final VoidCallback? onKick;
 
   @override
   Widget build(BuildContext context) {
@@ -350,7 +413,80 @@ class _MemberTile extends StatelessWidget {
                   'Лидер',
                   style: Style.ablation12w900.copyWith(color: AppColors.primaryTextColor),
                 ),
+              )
+            // Per Figma 151:924 each non-leader member row shows a close (x)
+            // glyph the leader taps to remove that member. Confirmation
+            // dialog is wired in the parent screen.
+            else if (canKick)
+              IconButton(
+                icon: Icon(Icons.close, color: AppColors.timerDoneOrangeColor, size: 20),
+                onPressed: onKick,
+                visualDensity: VisualDensity.compact,
+                splashRadius: 18,
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Pending join-request tile from Gohar's owner Clan page (Figma 151:924).
+/// Leader-only. Renders avatar + nickname + accept (check) and reject (x)
+/// icon buttons. Both icons call review with approve true/false.
+class _JoinRequestTile extends StatelessWidget {
+  const _JoinRequestTile({
+    required this.request,
+    required this.onApprove,
+    required this.onReject,
+  });
+
+  final ClanJoinRequest request;
+  final VoidCallback onApprove;
+  final VoidCallback onReject;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.backgroundContentColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.inputBorderColor, width: 1),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: AppColors.inputBackgroundColor,
+              backgroundImage: request.customer?.avatarUrl != null
+                  ? NetworkImage(request.customer!.avatarUrl!)
+                  : null,
+              child: request.customer?.avatarUrl == null
+                  ? Icon(Icons.person_outline, color: AppColors.secondaryTextColor, size: 18)
+                  : null,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                request.customer?.displayName ?? 'Игрок #${request.customerId}',
+                style: Style.ablation13w700.copyWith(color: AppColors.primaryTextColor),
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.check, color: AppColors.errorMessagePositive, size: 22),
+              onPressed: onApprove,
+              visualDensity: VisualDensity.compact,
+              splashRadius: 18,
+            ),
+            IconButton(
+              icon: Icon(Icons.close, color: AppColors.timerDoneOrangeColor, size: 22),
+              onPressed: onReject,
+              visualDensity: VisualDensity.compact,
+              splashRadius: 18,
+            ),
           ],
         ),
       ),

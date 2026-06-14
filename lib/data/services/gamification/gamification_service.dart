@@ -72,6 +72,21 @@ abstract class GamificationService {
     @Field('amount') int amount,
   );
 
+  @GET('/clans/{id}/join-requests')
+  Future<dynamic> getClanJoinRequests(@Path('id') int clanId);
+
+  @POST('/clans/requests/{requestId}/review')
+  Future<dynamic> reviewClanJoinRequest(
+    @Path('requestId') int requestId,
+    @Field('approve') bool approve,
+  );
+
+  @POST('/clans/{id}/members/{memberCustomerId}/kick')
+  Future<dynamic> kickClanMember(
+    @Path('id') int clanId,
+    @Path('memberCustomerId') int memberCustomerId,
+  );
+
   @POST('/clans/{id}/boosters/purchase')
   Future<dynamic> buyBoosterCard(
     @Path('id') int clanId,

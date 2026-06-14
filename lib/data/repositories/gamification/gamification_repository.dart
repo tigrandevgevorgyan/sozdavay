@@ -29,6 +29,9 @@ abstract class IGamificationRepository {
   Future<void> contributeToTreasury(int clanId, int amount);
   Future<void> buyBoosterCard(int clanId, int definitionId);
   Future<void> activateBooster(int clanId, int cardId);
+  Future<List<ClanJoinRequest>> getClanJoinRequests(int clanId);
+  Future<void> reviewClanJoinRequest({required int requestId, required bool approve});
+  Future<void> kickClanMember({required int clanId, required int memberCustomerId});
 
   // shop
   Future<List<ShopProduct>> getShopProducts();
@@ -140,6 +143,29 @@ class GamificationRepository implements IGamificationRepository {
   @override
   Future<void> activateBooster(int clanId, int cardId) =>
       _service.activateBooster(clanId, cardId);
+
+  @override
+  Future<List<ClanJoinRequest>> getClanJoinRequests(int clanId) async {
+    final raw = await _service.getClanJoinRequests(clanId);
+    if (raw is Map<String, dynamic>) {
+      final data = raw['data'];
+      if (data is List) {
+        return data
+            .whereType<Map<String, dynamic>>()
+            .map(ClanJoinRequest.fromJson)
+            .toList();
+      }
+    }
+    return [];
+  }
+
+  @override
+  Future<void> reviewClanJoinRequest({required int requestId, required bool approve}) =>
+      _service.reviewClanJoinRequest(requestId, approve);
+
+  @override
+  Future<void> kickClanMember({required int clanId, required int memberCustomerId}) =>
+      _service.kickClanMember(clanId, memberCustomerId);
 
   @override
   Future<List<ShopProduct>> getShopProducts() async {

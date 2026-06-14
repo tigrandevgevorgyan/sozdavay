@@ -145,6 +145,25 @@ Map<String, dynamic> _$ClanBoosterActivationToJson(
       'cost_paid_rating': instance.costPaidRating,
     };
 
+ClanJoinRequest _$ClanJoinRequestFromJson(Map<String, dynamic> json) =>
+    ClanJoinRequest(
+      id: (json['id'] as num).toInt(),
+      customerId: (json['customer_id'] as num).toInt(),
+      createdAt: json['created_at'] as String?,
+      customer: json['customer'] == null
+          ? null
+          : ClanMemberCustomer.fromJson(
+              json['customer'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$ClanJoinRequestToJson(ClanJoinRequest instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'customer_id': instance.customerId,
+      'created_at': instance.createdAt,
+      'customer': instance.customer,
+    };
+
 ClansListResponse _$ClansListResponseFromJson(Map<String, dynamic> json) =>
     ClansListResponse(
       data: (json['data'] as List<dynamic>)

@@ -172,6 +172,28 @@ class ClanBoosterActivation {
   Map<String, dynamic> toJson() => _$ClanBoosterActivationToJson(this);
 }
 
+/// Pending join request to a clan — returned by GET /clans/{id}/join-requests.
+@JsonSerializable()
+class ClanJoinRequest {
+  final int id;
+  @JsonKey(name: 'customer_id')
+  final int customerId;
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+  final ClanMemberCustomer? customer;
+
+  ClanJoinRequest({
+    required this.id,
+    required this.customerId,
+    this.createdAt,
+    this.customer,
+  });
+
+  factory ClanJoinRequest.fromJson(Map<String, dynamic> json) =>
+      _$ClanJoinRequestFromJson(json);
+  Map<String, dynamic> toJson() => _$ClanJoinRequestToJson(this);
+}
+
 @JsonSerializable()
 class ClansListResponse {
   final List<Clan> data;
