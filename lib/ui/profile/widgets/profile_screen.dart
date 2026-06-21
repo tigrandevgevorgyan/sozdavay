@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:level_up/assets/assets.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/gamification/models/achievement.dart';
+import 'package:level_up/data/services/gamification/models/active_booster.dart';
 import 'package:level_up/data/services/gamification/models/rating_level_summary.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
@@ -72,6 +73,11 @@ class ProfileScreen extends StatelessWidget {
                         _AchievementsPreview(
                           items: vm.topAchievements,
                           onSeeAll: () => vm.onAchievementsTap(context),
+                        ),
+                        const SizedBox(height: 24),
+                        _BoostersPreview(
+                          items: vm.activeBoosters,
+                          onSeeAll: () => vm.onShopTap(context),
                         ),
                         const SizedBox(height: 24),
                         _SectionHeader(title: 'ИГРОФИКАЦИЯ'),
@@ -347,7 +353,9 @@ class _AchievementsPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (items.isEmpty) return const SizedBox.shrink();
+    // Always rendered, even when empty — matches Gohar's Profile (Figma 32:638)
+    // which shows the section header + "Просмотреть все" regardless of whether
+    // the user has granted achievements yet.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -369,19 +377,35 @@ class _AchievementsPreview extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            for (var i = 0; i < items.length; i++) ...[
-              Expanded(child: _AchievementCard(grant: items[i])),
-              if (i < items.length - 1) const SizedBox(width: 10),
+        if (items.isEmpty)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundContentColor,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.inputBorderColor, width: 1),
+            ),
+            child: Center(
+              child: Text(
+                'У вас пока нет полученных достижений',
+                style: Style.outfit11w300.copyWith(color: AppColors.secondaryTextColor),
+              ),
+            ),
+          )
+        else
+          Row(
+            children: [
+              for (var i = 0; i < items.length; i++) ...[
+                Expanded(child: _AchievementCard(grant: items[i])),
+                if (i < items.length - 1) const SizedBox(width: 10),
+              ],
+              // Pad row to a consistent 3-column shape when < 3 granted.
+              for (var i = items.length; i < 3; i++) ...[
+                const Expanded(child: SizedBox()),
+                if (i < 2) const SizedBox(width: 10),
+              ],
             ],
-            // Pad row to a consistent 3-column shape even when < 3 granted.
-            for (var i = items.length; i < 3; i++) ...[
-              const Expanded(child: SizedBox()),
-              if (i < 2) const SizedBox(width: 10),
-            ],
-          ],
-        ),
+          ),
       ],
     );
   }
@@ -448,6 +472,130 @@ class _AchievementCard extends StatelessWidget {
     if (dt == null) return iso;
     final l = dt.toLocal();
     return '${l.day.toString().padLeft(2, '0')}.${l.month.toString().padLeft(2, '0')}.${l.year}';
+  }
+}
+
+/// "Мои Бустеры" preview on Profile (Figma 32:638). Renders up to 3 cards
+/// — same shape as the booster cards in the Clan boosters screen but with
+/// the customer's personal active boosters from `/shop/my-boosters`.
+/// Section hides entirely when the customer has no boosters.
+class _BoostersPreview extends StatelessWidget {
+  const _BoostersPreview({required this.items, required this.onSeeAll});
+
+  final List<ActiveBooster> items;
+  final VoidCallback onSeeAll;
+
+  @override
+  Widget build(BuildContext context) {
+    // Always rendered, even when empty — same pattern as the Достижения
+    // preview above. Empty state hints at the shop entry point.
+    final visible = items.take(3).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'МОИ БУСТЕРЫ',
+                style: Style.ablation14w900.copyWith(color: AppColors.primaryTextColor),
+              ),
+            ),
+            InkWell(
+              onTap: onSeeAll,
+              child: Text(
+                'В магазин',
+                style: Style.outfit11w300.copyWith(color: AppColors.primaryTextColor),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (visible.isEmpty)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundContentColor,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.inputBorderColor, width: 1),
+            ),
+            child: Center(
+              child: Text(
+                'У вас пока нет бустеров',
+                style: Style.outfit11w300.copyWith(color: AppColors.secondaryTextColor),
+              ),
+            ),
+          )
+        else
+          Row(
+            children: [
+              for (var i = 0; i < visible.length; i++) ...[
+                Expanded(child: _BoosterCard(booster: visible[i])),
+                if (i < visible.length - 1) const SizedBox(width: 10),
+              ],
+              // Pad to consistent 3-column shape.
+              for (var i = visible.length; i < 3; i++) ...[
+                const Expanded(child: SizedBox()),
+                if (i < 2) const SizedBox(width: 10),
+              ],
+            ],
+          ),
+      ],
+    );
+  }
+}
+
+class _BoosterCard extends StatelessWidget {
+  const _BoosterCard({required this.booster});
+
+  final ActiveBooster booster;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 132,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColors.inputBackgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.inputBorderColor, width: 1),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.backgroundContentColor,
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: booster.imageUrl != null && booster.imageUrl!.isNotEmpty
+                ? Image.network(
+                    booster.imageUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        Icon(Icons.flash_on, color: AppColors.errorMessagePositive, size: 28),
+                  )
+                : Icon(Icons.flash_on, color: AppColors.errorMessagePositive, size: 28),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            booster.name,
+            style: Style.outfit11w300.copyWith(color: AppColors.primaryTextColor),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'x${booster.quantity}',
+            style: Style.ablation13w700.copyWith(color: AppColors.errorMessagePositive),
+          ),
+        ],
+      ),
+    );
   }
 }
 

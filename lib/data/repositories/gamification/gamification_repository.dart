@@ -1,5 +1,6 @@
 import 'package:level_up/data/services/gamification/gamification_service.dart';
 import 'package:level_up/data/services/gamification/models/achievement.dart';
+import 'package:level_up/data/services/gamification/models/active_booster.dart';
 import 'package:level_up/data/services/gamification/models/avatar_frame.dart';
 import 'package:level_up/data/services/gamification/models/battle_pass.dart';
 import 'package:level_up/data/services/gamification/models/clan.dart';
@@ -37,6 +38,7 @@ abstract class IGamificationRepository {
   Future<List<ShopProduct>> getShopProducts();
   Future<void> purchaseProduct(int productId);
   Future<List<CustomerAvatarFrame>> getMyFrames();
+  Future<List<ActiveBooster>> getMyBoosters();
   Future<void> equipFrame(int? avatarFrameDefinitionId);
   Future<BattlePass?> getBattlePass();
   Future<void> claimBattlePassTier({required int tierId, required String track});
@@ -180,6 +182,12 @@ class GamificationRepository implements IGamificationRepository {
   @override
   Future<List<CustomerAvatarFrame>> getMyFrames() async {
     final r = await _service.getMyFrames();
+    return r.data;
+  }
+
+  @override
+  Future<List<ActiveBooster>> getMyBoosters() async {
+    final r = await _service.getMyBoosters();
     return r.data;
   }
 

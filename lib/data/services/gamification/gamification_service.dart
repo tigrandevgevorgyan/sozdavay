@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
 import 'models/achievement.dart';
+import 'models/active_booster.dart';
 import 'models/avatar_frame.dart';
 import 'models/battle_pass.dart';
 import 'models/clan.dart';
@@ -108,6 +109,9 @@ abstract class GamificationService {
 
   @GET('/shop/frames')
   Future<MyFramesResponse> getMyFrames();
+
+  @GET('/shop/my-boosters')
+  Future<ActiveBoostersResponse> getMyBoosters();
 
   @POST('/profile/equip-frame')
   Future<dynamic> equipFrame(@Field('avatar_frame_definition_id') int? definitionId);

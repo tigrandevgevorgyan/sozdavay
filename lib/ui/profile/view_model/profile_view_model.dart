@@ -7,6 +7,7 @@ import 'package:level_up/data/repositories/auth_repository/auth_repository.dart'
 import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/gamification/models/achievement.dart';
+import 'package:level_up/data/services/gamification/models/active_booster.dart';
 import 'package:level_up/data/services/gamification/models/rating_level_summary.dart';
 import 'package:level_up/data/services/local_storage.dart';
 import 'package:level_up/data/services/profile/models/user_profile.dart';
@@ -47,12 +48,18 @@ class ProfileViewModel extends ChangeNotifier {
   List<CustomerAchievement> _topAchievements = [];
   List<CustomerAchievement> get topAchievements => _topAchievements;
 
+  /// Active personal boosters — "Мои Бустеры" preview on Profile
+  /// (Figma 32:638). Loaded in parallel with profile + achievements.
+  List<ActiveBooster> _activeBoosters = [];
+  List<ActiveBooster> get activeBoosters => _activeBoosters;
+
   Future<void> _load() async {
-    // Profile (cached) + my achievements run in parallel — both are cheap
-    // and the screen doesn't depend on the order they resolve.
+    // Profile (cached) + my achievements + my boosters run in parallel —
+    // all three are cheap and the screen doesn't depend on order.
     final results = await Future.wait([
       profileRepository.getProfile(),
       _safeLoadAchievements(),
+      _safeLoadBoosters(),
     ]);
     final profileResult = results[0] as Result<UserProfileExtendedResponse>;
     switch (profileResult) {
@@ -62,6 +69,7 @@ class ProfileViewModel extends ChangeNotifier {
         break;
     }
     _topAchievements = results[1] as List<CustomerAchievement>;
+    _activeBoosters = results[2] as List<ActiveBooster>;
     _isLoading = false;
     notifyListeners();
   }
@@ -70,6 +78,14 @@ class ProfileViewModel extends ChangeNotifier {
     try {
       final list = await GetIt.I<IGamificationRepository>().getMyAchievements();
       return list.take(3).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<List<ActiveBooster>> _safeLoadBoosters() async {
+    try {
+      return await GetIt.I<IGamificationRepository>().getMyBoosters();
     } catch (_) {
       return [];
     }
