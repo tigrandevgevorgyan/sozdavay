@@ -11,6 +11,7 @@ import 'package:level_up/data/repositories/auth_repository/auth_repository.dart'
 import 'package:level_up/data/repositories/data_repository/data_repositry.dart';
 import 'package:level_up/data/repositories/profile_service/profile_repository.dart';
 import 'package:level_up/data/services/local_storage.dart';
+import 'package:level_up/data/services/data/models/rating_response.dart';
 import 'package:level_up/data/services/gamification/models/rating_level_summary.dart';
 import 'package:level_up/data/services/profile/models/user_profile_response.dart';
 import 'package:level_up/routing/levelup_router.dart';
@@ -104,6 +105,17 @@ class HomeViewModel extends ChangeNotifier {
 
   int get perSeason => _mainInfo?.workout.season ?? 0;
 
+  /// Top-3 of the season leaderboard — drives the "РЕЙТИНГ НЕОФИТ"
+  /// podium preview on Home (Figma 16:183). Loaded once on init in
+  /// parallel with /main; empty list means request hasn't returned yet
+  /// or the season has no leaderboard data.
+  List<UserRating> _topRatings = const [];
+  List<UserRating> get topRatings => _topRatings;
+
+  /// Convenience — the label for the topRatings section header
+  /// ("НЕОФИТ" / "ЛЮБОПЫТНЫЙ" / etc), drawn from the customer's own level.
+  String get topRatingsLabel => _profile?.data.ratingLevel?.label ?? '';
+
   String get trainingName =>
       _mainInfo?.schedule
           .where(
@@ -123,10 +135,32 @@ class HomeViewModel extends ChangeNotifier {
       _showFinalDialog(context);
     }
     if (isSuccess && context.mounted) {
-      await _loadMainInfo(context);
+      // Main info + top-3 leaderboard in parallel — both feed Home tiles.
+      // Top-3 fetch is soft-failing so a rating outage doesn't blank the
+      // rest of the screen.
+      await Future.wait([
+        _loadMainInfo(context),
+        _loadTopRatings(),
+      ]);
     }
     _isLoading = false;
     notifyListeners();
+  }
+
+  /// Pulls the season leaderboard once on init, stores the first 3 entries
+  /// for the РЕЙТИНГ НЕОФИТ podium preview.
+  Future<void> _loadTopRatings() async {
+    try {
+      final result = await dataRepository.getRatingInfo();
+      switch (result) {
+        case Ok<RatingResponse>():
+          _topRatings = result.value.rating.take(3).toList();
+        case Error<RatingResponse>():
+          _topRatings = const [];
+      }
+    } catch (_) {
+      _topRatings = const [];
+    }
   }
 
   void startRefreshTimer() {

@@ -15,6 +15,7 @@ import 'package:level_up/ui/home/widgets/calendar_widget.dart';
 import 'package:level_up/ui/home/widgets/level_progress_bar.dart';
 import 'package:level_up/ui/home/widgets/start_training_banner.dart';
 import 'package:level_up/ui/home/widgets/statistics_tile_widget.dart';
+import 'package:level_up/ui/rating/widgets/top3_rating_widget.dart';
 import 'package:provider/provider.dart';
 import '../../../data/repositories/workout_repository/workout_repository.dart';
 
@@ -50,10 +51,9 @@ class HomeScreen extends StatelessWidget {
             backgroundColor: AppColors.backgroundColor,
             body: provider.isLoading
                 ? Center(child: LevelUpLoader())
-                : Padding(
+                : SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 16),
@@ -67,11 +67,9 @@ class HomeScreen extends StatelessWidget {
                             provider.selectDay(index);
                           },
                         ),
+                        SizedBox(height: 20),
                         SizedBox(
-                          height: 20,
-                        ),
-                        Expanded(
-                          flex: 100,
+                          height: 140,
                           child: StartTrainingBanner(
                             imagePath: provider.trainingImage,
                             text: provider.selectedTrainingName,
@@ -83,8 +81,8 @@ class HomeScreen extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 14, bottom: 8),
                           child: Text('Статистика и рейтинг', style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor)),
                         ),
-                        Expanded(
-                          flex: 131,
+                        SizedBox(
+                          height: 184,
                           child: StatisticsTileWidget(
                             monthlyValue: provider.perMonth,
                             yearlyValue: provider.perSeason,
@@ -102,9 +100,49 @@ class HomeScreen extends StatelessWidget {
                             },
                           ),
                         ),
-                        SizedBox(height: 4),
-                        Expanded(
-                          flex: 100,
+                        if (provider.topRatings.isNotEmpty) ...[
+                          Padding(
+                            padding: const EdgeInsets.only(top: 14, bottom: 8),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'РЕЙТИНГ ${provider.topRatingsLabel.toUpperCase()}',
+                                    style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () => provider.onRatingClicked(context),
+                                  child: Text(
+                                    'ТОП 100',
+                                    style: Style.outfit14w400.copyWith(color: AppColors.primaryTextColor),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => provider.onRatingClicked(context),
+                            behavior: HitTestBehavior.translucent,
+                            child: SizedBox(
+                              height: 150,
+                              child: Top3RatingWidget(
+                                firstPlace: provider.topRatings.isNotEmpty
+                                    ? PersonsScores(provider.topRatings[0].name, provider.topRatings[0].totalRating)
+                                    : null,
+                                secondPlace: provider.topRatings.length > 1
+                                    ? PersonsScores(provider.topRatings[1].name, provider.topRatings[1].totalRating)
+                                    : null,
+                                thirdPlace: provider.topRatings.length > 2
+                                    ? PersonsScores(provider.topRatings[2].name, provider.topRatings[2].totalRating)
+                                    : null,
+                              ),
+                            ),
+                          ),
+                        ],
+                        SizedBox(height: 12),
+                        SizedBox(
+                          height: 140,
                           child: BannerButton(
                             imagePath: provider.measurementsImage,
                             text: 'Замеры',
@@ -112,15 +150,15 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 4),
-                        Expanded(
-                          flex: 100,
+                        SizedBox(
+                          height: 140,
                           child: BannerButton(
                             imagePath: provider.chatImage,
                             text: 'Чат с тренером',
                             onClick: provider.onChatClicked,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        SizedBox(height: 16),
                       ],
                     ),
                   ),
