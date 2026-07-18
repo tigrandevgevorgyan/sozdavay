@@ -1,7 +1,7 @@
 import Flutter
 import UIKit
 import UserNotifications
-//import alarm
+import alarm
 import AVFoundation
 
 @main
@@ -16,7 +16,16 @@ import AVFoundation
 
        try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
 
-//      SwiftAlarmPlugin.registerBackgroundTasks()
+      // Mandatory per the alarm package's INSTALL-IOS.md.
+      // Must run inside application(_:didFinishLaunchingWithOptions:) so iOS
+      // has a registered handler for the BGTaskScheduler identifier
+      // "com.gdelataillade.fetch" before any submitTaskRequest call. Without
+      // this, calling Alarm.set() (or Alarm.init() while persisted alarms
+      // exist) crashes with EXC_CRASH / SIGABRT and
+      // _handleSubmissionWithoutRegistrationForTaskRequest — which is what
+      // killed Nikita's app every time the rest-timer was used.
+      SwiftAlarmPlugin.registerBackgroundTasks()
+
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
