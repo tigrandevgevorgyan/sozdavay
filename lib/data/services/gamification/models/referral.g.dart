@@ -33,7 +33,7 @@ ReferralInvitee _$ReferralInviteeFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String?,
       nickname: json['nickname'] as String?,
       avatarUrl: json['avatar_url'] as String?,
-      joinedAt: json['joined_at'] as String?,
+      joinedAt: json['created_at'] as String?,
     );
 
 Map<String, dynamic> _$ReferralInviteeToJson(ReferralInvitee instance) =>
@@ -42,7 +42,7 @@ Map<String, dynamic> _$ReferralInviteeToJson(ReferralInvitee instance) =>
       'name': instance.name,
       'nickname': instance.nickname,
       'avatar_url': instance.avatarUrl,
-      'joined_at': instance.joinedAt,
+      'created_at': instance.joinedAt,
     };
 
 ReferralReferrer _$ReferralReferrerFromJson(Map<String, dynamic> json) =>

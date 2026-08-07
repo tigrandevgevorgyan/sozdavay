@@ -32,7 +32,7 @@ class ReferralInvitee {
   final String? nickname;
   @JsonKey(name: 'avatar_url')
   final String? avatarUrl;
-  @JsonKey(name: 'joined_at')
+  @JsonKey(name: 'created_at')
   final String? joinedAt;
 
   ReferralInvitee({

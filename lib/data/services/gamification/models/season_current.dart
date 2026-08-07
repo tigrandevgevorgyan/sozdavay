@@ -2,13 +2,9 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'season_current.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class SeasonCurrent {
-  final int id;
-  @JsonKey(name: 'date_start')
-  final String? dateStart;
-  @JsonKey(name: 'date_end')
-  final String? dateEnd;
+  final SeasonRef season;
   @JsonKey(name: 'label_ru')
   final String? labelRu;
   final List<SeasonReward> rewards;
@@ -16,17 +12,34 @@ class SeasonCurrent {
   final MySeasonProgress? myProgress;
 
   SeasonCurrent({
-    required this.id,
-    this.dateStart,
-    this.dateEnd,
+    required this.season,
     this.labelRu,
     required this.rewards,
     this.myProgress,
   });
 
+  int get id => season.id;
+  String? get dateStart => season.dateStart;
+  String? get dateEnd => season.dateEnd;
+
   factory SeasonCurrent.fromJson(Map<String, dynamic> json) =>
       _$SeasonCurrentFromJson(json);
   Map<String, dynamic> toJson() => _$SeasonCurrentToJson(this);
+}
+
+@JsonSerializable()
+class SeasonRef {
+  final int id;
+  @JsonKey(name: 'date_start')
+  final String? dateStart;
+  @JsonKey(name: 'date_end')
+  final String? dateEnd;
+
+  SeasonRef({required this.id, this.dateStart, this.dateEnd});
+
+  factory SeasonRef.fromJson(Map<String, dynamic> json) =>
+      _$SeasonRefFromJson(json);
+  Map<String, dynamic> toJson() => _$SeasonRefToJson(this);
 }
 
 @JsonSerializable()
@@ -62,7 +75,7 @@ class SeasonReward {
 class MySeasonProgress {
   @JsonKey(name: 'rating_balance')
   final int? ratingBalance;
-  @JsonKey(name: 'current_level')
+  @JsonKey(name: 'level')
   final int? currentLevel;
   @JsonKey(name: 'draw_min_level')
   final int? drawMinLevel;

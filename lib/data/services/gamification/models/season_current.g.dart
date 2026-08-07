@@ -8,9 +8,7 @@ part of 'season_current.dart';
 
 SeasonCurrent _$SeasonCurrentFromJson(Map<String, dynamic> json) =>
     SeasonCurrent(
-      id: (json['id'] as num).toInt(),
-      dateStart: json['date_start'] as String?,
-      dateEnd: json['date_end'] as String?,
+      season: SeasonRef.fromJson(json['season'] as Map<String, dynamic>),
       labelRu: json['label_ru'] as String?,
       rewards: (json['rewards'] as List<dynamic>)
           .map((e) => SeasonReward.fromJson(e as Map<String, dynamic>))
@@ -23,12 +21,22 @@ SeasonCurrent _$SeasonCurrentFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SeasonCurrentToJson(SeasonCurrent instance) =>
     <String, dynamic>{
+      'season': instance.season.toJson(),
+      'label_ru': instance.labelRu,
+      'rewards': instance.rewards.map((e) => e.toJson()).toList(),
+      'my_progress': instance.myProgress?.toJson(),
+    };
+
+SeasonRef _$SeasonRefFromJson(Map<String, dynamic> json) => SeasonRef(
+      id: (json['id'] as num).toInt(),
+      dateStart: json['date_start'] as String?,
+      dateEnd: json['date_end'] as String?,
+    );
+
+Map<String, dynamic> _$SeasonRefToJson(SeasonRef instance) => <String, dynamic>{
       'id': instance.id,
       'date_start': instance.dateStart,
       'date_end': instance.dateEnd,
-      'label_ru': instance.labelRu,
-      'rewards': instance.rewards,
-      'my_progress': instance.myProgress,
     };
 
 SeasonReward _$SeasonRewardFromJson(Map<String, dynamic> json) => SeasonReward(
@@ -55,7 +63,7 @@ Map<String, dynamic> _$SeasonRewardToJson(SeasonReward instance) =>
 MySeasonProgress _$MySeasonProgressFromJson(Map<String, dynamic> json) =>
     MySeasonProgress(
       ratingBalance: (json['rating_balance'] as num?)?.toInt(),
-      currentLevel: (json['current_level'] as num?)?.toInt(),
+      currentLevel: (json['level'] as num?)?.toInt(),
       drawMinLevel: (json['draw_min_level'] as num?)?.toInt(),
       drawThresholdPoints: (json['draw_threshold_points'] as num?)?.toInt(),
       qualifiedForDraw: json['qualified_for_draw'] as bool?,
@@ -64,7 +72,7 @@ MySeasonProgress _$MySeasonProgressFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$MySeasonProgressToJson(MySeasonProgress instance) =>
     <String, dynamic>{
       'rating_balance': instance.ratingBalance,
-      'current_level': instance.currentLevel,
+      'level': instance.currentLevel,
       'draw_min_level': instance.drawMinLevel,
       'draw_threshold_points': instance.drawThresholdPoints,
       'qualified_for_draw': instance.qualifiedForDraw,

@@ -46,7 +46,7 @@ abstract class GamificationService {
 
   // ------ Clans ------
   @GET('/clans')
-  Future<ClansListResponse> getClans(@Query('q') String? search);
+  Future<ClansListResponse> getClans(@Query('name') String? search);
 
   @GET('/clans/mine')
   Future<ClanResponse> getMyClan();

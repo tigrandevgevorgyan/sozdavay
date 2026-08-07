@@ -164,7 +164,7 @@ class _GamificationService implements GamificationService {
   @override
   Future<ClansListResponse> getClans(String? search) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'q': search};
+    final queryParameters = <String, dynamic>{r'name': search};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
