@@ -68,6 +68,16 @@ class RegisterScreen extends StatelessWidget {
                         keyboardType: TextInputType.number,
                         maxLength: 4,
                       ),
+                      const SizedBox(height: 12),
+                      LevelUpTextField(
+                        controller: provider.referrerCodeController,
+                        hintText: 'Код друга (необязательно)',
+                        keyboardType: TextInputType.text,
+                        maxLength: 16,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
+                        ],
+                      ),
                       const SizedBox(height: 16),
 
                       if (provider.isLoadingOptions)

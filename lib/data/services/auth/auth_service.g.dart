@@ -146,9 +146,11 @@ class _AuthService implements AuthService {
     String gender,
     String osType,
     String appVersion,
+    String? referrerCode,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = {
       'phone': phone,
@@ -160,7 +162,9 @@ class _AuthService implements AuthService {
       'gender': gender,
       'os_type': osType,
       'app_version': appVersion,
+      'referrer_code': referrerCode,
     };
+    _data.removeWhere((k, v) => v == null);
     final _options = _setStreamType<AccessTokenResponse>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(

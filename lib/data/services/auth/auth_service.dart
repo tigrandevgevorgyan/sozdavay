@@ -33,5 +33,6 @@ abstract class AuthService {
     @Field() String gender,
     @Field('os_type') String osType,
     @Field('app_version') String appVersion,
+    @Field('referrer_code') String? referrerCode,
   );
 }

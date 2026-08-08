@@ -34,6 +34,7 @@ abstract class IAuthRepository {
     required String gender,
     required String osType,
     required String appVersion,
+    String? referrerCode,
   });
 }
 
@@ -136,6 +137,7 @@ class AuthRepository extends IAuthRepository {
     required String gender,
     required String osType,
     required String appVersion,
+    String? referrerCode,
   }) async {
     try {
       final result = await _authService.register(
@@ -148,6 +150,7 @@ class AuthRepository extends IAuthRepository {
         gender,
         osType,
         appVersion,
+        referrerCode,
       );
 
       _token = result.accessToken;

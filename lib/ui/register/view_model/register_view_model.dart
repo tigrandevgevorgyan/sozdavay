@@ -12,6 +12,7 @@ class RegisterViewModel extends ChangeNotifier {
     phoneController = TextEditingController();
     nicknameController = TextEditingController();
     passwordController = TextEditingController();
+    referrerCodeController = TextEditingController();
 
     phoneController.addListener(_validate);
     nicknameController.addListener(_validate);
@@ -25,6 +26,10 @@ class RegisterViewModel extends ChangeNotifier {
   late TextEditingController phoneController;
   late TextEditingController nicknameController;
   late TextEditingController passwordController;
+
+  /// Optional — user enters someone else's referral code they were invited
+  /// with. Empty = organic signup, no attribution.
+  late TextEditingController referrerCodeController;
 
   bool isLoadingOptions = false;
   bool isSubmitting = false;
@@ -155,6 +160,9 @@ class RegisterViewModel extends ChangeNotifier {
     final trainingPerWeek = selectedTrainingPerWeek!.value.toString();
     final gender = selectedGender!.value.toString();
 
+    final referrerRaw = referrerCodeController.text.trim();
+    final referrerCode = referrerRaw.isEmpty ? null : referrerRaw.toUpperCase();
+
     final result = await authRepository.register(
       phone: phone,
       nickname: nickname,
@@ -165,6 +173,7 @@ class RegisterViewModel extends ChangeNotifier {
       gender: gender,
       osType: 'iOS',
       appVersion: '1.0',
+      referrerCode: referrerCode,
     );
 
     switch (result) {
@@ -197,6 +206,7 @@ class RegisterViewModel extends ChangeNotifier {
     phoneController.dispose();
     nicknameController.dispose();
     passwordController.dispose();
+    referrerCodeController.dispose();
     super.dispose();
   }
 }
