@@ -38,10 +38,12 @@ class ProfileScreen extends StatelessWidget {
               automaticallyImplyLeading: false,
               centerTitle: true,
               title: Image.asset(Assets.logo, height: 40, width: 57, fit: BoxFit.contain),
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
-                onPressed: () => GoRouter.of(context).pop(),
-              ),
+              leading: GoRouter.of(context).canPop()
+                  ? IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                      onPressed: () => GoRouter.of(context).pop(),
+                    )
+                  : null,
               actions: [
                 // Notification bell on the right per Gohar's Profile design
                 // (Figma 32:638). Matches the bell on Home — same destination.

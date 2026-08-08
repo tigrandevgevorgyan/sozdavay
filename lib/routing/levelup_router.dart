@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:level_up/ui/home/widgets/home_screen.dart';
+import 'package:level_up/ui/main_tabs_shell/main_tabs_shell.dart';
 import 'package:level_up/ui/achievements/widgets/achievements_screen.dart';
 import 'package:level_up/ui/clans/widgets/clan_detail_screen.dart';
 import 'package:level_up/ui/clans/widgets/clans_list_screen.dart';
@@ -117,7 +117,7 @@ class LevelUpRouter {
           path: homePath,
           pageBuilder: (context, state) {
             return getPage(
-              child: const HomeScreen(),
+              child: const MainTabsShell(),
               state: state,
             );
           },

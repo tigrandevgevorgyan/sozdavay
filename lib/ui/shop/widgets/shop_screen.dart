@@ -29,10 +29,12 @@ class ShopScreen extends StatelessWidget {
               backgroundColor: AppColors.backgroundColor,
               automaticallyImplyLeading: false,
               centerTitle: true,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
-                onPressed: () => GoRouter.of(context).pop(),
-              ),
+              leading: GoRouter.of(context).canPop()
+                  ? IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                      onPressed: () => GoRouter.of(context).pop(),
+                    )
+                  : null,
               title: Text(
                 'Магазин',
                 style: Style.ablation18w900.copyWith(color: AppColors.primaryTextColor),
