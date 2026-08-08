@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
 import 'package:level_up/data/services/gamification/models/season_current.dart';
+import 'package:level_up/utils/error_utils.dart';
 
 class SeasonViewModel extends ChangeNotifier {
   SeasonViewModel({required this.repo}) {
@@ -27,7 +28,7 @@ class SeasonViewModel extends ChangeNotifier {
       _season = await repo.getCurrentSeason();
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
     }
     _isLoading = false;
     notifyListeners();

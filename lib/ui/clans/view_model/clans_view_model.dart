@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
 import 'package:level_up/data/services/gamification/models/clan.dart';
 import 'package:level_up/routing/levelup_router.dart';
+import 'package:level_up/utils/error_utils.dart';
 // Re-export so view widgets can `import 'clans_view_model.dart'` and still
 // use ClanJoinRequest typed handlers without a second import.
 export 'package:level_up/data/services/gamification/models/clan.dart' show ClanJoinRequest;
@@ -57,7 +58,7 @@ class ClansListViewModel extends ChangeNotifier {
       _myClan = results[1] as Clan?;
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
     }
     _isLoading = false;
     notifyListeners();
@@ -136,7 +137,7 @@ class ClanDetailViewModel extends ChangeNotifier {
         _pendingRequests = [];
       }
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
     }
     _isLoading = false;
     notifyListeners();
@@ -151,7 +152,7 @@ class ClanDetailViewModel extends ChangeNotifier {
       await _load();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
       return false;
     } finally {
       _busy = false;
@@ -168,7 +169,7 @@ class ClanDetailViewModel extends ChangeNotifier {
       await _load();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
       return false;
     } finally {
       _busy = false;
@@ -185,7 +186,7 @@ class ClanDetailViewModel extends ChangeNotifier {
       await _load();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
       _busy = false;
       notifyListeners();
       return false;
@@ -203,7 +204,7 @@ class ClanDetailViewModel extends ChangeNotifier {
       await _load();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
       _busy = false;
       notifyListeners();
       return false;
@@ -221,7 +222,7 @@ class ClanDetailViewModel extends ChangeNotifier {
       await _load();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
       _busy = false;
       notifyListeners();
       return false;
@@ -239,7 +240,7 @@ class ClanDetailViewModel extends ChangeNotifier {
       await _load();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
       _busy = false;
       notifyListeners();
       return false;
@@ -288,7 +289,7 @@ class CreateClanViewModel extends ChangeNotifier {
       );
       return c;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
       return null;
     } finally {
       _busy = false;

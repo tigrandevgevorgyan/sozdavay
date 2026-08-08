@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
 import 'package:level_up/data/services/gamification/models/referral.dart';
+import 'package:level_up/utils/error_utils.dart';
 
 class ReferralsViewModel extends ChangeNotifier {
   ReferralsViewModel({required this.repo}) {
@@ -28,7 +29,7 @@ class ReferralsViewModel extends ChangeNotifier {
       _info = await repo.getMyReferralInfo();
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
     }
     _isLoading = false;
     notifyListeners();

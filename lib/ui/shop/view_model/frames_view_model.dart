@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
 import 'package:level_up/data/services/gamification/models/avatar_frame.dart';
+import 'package:level_up/utils/error_utils.dart';
 
 class FramesViewModel extends ChangeNotifier {
   FramesViewModel({required this.repo}) {
@@ -36,7 +37,7 @@ class FramesViewModel extends ChangeNotifier {
       _items = await repo.getMyFrames();
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
     }
     _isLoading = false;
     notifyListeners();
@@ -51,7 +52,7 @@ class FramesViewModel extends ChangeNotifier {
       await repo.equipFrame(isCurrentlyEquipped ? null : frame.definition!.id);
       await _load();
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
     } finally {
       _busy = false;
       notifyListeners();

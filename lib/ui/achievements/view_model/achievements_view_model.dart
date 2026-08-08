@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
 import 'package:level_up/data/services/gamification/models/achievement.dart';
+import 'package:level_up/utils/error_utils.dart';
 
 enum AchievementsFilter { all, earned, available }
 
@@ -57,7 +58,7 @@ class AchievementsViewModel extends ChangeNotifier {
       _featureDisabled = false;
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
     }
     _isLoading = false;
     notifyListeners();

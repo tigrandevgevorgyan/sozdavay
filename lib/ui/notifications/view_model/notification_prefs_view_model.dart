@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
+import 'package:level_up/utils/error_utils.dart';
 
 class NotificationPrefsViewModel extends ChangeNotifier {
   NotificationPrefsViewModel({required this.repo}) {
@@ -44,7 +45,7 @@ class NotificationPrefsViewModel extends ChangeNotifier {
       }
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
     }
     _isLoading = false;
     notifyListeners();

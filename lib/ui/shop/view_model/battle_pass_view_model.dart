@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:level_up/data/repositories/gamification/gamification_repository.dart';
 import 'package:level_up/data/services/gamification/models/battle_pass.dart';
+import 'package:level_up/utils/error_utils.dart';
 
 class BattlePassViewModel extends ChangeNotifier {
   BattlePassViewModel({required this.repo}) {
@@ -32,7 +33,7 @@ class BattlePassViewModel extends ChangeNotifier {
       _bp = await repo.getBattlePass();
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
     }
     _isLoading = false;
     notifyListeners();
@@ -47,7 +48,7 @@ class BattlePassViewModel extends ChangeNotifier {
       await _load();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorUtils.extract(e);
       return false;
     } finally {
       _busy = false;
