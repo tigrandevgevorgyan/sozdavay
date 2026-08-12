@@ -7,6 +7,7 @@ import 'package:level_up/data/services/gamification/models/achievement.dart';
 import 'package:level_up/ui/achievements/view_model/achievements_view_model.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_button.dart';
 import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
+import 'package:level_up/ui/core/common_widgets/network_asset.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:provider/provider.dart';
@@ -245,10 +246,10 @@ class _CardBody extends StatelessWidget {
               ),
               clipBehavior: Clip.antiAlias,
               child: achievement.iconUrl != null && achievement.iconUrl!.isNotEmpty
-                  ? Image.network(
+                  ? NetworkAsset(
                       achievement.iconUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Icon(
+                      errorWidget: Icon(
                         Icons.emoji_events,
                         color: AppColors.secondaryTextColor,
                         size: 28,
@@ -396,10 +397,10 @@ class _AchievementDetailDialogState extends State<_AchievementDetailDialog> {
               ),
               clipBehavior: Clip.antiAlias,
               child: a.iconUrl != null && a.iconUrl!.isNotEmpty
-                  ? Image.network(
+                  ? NetworkAsset(
                       a.iconUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Icon(
+                      errorWidget: Icon(
                         Icons.emoji_events,
                         color: AppColors.activeButtonColor,
                         size: 64,

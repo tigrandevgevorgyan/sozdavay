@@ -10,6 +10,7 @@ import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/ui/shop/view_model/shop_view_model.dart';
 import 'package:provider/provider.dart';
+import 'package:level_up/ui/core/common_widgets/network_asset.dart';
 
 class ShopScreen extends StatelessWidget {
   const ShopScreen({super.key});
@@ -241,10 +242,10 @@ class _ProductCard extends StatelessWidget {
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: product.imageUrl != null && product.imageUrl!.isNotEmpty
-                    ? Image.network(
+                    ? NetworkAsset(
                         product.imageUrl!,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Center(
+                        errorWidget: Center(
                           child: Icon(Icons.storefront,
                               color: AppColors.secondaryTextColor, size: 32),
                         ),

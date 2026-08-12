@@ -9,6 +9,7 @@ import 'package:level_up/ui/core/common_widgets/level_up_loader.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:provider/provider.dart';
+import 'package:level_up/ui/core/common_widgets/network_asset.dart';
 
 class ClansListScreen extends StatelessWidget {
   const ClansListScreen({super.key});
@@ -165,10 +166,10 @@ class _ClanTile extends StatelessWidget {
               ),
               clipBehavior: Clip.antiAlias,
               child: clan.iconUrl != null && clan.iconUrl!.isNotEmpty
-                  ? Image.network(
+                  ? NetworkAsset(
                       clan.iconUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
+                      errorWidget:
                           Icon(Icons.groups, color: AppColors.secondaryTextColor),
                     )
                   : Icon(Icons.groups, color: AppColors.secondaryTextColor),

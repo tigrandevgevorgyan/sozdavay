@@ -10,6 +10,7 @@ import 'package:level_up/ui/core/common_widgets/level_up_text_field.dart';
 import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:provider/provider.dart';
+import 'package:level_up/ui/core/common_widgets/network_asset.dart';
 
 class ClanDetailScreen extends StatelessWidget {
   const ClanDetailScreen({super.key, required this.clanId});
@@ -250,9 +251,12 @@ class _Header extends StatelessWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: clan.iconUrl != null && clan.iconUrl!.isNotEmpty
-                ? Image.network(clan.iconUrl!, fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) =>
-                        Icon(Icons.groups, color: AppColors.secondaryTextColor, size: 32))
+                ? NetworkAsset(
+                    clan.iconUrl!,
+                    fit: BoxFit.cover,
+                    errorWidget:
+                        Icon(Icons.groups, color: AppColors.secondaryTextColor, size: 32),
+                  )
                 : Icon(Icons.groups, color: AppColors.secondaryTextColor, size: 32),
           ),
           const SizedBox(width: 12),

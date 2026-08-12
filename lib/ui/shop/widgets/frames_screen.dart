@@ -8,6 +8,7 @@ import 'package:level_up/ui/core/themes/app_colors.dart';
 import 'package:level_up/ui/core/themes/text_styles.dart';
 import 'package:level_up/ui/shop/view_model/frames_view_model.dart';
 import 'package:provider/provider.dart';
+import 'package:level_up/ui/core/common_widgets/network_asset.dart';
 
 class FramesScreen extends StatelessWidget {
   const FramesScreen({super.key});
@@ -110,10 +111,10 @@ class _FrameCard extends StatelessWidget {
               ),
               clipBehavior: Clip.antiAlias,
               child: def?.imageUrl != null && def!.imageUrl!.isNotEmpty
-                  ? Image.network(
+                  ? NetworkAsset(
                       def.imageUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Icon(
+                      errorWidget: Icon(
                         Icons.collections_bookmark_outlined,
                         color: AppColors.secondaryTextColor,
                         size: 28,
