@@ -125,7 +125,7 @@ class HomeScreen extends StatelessWidget {
                             onTap: () => provider.onRatingClicked(context),
                             behavior: HitTestBehavior.translucent,
                             child: SizedBox(
-                              height: 150,
+                              height: 180,
                               child: Top3RatingWidget(
                                 firstPlace: provider.topRatings.isNotEmpty
                                     ? PersonsScores(provider.topRatings[0].name, provider.topRatings[0].totalRating)
